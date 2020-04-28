@@ -45,8 +45,9 @@ class _Login extends State<Login> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    repository=Repository();
+    repository = Repository();
   }
+
   @override
   Widget build(BuildContext context) {
     return ProgressHUD(
@@ -82,45 +83,7 @@ class _Login extends State<Login> {
                       padding: EdgeInsets.only(bottom: 5),
                     )
                   : Container(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Stack(
-                    alignment: Alignment.bottomRight,
-                    children: <Widget>[
-                      InputWidgetPassword(
-                          30.0, 0.0, "Password", _passwordController),
-                      Padding(
-                          padding: EdgeInsets.only(right: 50),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              GestureDetector(
-                                child: Container(
-                                  padding: EdgeInsets.all(10),
-                                  decoration: ShapeDecoration(
-                                    shape: CircleBorder(),
-                                    gradient: LinearGradient(
-                                        colors: signInGradients,
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight),
-                                  ),
-                                  child: ImageIcon(
-                                    AssetImage("assets/ic_forward.png"),
-                                    size: 40,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                onTap: () {
-                                  loginFunction();
-                                },
-                              )
-                            ],
-                          ))
-                    ],
-                  ),
-                ],
-              ),
+              InputWidgetPassword(30.0, 0.0, "Password", _passwordController),
               GestureDetector(
                 child: Text(
                   "Forgot password?",
@@ -138,22 +101,16 @@ class _Login extends State<Login> {
               Padding(
                 padding: EdgeInsets.only(bottom: 20),
               ),
-              Text(
-                "New user?",
-                style: TextStyle(decoration: TextDecoration.none, fontSize: 14),
-              ),
-              Padding(
-                padding: EdgeInsets.all(2),
-              ),
+
               //roundedRectButton("Let's get Started", signInGradients, false),
               GestureDetector(
                 child: roundedRectButton(
-                  "Create an Account",
+                  "Login",
                   signUpGradients,
                   false,
                 ),
                 onTap: () {
-                  signUp();
+                  loginFunction();
                 },
               ),
               Padding(
@@ -193,13 +150,20 @@ class _Login extends State<Login> {
           .signInWithCredentials(
               _userIdController.text, _passwordController.text)
           .then((res) async {
+        print("BLB login ${res.user.uid}");
         setState(() {
           _loading = false;
         });
-        await repository.updateUserSignedLocally(true,res.uid);
-        navigateToHome();
+        await repository.updateUserSignedLocally(true, res.user.uid);
+        User user;
+        await repository.getProfile().then((value) {
+          user = new User.fromSnapshot(snapshot: value);
+        }).whenComplete(() {
+          Repository.user = user;
+          navigateToHome();
+        });
       }).catchError((e) {
-        print("BLB login $e");
+        print("BLB login error $e");
         setState(() {
           _loading = false;
         });
@@ -255,9 +219,9 @@ class _Login extends State<Login> {
       repository
           .signUp(_userIdController.text, _passwordController.text)
           .then((res) async {
-        await repository.updateUserSignedLocally(true,res.uid);
-        User user=new User(email:_userIdController.text,uid:res.uid);
-        user.name="Guest";
+        await repository.updateUserSignedLocally(true, res.uid);
+        User user = new User(email: _userIdController.text, uid: res.uid);
+        user.name = "Guest";
         await repository.createUserProfile(user);
         setState(() {
           _loading = false;

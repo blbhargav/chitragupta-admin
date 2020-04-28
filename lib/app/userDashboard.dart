@@ -12,18 +12,18 @@ import 'package:chitragupta/globals.dart' as globals;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
-class dashBoardScreen extends StatefulWidget {
+class userDashBoardScreen extends StatefulWidget {
   Repository repository;
-  dashBoardScreen(Repository repository)
+  userDashBoardScreen(Repository repository)
       : repository = repository ?? Repository();
 
   @override
-  _dashBoardScreenState createState() => _dashBoardScreenState(repository);
+  _userDashBoardScreenState createState() => _userDashBoardScreenState(repository);
 }
 
-class _dashBoardScreenState extends State<dashBoardScreen>
+class _userDashBoardScreenState extends State<userDashBoardScreen>
     with TickerProviderStateMixin {
-  _dashBoardScreenState(Repository repository)
+  _userDashBoardScreenState(Repository repository)
       : repository = repository ?? Repository();
 
   String userName = "Hi Guest";
@@ -35,6 +35,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
   Repository repository;
   @override
   void initState() {
+    super.initState();
     repository
         .getRecentRecords(_updateRecentSpends)
         .then((StreamSubscription s) => _subscriptionTodo = s)
@@ -44,8 +45,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
         noDataTV = "No spends in this month yet";
       });
     });
-    userName="Hi ${Repository.user.name}";
-    super.initState();
+
 
   }
 
@@ -67,7 +67,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
     });
     var currentDate = DateTime.now();
     var yesterdayDate =
-        new DateTime(currentDate.year, currentDate.month, currentDate.day - 1);
+    new DateTime(currentDate.year, currentDate.month, currentDate.day - 1);
 
     spendList.forEach((spend) {
       int i = 0;
@@ -77,7 +77,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
       }
       String todayDate = DateFormat('dd-MM-yyyy').format(currentDate);
       String yesterdayDateString =
-          DateFormat('dd-MM-yyyy').format(yesterdayDate);
+      DateFormat('dd-MM-yyyy').format(yesterdayDate);
 
       if (todayDate == DateFormat('dd-MM-yyyy').format(spend.dateTime)) {
         tempToday += spend.amount;

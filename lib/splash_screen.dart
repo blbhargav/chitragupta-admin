@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:chitragupta/app/home.dart';
+import 'package:chitragupta/models/user.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:flutter/material.dart';
 
@@ -28,13 +29,20 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     bool signedInFirebase=await repository.isSignedIn();
 
     if(signedInFirebase && signedInLocal){
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-              builder: (context) => homeScreen(repository)
-          ),
-          ModalRoute.withName("/Home")
-      );
+      User user;
+      await repository.getProfile().then((value){
+        user = new User.fromSnapshot(snapshot: value);
+      }) .whenComplete((){
+        Repository.user=user;
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+                builder: (context) => homeScreen(repository)
+            ),
+            ModalRoute.withName("/Home")
+        );
+      });
+
     }else{
       Navigator.pushAndRemoveUntil(
           context,

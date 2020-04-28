@@ -18,6 +18,7 @@ class Repository {
   SharedPreferences prefs;
   FirebaseDatabase fbDBRef;
   static String uid = globals.UID;
+  static User user;
 
   Repository({FirebaseAuth firebaseAuth, fbDBRef}) {
     _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
@@ -105,7 +106,6 @@ class Repository {
     DatabaseReference profileReference =
         fbDBRef.reference().child("Profile").child(uid);
     profileReference.keepSynced(true);
-
     StreamSubscription<Event> subscription =
         profileReference.onValue.listen((Event event) {
       if (event.snapshot.value != null) {
@@ -117,6 +117,20 @@ class Repository {
     });
 
     return subscription;
+  }
+
+  Future getProfile() async {
+
+    DatabaseReference profileReference = fbDBRef.reference().child("Profile").child(uid);
+//    await profileReference.once().then((value){
+//      var user = new User.fromSnapshot(snapshot: value);
+//      print("BLB repo ${user.name}");
+//      return user;
+//    }).catchError((onError){
+//      print("BLB error repo");
+//      return User();
+//    });
+      return profileReference.once();
   }
 
   Future addSpend(Spend spend) async {

@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:chitragupta/app/analytics.dart';
 import 'package:chitragupta/app/dashboard.dart';
 import 'package:chitragupta/app/settings.dart';
 import 'package:chitragupta/app/spends.dart';
+import 'package:chitragupta/models/user.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -22,11 +25,27 @@ class _homeScreenState extends State<homeScreen> with TickerProviderStateMixin {
       : repository = repository ?? Repository();
 
   Repository repository;
-
+  StreamSubscription _subscriptionTodo;
+  User user;
   @override
   void initState() {
-    super.initState();
     repository.getUserId();
+    repository
+        .getUserProfile(_updateUserName)
+        .then((StreamSubscription s) => _subscriptionTodo = s)
+        .catchError((err) {});
+    super.initState();
+  }
+  @override
+  void dispose() {
+    if (_subscriptionTodo != null) {
+      _subscriptionTodo.cancel();
+    }
+    super.dispose();
+  }
+
+  void _updateUserName(User usr) {
+    user=usr;
   }
 
   @override
@@ -35,7 +54,7 @@ class _homeScreenState extends State<homeScreen> with TickerProviderStateMixin {
       child: Scaffold(
         body: _selectedIndex == 0
             ? dashBoardScreen(
-                repository,
+                repository
               )
             : (_selectedIndex == 1
                 ? Spends(repository)
