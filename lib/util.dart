@@ -1,6 +1,9 @@
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:flutter/material.dart';
 
 class Utils {
+  static var headingColor=Colors.blue[900];
+
   static final foodColor = charts.MaterialPalette.blue.makeShades(2)[2];
   static final entertainColor =
       charts.MaterialPalette.deepOrange.makeShades(2)[1];

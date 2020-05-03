@@ -5,6 +5,7 @@ import 'package:chitragupta/inputWidget.dart';
 import 'package:chitragupta/models/user.dart';
 import 'package:chitragupta/progress.dart';
 import 'package:chitragupta/repository.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -43,7 +44,6 @@ class _Login extends State<Login> {
   Repository repository;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     repository = Repository();
 
@@ -60,66 +60,75 @@ class _Login extends State<Login> {
             padding:
                 EdgeInsets.only(top: MediaQuery.of(context).size.height / 3),
           ),
-          Column(
-            children: <Widget>[
-              ///holds email header and inputField
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          Align(
+            child: Container(
+              width: 600,
+              child: Column(
                 children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(left: 40, bottom: 10),
-                  ),
-                  Stack(
-                    alignment: Alignment.bottomRight,
+                  ///holds email header and inputField
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      InputWidget(30.0, 0.0, "Email", _userIdController),
+                      Padding(
+                        padding: EdgeInsets.only(left: 40, bottom: 10),
+                      ),
+                      Stack(
+                        alignment: Alignment.bottomRight,
+                        children: <Widget>[
+                          InputWidget(30.0, 0.0, "Email", _userIdController),
+                        ],
+                      ),
                     ],
                   ),
+                  error != null
+                      ? Padding(
+                    child: Text(
+                      error,
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    padding: EdgeInsets.only(bottom: 5),
+                  )
+                      : Container(),
+                  InputWidgetPassword(30.0, 0.0, "Password", _passwordController),
+                  GestureDetector(
+                    child: Text(
+                      "Forgot password?",
+                      style: TextStyle(
+                          color: Colors.lightBlueAccent,
+                          fontStyle: FontStyle.italic,
+                          fontSize: 15,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.blue),
+                    ),
+                    onTap: () {
+                      showForgotAlert(context);
+                    },
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                  ),
+
+                  //roundedRectButton("Let's get Started", signInGradients, false),
+                  Container(
+                    child: GestureDetector(
+                      child: roundedRectButton(
+                        "Login",
+                        signUpGradients,
+                        false,
+                      ),
+                      onTap: () {
+                        loginFunction();
+                      },
+                    ),
+                    margin: EdgeInsets.only(right: 40),
+                  ),
+                  Padding(
+                      padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).viewInsets.bottom)),
                 ],
               ),
-              error != null
-                  ? Padding(
-                      child: Text(
-                        error,
-                        style: TextStyle(color: Colors.red),
-                      ),
-                      padding: EdgeInsets.only(bottom: 5),
-                    )
-                  : Container(),
-              InputWidgetPassword(30.0, 0.0, "Password", _passwordController),
-              GestureDetector(
-                child: Text(
-                  "Forgot password?",
-                  style: TextStyle(
-                      color: Colors.lightBlueAccent,
-                      fontStyle: FontStyle.italic,
-                      fontSize: 15,
-                      decoration: TextDecoration.underline,
-                      decorationColor: Colors.blue),
-                ),
-                onTap: () {
-                  showForgotAlert(context);
-                },
-              ),
-              Padding(
-                padding: EdgeInsets.only(bottom: 20),
-              ),
-
-              //roundedRectButton("Let's get Started", signInGradients, false),
-              GestureDetector(
-                child: roundedRectButton(
-                  "Login",
-                  signUpGradients,
-                  false,
-                ),
-                onTap: () {
-                  loginFunction();
-                },
-              ),
-              Padding(
-                  padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom)),
-            ],
+            ),
+            alignment: Alignment.center,
           )
         ],
       ),
@@ -358,7 +367,7 @@ Widget roundedRectButton(
                     color: Colors.white,
                     fontSize: 18,
                     decoration: TextDecoration.none,
-                    fontWeight: FontWeight.w500)),
+                    fontWeight: FontWeight.w700)),
             padding: EdgeInsets.only(top: 16, bottom: 16),
           ),
           Visibility(

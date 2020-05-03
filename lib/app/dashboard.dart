@@ -190,7 +190,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                               child: Text(
                                 "Today insights",
                                 style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.w700),
+                                    fontSize: 18, color: Utils.headingColor,fontWeight: FontWeight.w700),
                               ),
                               padding: EdgeInsets.only(left: 0),
                             ),
@@ -320,7 +320,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                               child: Text(
                                 "${DateFormat('MMM, yyyy').format(DateTime.now())} insights",
                                 style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.w700),
+                                    fontSize: 18,color: Utils.headingColor, fontWeight: FontWeight.w700),
                               ),
                               padding: EdgeInsets.only(left: 0),
                             ),
@@ -449,7 +449,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                     child: Text(
                       "Upcoming Orders",
                       style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                          TextStyle(fontSize: 18, color: Utils.headingColor,fontWeight: FontWeight.w700),
                     ),
                     padding: EdgeInsets.only(left: 15, top: 5, bottom: 5),
                   ),
@@ -530,7 +530,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                                   children: <Widget>[
                                                     Text(
                                                       "Order Date",
-                                                      style: TextStyle(fontSize:17,fontWeight: FontWeight.w700),
+                                                      style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
                                                     ),
                                                   ],
                                                 ),
@@ -578,7 +578,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                                   children: <Widget>[
                                                     Text(
                                                       "Total Items",
-                                                      style: TextStyle(fontSize:17,fontWeight: FontWeight.w700),
+                                                      style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
                                                     ),
                                                   ],
                                                 ),
@@ -628,7 +628,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                                   children: <Widget>[
                                                     Text(
                                                       "Procured Items",
-                                                      style: TextStyle(fontSize:17,fontWeight: FontWeight.w700),
+                                                      style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
                                                     ),
                                                   ],
                                                 ),
@@ -710,7 +710,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                 borderRadius: BorderRadius.all(Radius.circular(15.0))),
             contentPadding: EdgeInsets.only(top: 10.0),
             content: Container(
-              width: 300.0,
+              width: 500.0,
               padding:
                   EdgeInsets.only(top: 10, right: 15, bottom: 10, left: 15),
               child: Column(
@@ -773,12 +773,12 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                     child: RaisedButton(
                       child: Text(
                         "Create",
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.white,fontWeight: FontWeight.w700),
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(5.0),
                       ),
-                      color: Colors.lightBlue,
+                      color: Colors.blue[900],
                       padding: EdgeInsets.only(top: 15, bottom: 15),
                       onPressed: () {
                         Navigator.pop(contxt);

@@ -7,6 +7,8 @@ import 'package:chitragupta/main.dart';
 import 'package:chitragupta/models/Order.dart';
 import 'package:chitragupta/models/spends_model.dart';
 import 'package:chitragupta/models/user.dart';
+import 'package:chitragupta/models/ExtraData.dart';
+import 'package:chitragupta/models/Product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -114,7 +116,7 @@ class Repository {
     return databaseReference.collection("Profile").document(uid).get();
   }
 
-  createOrder(String date,String name) {
+  createOrder(String date, String name) {
     if (uid == null) {
       getUserId();
     }
@@ -126,8 +128,8 @@ class Repository {
       "month": orderDate.month,
       "day": orderDate.day,
       "uid": uid,
-      "name":name,
-      "status":1
+      "name": name,
+      "status": 1
     };
     var docId =
         "CH${orderDate.year}${orderDate.month}${orderDate.day}_${DateTime.now().hour}${DateTime.now().minute}${DateTime.now().second}";
@@ -139,19 +141,107 @@ class Repository {
         .collection("Orders")
         .where("year", isEqualTo: DateTime.now().year)
         .where("month", isEqualTo: DateTime.now().month)
-        .where("uid", isEqualTo: uid).orderBy("createdDate",descending: true).limit(10)
+        .where("uid", isEqualTo: uid)
+        .orderBy("createdDate", descending: true)
+        .limit(10)
         .snapshots();
 
     return reference;
   }
 
   getOrder(String orderId) {
-    Stream<DocumentSnapshot> reference = databaseReference.collection("Orders").document(orderId).snapshots();
+    Stream<DocumentSnapshot> reference =
+        databaseReference.collection("Orders").document(orderId).snapshots();
+    return reference;
+  }
+
+  addExtraDataToOrder(String orderId, ExtraData data) {
+    return databaseReference
+        .collection('Orders')
+        .document(orderId)
+        .collection("extra")
+        .document()
+        .setData(data.toJson());
+  }
+  getOrderExtraData(String orderId) {
+    Stream<QuerySnapshot> reference = databaseReference
+        .collection("Orders")
+        .document(orderId)
+        .collection("extra")
+        .snapshots();
+
+    return reference;
+  }
+  addExtraSpentToOrder(String orderId, ExtraData data) {
+    return databaseReference
+        .collection('Orders')
+        .document(orderId)
+        .collection("extraSpent")
+        .document()
+        .setData(data.toJson());
+  }
+  getOrderExtraSpent(String orderId) {
+    Stream<QuerySnapshot> reference = databaseReference
+        .collection("Orders")
+        .document(orderId)
+        .collection("extraSpent")
+        .snapshots();
 
     return reference;
   }
 
+  addExtraEarnedToOrder(String orderId, ExtraData data) {
+    return databaseReference
+        .collection('Orders')
+        .document(orderId)
+        .collection("extraEarned")
+        .document()
+        .setData(data.toJson());
+  }
+  getOrderExtraEarned(String orderId) {
+    Stream<QuerySnapshot> reference = databaseReference
+        .collection("Orders")
+        .document(orderId)
+        .collection("extraEarned")
+        .snapshots();
 
+    return reference;
+  }
+
+  addProductToOrder(String orderId, Product data) {
+    return databaseReference
+        .collection('Orders')
+        .document(orderId)
+        .collection("products")
+        .document()
+        .setData(data.toJson());
+  }
+
+  getOrderProducts(String orderId) {
+    Stream<QuerySnapshot> reference = databaseReference
+        .collection("Orders")
+        .document(orderId)
+        .collection("products")
+        .snapshots();
+
+    return reference;
+  }
+
+  removeProductFromOrder(String orderId, String productId) {
+    return databaseReference
+        .collection('Orders')
+        .document(orderId)
+        .collection("products")
+        .document(productId).delete();
+  }
+  updateProductInOrder(String orderId, Product data) {
+    return databaseReference
+        .collection('Orders')
+        .document(orderId)
+        .collection("products")
+        .document(data.id)
+        .updateData(data.toJson());
+  }
 
   /*
   *
