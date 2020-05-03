@@ -46,6 +46,9 @@ class _Login extends State<Login> {
     // TODO: implement initState
     super.initState();
     repository = Repository();
+
+    _userIdController.text='bhargavbl224@gmail.com';
+    _passwordController.text='9618794545';
   }
 
   @override
@@ -150,20 +153,22 @@ class _Login extends State<Login> {
           .signInWithCredentials(
               _userIdController.text, _passwordController.text)
           .then((res) async {
-        print("BLB login ${res.user.uid}");
         setState(() {
           _loading = false;
         });
         await repository.updateUserSignedLocally(true, res.user.uid);
+        Repository.uid=res.user.uid;
         User user;
-        await repository.getProfile().then((value) {
+        repository.getProfile().then((value) {
           user = new User.fromSnapshot(snapshot: value);
         }).whenComplete(() {
           Repository.user = user;
           navigateToHome();
         });
+        setState(() {
+          _loading = false;
+        });
       }).catchError((e) {
-        print("BLB login error $e");
         setState(() {
           _loading = false;
         });
@@ -190,63 +195,9 @@ class _Login extends State<Login> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    super.dispose();
     _userIdController.dispose();
     _passwordController.dispose();
-  }
-
-  void signUp() {
-    setState(() {
-      error = null;
-    });
-    if (_userIdController.text.isEmpty) {
-      setState(() {
-        error = "Please enter email Id";
-      });
-    } else if (_passwordController.text.isEmpty) {
-      setState(() {
-        error = "Please enter password";
-      });
-    } else if (_passwordController.text.length < 6) {
-      setState(() {
-        error = "Password must be at least 6 characters";
-      });
-    } else {
-      setState(() {
-        _loading = true;
-      });
-      repository
-          .signUp(_userIdController.text, _passwordController.text)
-          .then((res) async {
-        await repository.updateUserSignedLocally(true, res.uid);
-        User user = new User(email: _userIdController.text, uid: res.uid);
-        user.name = "Guest";
-        await repository.createUserProfile(user);
-        setState(() {
-          _loading = false;
-        });
-        navigateToHome();
-      }).catchError((e) {
-        print("BLB signup $e");
-        setState(() {
-          _loading = false;
-        });
-        if (e.toString().toLowerCase().contains("already")) {
-          setState(() {
-            error = "Email already registered";
-          });
-        } else if (e.toString().toLowerCase().contains("invalid_email")) {
-          setState(() {
-            error = "Invalid email Id";
-          });
-        } else {
-          setState(() {
-            error = "Something went wrong. Please try again later.";
-          });
-        }
-      });
-    }
+    super.dispose();
   }
 
   void navigateToHome() {

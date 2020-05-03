@@ -4,12 +4,16 @@ import 'dart:core';
 import 'dart:math';
 import 'package:chitragupta/app/spends.dart';
 import 'package:chitragupta/main.dart';
+import 'package:chitragupta/models/Order.dart';
 import 'package:chitragupta/models/spends_model.dart';
 import 'package:chitragupta/models/user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_web/shared_preferences_web.dart';
 import 'package:chitragupta/globals.dart' as globals;
 import 'package:http/http.dart' as http;
 
@@ -17,13 +21,14 @@ class Repository {
   FirebaseAuth _firebaseAuth;
   SharedPreferences prefs;
   FirebaseDatabase fbDBRef;
+  final databaseReference = Firestore.instance;
   static String uid = globals.UID;
   static User user;
 
   Repository({FirebaseAuth firebaseAuth, fbDBRef}) {
     _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
     this.fbDBRef = fbDBRef ?? FirebaseDatabase.instance;
-    this.fbDBRef.setPersistenceEnabled(true);
+    //this.fbDBRef.setPersistenceEnabled(true);
     getUserId();
   }
 
@@ -93,46 +98,68 @@ class Repository {
       Repository.uid = prefs.getString("uid");
     } else {
       FirebaseUser user = await _firebaseAuth.currentUser();
-      Repository.uid = user.uid;
-      prefs.setString("uid", Repository.uid);
+      uid = user.uid;
+      prefs.setString("uid", uid);
     }
 
-    globals.UID = Repository.uid;
-    return Repository.uid;
+    globals.UID = uid;
+    return uid;
   }
 
-  Future<StreamSubscription<Event>> getUserProfile(
-      void onData(User user)) async {
-    DatabaseReference profileReference =
-        fbDBRef.reference().child("Profile").child(uid);
-    profileReference.keepSynced(true);
-    StreamSubscription<Event> subscription =
-        profileReference.onValue.listen((Event event) {
-      if (event.snapshot.value != null) {
-        var user = new User.fromSnapshot(snapshot: event.snapshot);
-        onData(user);
-      } else {
-        onData(null);
-      }
-    });
+  getProfile() async {
+    if (uid == null) {
+      getUserId();
+    }
 
-    return subscription;
+    return databaseReference.collection("Profile").document(uid).get();
   }
 
-  Future getProfile() async {
-
-    DatabaseReference profileReference = fbDBRef.reference().child("Profile").child(uid);
-//    await profileReference.once().then((value){
-//      var user = new User.fromSnapshot(snapshot: value);
-//      print("BLB repo ${user.name}");
-//      return user;
-//    }).catchError((onError){
-//      print("BLB error repo");
-//      return User();
-//    });
-      return profileReference.once();
+  createOrder(String date,String name) {
+    if (uid == null) {
+      getUserId();
+    }
+    DateTime orderDate = DateFormat("dd-MM-yyyy").parse(date);
+    var data = {
+      "date": orderDate.millisecondsSinceEpoch,
+      "createdDate": DateTime.now().millisecondsSinceEpoch,
+      "year": orderDate.year,
+      "month": orderDate.month,
+      "day": orderDate.day,
+      "uid": uid,
+      "name":name,
+      "status":1
+    };
+    var docId =
+        "CH${orderDate.year}${orderDate.month}${orderDate.day}_${DateTime.now().hour}${DateTime.now().minute}${DateTime.now().second}";
+    return databaseReference.collection("Orders").document(docId).setData(data);
   }
 
+  getThisMonthOrders() {
+    Stream<QuerySnapshot> reference = databaseReference
+        .collection("Orders")
+        .where("year", isEqualTo: DateTime.now().year)
+        .where("month", isEqualTo: DateTime.now().month)
+        .where("uid", isEqualTo: uid).orderBy("createdDate",descending: true).limit(10)
+        .snapshots();
+
+    return reference;
+  }
+
+  getOrder(String orderId) {
+    Stream<DocumentSnapshot> reference = databaseReference.collection("Orders").document(orderId).snapshots();
+
+    return reference;
+  }
+
+
+
+  /*
+  *
+  *
+  * Old data
+  *
+  *
+  * */
   Future addSpend(Spend spend) async {
     String month = DateFormat('MM').format(spend.dateTime);
     String year = DateFormat('yyyy').format(spend.dateTime);
@@ -278,22 +305,21 @@ class Repository {
     return subscription;
   }
 
-  Future<StreamSubscription<Event>> getMonthlyRecords(String year,String month,
-      void onData(List<Spend> spendList)) async {
-
+  Future<StreamSubscription<Event>> getMonthlyRecords(
+      String year, String month, void onData(List<Spend> spendList)) async {
     DatabaseReference spendsRef =
-    fbDBRef.reference().child("Spends").child(uid).child(year).child(month);
+        fbDBRef.reference().child("Spends").child(uid).child(year).child(month);
     spendsRef.keepSynced(true);
 
     StreamSubscription<Event> subscription =
-    spendsRef.onValue.listen((Event event) {
+        spendsRef.onValue.listen((Event event) {
       if (event.snapshot.value != null) {
         List<Spend> spendList = new List();
 
         var spends = new SpendsList.fromJson(event.snapshot.value);
         spendList.addAll(spends.spendList);
 
-        onData( spendList);
+        onData(spendList);
       } else {
         onData(null);
       }
@@ -302,14 +328,14 @@ class Repository {
     return subscription;
   }
 
-  Future<StreamSubscription<Event>> getYearlyListRecords(String year,
-      void onData(List<Spend> spendList)) async {
+  Future<StreamSubscription<Event>> getYearlyListRecords(
+      String year, void onData(List<Spend> spendList)) async {
     DatabaseReference spendsRef =
-    fbDBRef.reference().child("Spends").child(uid).child(year);
+        fbDBRef.reference().child("Spends").child(uid).child(year);
     spendsRef.keepSynced(true);
 
     StreamSubscription<Event> subscription =
-    spendsRef.onValue.listen((Event event) {
+        spendsRef.onValue.listen((Event event) {
       if (event.snapshot.value != null) {
         List<Spend> spendList = new List();
 

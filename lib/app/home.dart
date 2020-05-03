@@ -4,6 +4,7 @@ import 'package:chitragupta/app/analytics.dart';
 import 'package:chitragupta/app/dashboard.dart';
 import 'package:chitragupta/app/settings.dart';
 import 'package:chitragupta/app/spends.dart';
+import 'package:chitragupta/app/userDashboard.dart';
 import 'package:chitragupta/models/user.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:flutter/material.dart';
@@ -30,10 +31,9 @@ class _homeScreenState extends State<homeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     repository.getUserId();
-    repository
-        .getUserProfile(_updateUserName)
-        .then((StreamSubscription s) => _subscriptionTodo = s)
-        .catchError((err) {});
+    repository.getProfile().then((value) {
+      user = new User.fromSnapshot(snapshot: value);
+    });
     super.initState();
   }
   @override
@@ -44,23 +44,19 @@ class _homeScreenState extends State<homeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void _updateUserName(User usr) {
-    user=usr;
-  }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       child: Scaffold(
         body: _selectedIndex == 0
-            ? dashBoardScreen(
-                repository
-              )
+            ? (Repository.user.role=="admin"? dashBoardScreen(repository):userDashBoardScreen(repository))
             : (_selectedIndex == 1
                 ? Spends(repository)
                 : (_selectedIndex == 2
                     ? Analytics(repository)
                     : (_selectedIndex == 3 ? Settings(repository) : Container()))),
+
+
         bottomNavigationBar: BottomNavigationBar(
           backgroundColor: Colors.lightBlue[900],
           items: const <BottomNavigationBarItem>[

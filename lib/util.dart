@@ -13,6 +13,9 @@ class Utils {
   static final otherColor = charts.MaterialPalette.purple.makeShades(2)[2];
   static final defaultColor = charts.MaterialPalette.gray.makeShades(2)[2];
 
+  static final spentColor = charts.MaterialPalette.deepOrange.makeShades(2)[2];
+  static final earnedColor = charts.MaterialPalette.green.makeShades(2)[2];
+
   static List<charts.Series<LinearBudgets, String>> createBarData(data) {
     return [
       new charts.Series<LinearBudgets, String>(
@@ -49,22 +52,10 @@ class Utils {
         data: data,
         colorFn: (LinearBudgets spend, _) {
           switch (spend.budget) {
-            case "Food":
-              return foodColor;
-            case "Entertainment":
-              return entertainColor;
-            case "Travel":
-              return travelColor;
-            case "Snacks":
-              return snacksColor;
-            case "Fuel":
-              return fuelColor;
-            case "Bills":
-              return billsColor;
-            case "Shopping":
-              return shoppingColor;
-            case "Health":
-              return healthColor;
+            case "Spent":
+              return spentColor;
+            case "Earned":
+              return earnedColor;
             case "Others":
               return otherColor;
             default:

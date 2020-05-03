@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class Profile extends StatefulWidget {
-  Profile(Repository repository):repository=repository??Repository();
+  Profile(Repository repository) : repository = repository ?? Repository();
   Repository repository;
   @override
   _ProfileState createState() => _ProfileState(repository);
@@ -19,31 +19,23 @@ class _ProfileState extends State<Profile> {
   Repository repository;
   var userName = "Name";
   var email = "Email";
-  bool _laoding=true;
+  bool _laoding = true;
   User user;
   StreamSubscription _subscriptionTodo;
 
-  _ProfileState(Repository repository):repository=repository??Repository();
+  _ProfileState(Repository repository)
+      : repository = repository ?? Repository();
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
-    repository
-        .getUserProfile(_updateUserName)
-        .then((StreamSubscription s) => _subscriptionTodo = s).catchError((err){
-          setState(() {
-            _laoding=false;
-          });
-    });
-  }
-
-  void _updateUserName(User user) {
-    this.user=user;
-    setState(() {
-      _laoding=false;
-      userName=user.name;
-      email=user.email;
+    repository.getProfile().then((value) {
+      this.user = new User.fromSnapshot(snapshot: value);
+      setState(() {
+        _laoding = false;
+        userName = user.name;
+        email = user.email;
+      });
     });
   }
 
@@ -68,7 +60,9 @@ class _ProfileState extends State<Profile> {
         ),
         body: ListView(
           children: <Widget>[
-            Padding(padding: EdgeInsets.all(5),),
+            Padding(
+              padding: EdgeInsets.all(5),
+            ),
             Stack(
               children: <Widget>[
                 Container(
@@ -76,8 +70,7 @@ class _ProfileState extends State<Profile> {
                   decoration: BoxDecoration(
                     image: DecorationImage(
                         image: AssetImage('assets/profile.png'),
-                        fit: BoxFit.fitHeight
-                    ),
+                        fit: BoxFit.fitHeight),
                   ),
                 ),
                 Container(
@@ -87,7 +80,7 @@ class _ProfileState extends State<Profile> {
                 Container(
                   height: 200,
                   alignment: Alignment.center,
-                  padding: EdgeInsets.only(bottom: 25,left: 20),
+                  padding: EdgeInsets.only(bottom: 25, left: 20),
                   child: Center(
                     child: CircleAvatar(
                       child: Image.asset('assets/user_avatar.png'),
@@ -98,7 +91,6 @@ class _ProfileState extends State<Profile> {
                 ),
               ],
             ),
-
             Container(
               margin: EdgeInsets.only(left: 10, right: 10, top: 20),
               child: Center(
@@ -107,27 +99,35 @@ class _ProfileState extends State<Profile> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Container(
-                      child: Text(userName,style: TextStyle(fontSize: 18),),
+                      child: Text(
+                        userName,
+                        style: TextStyle(fontSize: 18),
+                      ),
                     ),
                     Container(
                       padding: EdgeInsets.only(top: 10),
-                      child: Text(email,style: TextStyle(fontSize: 18),),
+                      child: Text(
+                        email,
+                        style: TextStyle(fontSize: 18),
+                      ),
                     ),
-
-
                   ],
                 ),
               ),
             ),
-
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          child: Image.asset('assets/feather.png',height: 35,width: 35,),
+          child: Image.asset(
+            'assets/feather.png',
+            height: 35,
+            width: 35,
+          ),
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => EditProfile(user,repository)),
+              MaterialPageRoute(
+                  builder: (context) => EditProfile(user, repository)),
             );
           },
         ),

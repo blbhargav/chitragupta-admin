@@ -144,26 +144,85 @@ class _settingsState extends State<Settings>{
         ModalRoute.withName("/Splash"));
   }
 
+  showAlertDialog(BuildContext contxt) {
+    return showDialog(
+        context: contxt,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            contentPadding: EdgeInsets.only(top: 10.0),
+            content: Container(
+              width: 300.0,
+              padding:
+              EdgeInsets.only(top: 10, right: 15, bottom: 10, left: 15),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(
+                    "Create Order",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                  ),
+
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    // height: double.infinity,
+                    child: RaisedButton(
+                      child: Text(
+                        "Create",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(5.0),
+                      ),
+                      color: Colors.lightBlue,
+                      padding: EdgeInsets.only(top: 15, bottom: 15),
+                      onPressed: () {
+
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   void showLogoutAlert() {
     showDialog(
         context: context,
-        barrierDismissible: false,
+        barrierDismissible: true,
         builder: (BuildContext context) {
           // return object of type Dialog
           return AlertDialog(
-            title: new Text("Are you sure to Logout?"),
+            title: new Text("Are you sure to Logout?",style: TextStyle(fontSize: 25)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            contentPadding: EdgeInsets.only(top: 10.0),
             content: Text(""),
             actions: <Widget>[
               // usually buttons at the bottom of the dialog
               new FlatButton(
-                child: new Text("Logout"),
+                child: new Text("Logout",style: TextStyle(fontSize: 20),),
                 onPressed: () {
                   Navigator.of(context).pop();
                   _logout();
                 },
               ),
               new FlatButton(
-                child: new Text("No"),
+                child: new Text("No",style: TextStyle(fontSize: 20)),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },

@@ -16,11 +16,13 @@ class Background extends StatelessWidget {
                 children: <Widget>[
                   Stack(
                     children: <Widget>[
-                      Image.asset(
-                        'assets/logo.png',
-                        width: MediaQuery.of(context).size.width / 2.3,
+                      Center(
+                        child: Image.asset(
+                          'assets/logo.png',
+                          width: 120,
+                        ),
                       ),
-                      Positioned(
+                      Center(
                         child: Text(
                           "Login",
                           style: TextStyle(
@@ -29,15 +31,13 @@ class Background extends StatelessWidget {
                             color: Colors.black,
                           ),
                         ),
-                        top: 50,
-                        left: 50,
-                      ),
+                      )
                     ],
                   ),
                   Text(
                     "Chitragupta",
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         fontSize: 18,
                         color: Colors.blue),
                   )

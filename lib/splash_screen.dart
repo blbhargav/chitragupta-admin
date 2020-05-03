@@ -20,38 +20,18 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
-    repository=Repository();
+    //repository=Repository();
     startTime();
   }
-  void _checkUserHistory() async {
+  Future<void> _checkUserHistory() async {
 
-    bool signedInLocal=await repository.isUserSignedLocally();
-    bool signedInFirebase=await repository.isSignedIn();
-
-    if(signedInFirebase && signedInLocal){
-      User user;
-      await repository.getProfile().then((value){
-        user = new User.fromSnapshot(snapshot: value);
-      }) .whenComplete((){
-        Repository.user=user;
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-                builder: (context) => homeScreen(repository)
-            ),
-            ModalRoute.withName("/Home")
-        );
-      });
-
-    }else{
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-              builder: (context) => loginRoot()
-          ),
-          ModalRoute.withName("/login")
-      );
-    }
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) => loginRoot()
+        ),
+        ModalRoute.withName("/login")
+    );
 
   }
 
