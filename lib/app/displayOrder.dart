@@ -5,7 +5,6 @@ import 'package:chitragupta/repository.dart';
 import 'package:chitragupta/util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:chitragupta/models/ExtraData.dart';
@@ -830,7 +829,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
                                 Text(
-                                  "Products",
+                                  "Products (${productsList.length})",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 25,

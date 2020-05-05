@@ -167,9 +167,9 @@ class _Login extends State<Login> {
         });
         await repository.updateUserSignedLocally(true, res.user.uid);
         Repository.uid=res.user.uid;
-        User user;
+        AdminUser user;
         repository.getProfile().then((value) {
-          user = new User.fromSnapshot(snapshot: value);
+          user = new AdminUser.fromSnapshot(snapshot: value);
         }).whenComplete(() {
           Repository.user = user;
           navigateToHome();

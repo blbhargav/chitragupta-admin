@@ -1,10 +1,7 @@
 import 'dart:async';
-import 'package:chitragupta/app/home.dart';
-import 'package:chitragupta/models/user.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:flutter/material.dart';
 
-import 'app/dashboard.dart';
 import 'login.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -20,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
-    //repository=Repository();
+    repository=Repository();
     startTime();
   }
   Future<void> _checkUserHistory() async {

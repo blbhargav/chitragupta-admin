@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditProfile extends StatefulWidget {
-  User user; Repository repository;
-  EditProfile(User user, Repository repository){
+  AdminUser user; Repository repository;
+  EditProfile(AdminUser user, Repository repository){
     this.user=user;
     this.repository=repository;
   }
@@ -32,8 +32,8 @@ class _EditProfileState extends State<EditProfile> {
     Color(0xFF03A0FE),
   ];
   Repository repository;
-  User user;
-  _EditProfileState(User user, Repository repository){
+  AdminUser user;
+  _EditProfileState(AdminUser user, Repository repository){
     this.user=user;
     this.repository=repository;
     _nameController.text=user.name;
@@ -253,17 +253,17 @@ class _EditProfileState extends State<EditProfile> {
         _loading=true;
       });
       user.name=_nameController.text;
-      repository.createUserProfile(user).then((res){
-        Navigator.of(context).pop();
-        setState(() {
-          _loading=true;
-        });
-      }).catchError((err){
-        setState(() {
-          _loading=true;
-        });
-        showAlertDialog("Error","Something went wrong. Please try again later.");
-      });
+//      repository.createUserProfile(user).then((res){
+//        Navigator.of(context).pop();
+//        setState(() {
+//          _loading=true;
+//        });
+//      }).catchError((err){
+//        setState(() {
+//          _loading=true;
+//        });
+//        showAlertDialog("Error","Something went wrong. Please try again later.");
+//      });
     }
   }
   showAlertDialog(title, body) {

@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:chitragupta/app/analytics.dart';
 import 'package:chitragupta/app/dashboard.dart';
 import 'package:chitragupta/app/settings.dart';
-import 'package:chitragupta/app/spends.dart';
-import 'package:chitragupta/app/userDashboard.dart';
 import 'package:chitragupta/models/user.dart';
 import 'package:chitragupta/repository.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -27,12 +26,12 @@ class _homeScreenState extends State<homeScreen> with TickerProviderStateMixin {
 
   Repository repository;
   StreamSubscription _subscriptionTodo;
-  User user;
+  AdminUser user;
   @override
   void initState() {
     repository.getUserId();
     repository.getProfile().then((value) {
-      user = new User.fromSnapshot(snapshot: value);
+      user = new AdminUser.fromSnapshot(snapshot: value);
     });
     super.initState();
   }
@@ -49,9 +48,9 @@ class _homeScreenState extends State<homeScreen> with TickerProviderStateMixin {
     return WillPopScope(
       child: Scaffold(
         body: _selectedIndex == 0
-            ? (Repository.user.role=="admin"? dashBoardScreen(repository):userDashBoardScreen(repository))
+            ? dashBoardScreen(repository)
             : (_selectedIndex == 1
-                ? Spends(repository)
+                ? Container(child: Text("Spends"),)
                 : (_selectedIndex == 2
                     ? Analytics(repository)
                     : (_selectedIndex == 3 ? Settings(repository) : Container()))),

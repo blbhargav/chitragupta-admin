@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class User {
+class AdminUser {
   String uid,email,name,profileImage,role;
-  User({this.uid,this.email,this.name,this.profileImage});
+  AdminUser({this.uid,this.email,this.name,this.profileImage});
 
-  User.fromSnapshot({DocumentSnapshot snapshot})
+  AdminUser.fromSnapshot({DocumentSnapshot snapshot})
       :uid = snapshot.data['uid'],
         email = snapshot.data['email'],
         name = snapshot.data['name'],

@@ -1,6 +1,3 @@
-import 'package:chitragupta/app/all_analytics.dart';
-import 'package:chitragupta/app/month_analytics.dart';
-import 'package:chitragupta/app/year_analytics.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:flutter/material.dart';
 
@@ -39,9 +36,9 @@ class _analyticsState extends State<Analytics> {
           backgroundColor: Colors.lightBlue[900],
         ),
         body:TabBarView(children: [
-          MonthAnalytics(repository),
-          YearAnalytics(repository),
-          AllAnalytics(repository)
+          Container(),
+          Container(),
+          Container(),
         ]),
       ),
     );

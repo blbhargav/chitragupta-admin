@@ -1,20 +1,13 @@
 import 'dart:async';
 
-import 'package:chitragupta/app/OrdersScreen.dart';
-import 'package:chitragupta/app/addTransaction.dart';
 import 'package:chitragupta/app/createOrder.dart';
 import 'package:chitragupta/app/displayOrder.dart';
-import 'package:chitragupta/app/displaySpend.dart';
 import 'package:chitragupta/models/Order.dart';
-import 'package:chitragupta/models/spends_model.dart';
-import 'package:chitragupta/models/user.dart';
 import 'package:chitragupta/progress.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:chitragupta/util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:chitragupta/globals.dart' as globals;
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
@@ -35,7 +28,6 @@ class _dashBoardScreenState extends State<dashBoardScreen>
   String userName = "Hi Guest";
   String currency = "₹", noDataTV = "";
   StreamSubscription _subscriptionTodo;
-  List<Spend> recentSpends = new List();
   bool _laoding = true;
   Repository repository;
 
@@ -802,13 +794,6 @@ class _dashBoardScreenState extends State<dashBoardScreen>
       _subscriptionTodo.cancel();
     }
     super.dispose();
-  }
-
-  void navigateToDisplaySpend(Spend recentSpend) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => DisplaySpendScreen(recentSpend, repository)));
   }
 
   dateValidator() {
