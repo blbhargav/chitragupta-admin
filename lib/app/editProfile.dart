@@ -273,6 +273,9 @@ class _EditProfileState extends State<EditProfile> {
         builder: (BuildContext context) {
           // return object of type Dialog
           return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            contentPadding: EdgeInsets.only(top: 10.0),
             title: new Text(title),
             content: Text(body),
             actions: <Widget>[

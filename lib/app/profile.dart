@@ -143,7 +143,7 @@ class _ProfileState extends State<Profile> {
               child: membersList.length == 0
                   ? Container(
                       height: 100,
-                      child: Text("No data found"),
+                      child: Center(child: Text("No data found"),),
                     )
                   : Container(
                       child: ListView.separated(

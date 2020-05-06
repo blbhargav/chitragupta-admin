@@ -121,10 +121,10 @@ class Repository {
     Stream<QuerySnapshot> reference = databaseReference
         .collection("Orders")
         .where("year", isEqualTo: DateTime.now().year)
-        .where("month", isEqualTo: DateTime.now().month)
         .where("uid", isEqualTo: uid)
+        .where("status", isEqualTo: 1)
         .orderBy("createdDate", descending: true)
-        .limit(10)
+        .limit(15)
         .snapshots();
 
     return reference;
@@ -227,7 +227,7 @@ class Repository {
   addTeamMember(String userId, String name,String email,String mobile) {
     return databaseReference
         .collection('Team')
-        .document()
+        .document(userId)
         .setData({"adminId":uid,"uid":userId,"name":name,"email":email,"mobile":mobile});
   }
   getTeamMembers() {
