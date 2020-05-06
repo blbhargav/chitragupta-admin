@@ -593,7 +593,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                                       padding: EdgeInsets.all(7),
                                                       child:  Row(
                                                         children: <Widget>[
-                                                          Text("0",
+                                                          Text("${monthOrdersList[index].totalItems??0}",
                                                               style: TextStyle(
                                                                   fontSize: 16, color: Colors.black)),
                                                         ],

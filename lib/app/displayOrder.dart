@@ -296,7 +296,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                             padding: EdgeInsets.all(7),
                                             child: Row(
                                               children: <Widget>[
-                                                Text("0",
+                                                Text("${order.totalItems??0}",
                                                     style: TextStyle(
                                                         fontSize: 16,
                                                         color: Colors.black)),
@@ -987,17 +987,17 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                             ),
                                             Expanded(
                                               child: Container(
-                                                child: Text("${productsList[index].remarks}"),
+                                                child: Text("${productsList[index].remarks??"-"}"),
                                               ),
                                             ),
                                             Expanded(
                                               child: Container(
-                                                child: Text("${productsList[index].payer}"),
+                                                child: Text("${productsList[index].payer??"-"}"),
                                               ),
                                             ),
                                             Expanded(
                                               child: Container(
-                                                child: Text("${productsList[index].paid}"),
+                                                child: Text("${productsList[index].paid??"-"}"),
                                               ),
                                             ),
 

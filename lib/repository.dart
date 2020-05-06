@@ -190,6 +190,7 @@ class Repository {
   }
 
   addProductToOrder(String orderId, Product data) {
+    databaseReference.collection("Orders").document(orderId).updateData({"totalItems":FieldValue.increment(1)});
     return databaseReference
         .collection('Orders')
         .document(orderId)
@@ -209,6 +210,7 @@ class Repository {
   }
 
   removeProductFromOrder(String orderId, String productId) {
+    databaseReference.collection("Orders").document(orderId).updateData({"totalItems":FieldValue.increment(-1)});
     return databaseReference
         .collection('Orders')
         .document(orderId)
