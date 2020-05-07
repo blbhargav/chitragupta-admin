@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Order {
   String uid, orderId,name;
   int year, month, day,status,totalItems,procuredItems;
+  int amountSpent,amountEarned;
   DateTime date,createdDate;
   Order(
       {this.uid, this.date, this.createdDate, this.year, this.month, this.day,this.status,this.totalItems,this.procuredItems});
@@ -18,5 +19,7 @@ class Order {
         orderId = snapshot.documentID,
         totalItems= snapshot['totalItems'],
         procuredItems= snapshot['procuredItems'],
+        amountSpent= snapshot['amountSpent'],
+        amountEarned=snapshot['amountEarned'],
         status=snapshot.data['status'];
 }

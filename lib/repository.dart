@@ -110,6 +110,8 @@ class Repository {
       "day": orderDate.day,
       "uid": uid,
       "name": name,
+      "amountEarned":0,
+      "amountSpent":0,
       "status": 1
     };
     var docId =
@@ -117,7 +119,7 @@ class Repository {
     return databaseReference.collection("Orders").document(docId).setData(data);
   }
 
-  getThisMonthOrders() {
+  getRecentOrdersOrders() {
     Stream<QuerySnapshot> reference = databaseReference
         .collection("Orders")
         .where("year", isEqualTo: DateTime.now().year)
@@ -125,6 +127,27 @@ class Repository {
         .where("status", isEqualTo: 1)
         .orderBy("createdDate", descending: true)
         .limit(15)
+        .snapshots();
+
+    return reference;
+  }
+  getTodayOrders() {
+    Stream<QuerySnapshot> reference = databaseReference
+        .collection("Orders")
+        .where("year", isEqualTo: DateTime.now().year)
+        .where("month", isEqualTo: DateTime.now().month)
+        .where("day", isEqualTo: DateTime.now().day)
+        .where("uid", isEqualTo: uid)
+        .snapshots();
+
+    return reference;
+  }
+  getThisMonthOrdersOrders() {
+    Stream<QuerySnapshot> reference = databaseReference
+        .collection("Orders")
+        .where("year", isEqualTo: DateTime.now().year)
+        .where("month", isEqualTo: DateTime.now().month)
+        .where("uid", isEqualTo: uid)
         .snapshots();
 
     return reference;

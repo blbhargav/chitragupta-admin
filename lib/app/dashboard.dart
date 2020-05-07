@@ -35,6 +35,8 @@ class _dashBoardScreenState extends State<dashBoardScreen>
 
   TextEditingController _orderDateController = new TextEditingController();
   TextEditingController _orderNameController = new TextEditingController();
+  List<Order> recentOrdersList = new List();
+  List<Order> todayOrdersList = new List();
   List<Order> monthOrdersList = new List();
   @override
   void initState() {
@@ -55,7 +57,32 @@ class _dashBoardScreenState extends State<dashBoardScreen>
         .format(DateTime(now.year, now.month, now.day + 2));
     _orderNameController.text="Super Daily";
     _orderDateController.addListener(dateValidator());
-    repository.getThisMonthOrders().listen((event) {
+    repository.getRecentOrdersOrders().listen((event) {
+      List<Order> tempMonthOrdersList = new List();
+      if (event.documents.length > 0) {
+        event.documents.forEach((element) {
+          tempMonthOrdersList.add(Order.fromSnapshot(snapshot: element));
+        });
+      }
+      setState(() {
+        recentOrdersList = tempMonthOrdersList;
+        todaySeriesList = Utils.createPieData(todayData);
+      });
+    });
+
+    repository.getTodayOrders().listen((event) {
+      List<Order> tempMonthOrdersList = new List();
+      if (event.documents.length > 0) {
+        event.documents.forEach((element) {
+          tempMonthOrdersList.add(Order.fromSnapshot(snapshot: element));
+        });
+      }
+      setState(() {
+        todayOrdersList = tempMonthOrdersList;
+      });
+    });
+
+    repository.getThisMonthOrdersOrders().listen((event) {
       List<Order> tempMonthOrdersList = new List();
       if (event.documents.length > 0) {
         event.documents.forEach((element) {
@@ -64,9 +91,9 @@ class _dashBoardScreenState extends State<dashBoardScreen>
       }
       setState(() {
         monthOrdersList = tempMonthOrdersList;
-        todaySeriesList = Utils.createPieData(todayData);
       });
     });
+
   }
 
 //new code
@@ -216,7 +243,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                             MainAxisAlignment.center,
                                         children: <Widget>[
                                           Text(
-                                            "Total Spent",
+                                            "Total Orders",
                                             style: TextStyle(
                                                 fontSize: 12.0,
                                                 color: Colors.black54,
@@ -226,9 +253,9 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                             padding: EdgeInsets.all(2),
                                           ),
                                           Text(
-                                            "120",
+                                            "${todayOrdersList.length}",
                                             style: TextStyle(
-                                                fontSize: 16.0,
+                                                fontSize: 20.0,
                                                 color: Colors.blue,
                                                 fontWeight: FontWeight.bold),
                                           )
@@ -346,7 +373,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                             MainAxisAlignment.center,
                                         children: <Widget>[
                                           Text(
-                                            "Total Spent",
+                                            "Total Orders",
                                             style: TextStyle(
                                                 fontSize: 12.0,
                                                 color: Colors.black54,
@@ -356,9 +383,9 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                             padding: EdgeInsets.all(2),
                                           ),
                                           Text(
-                                            "120",
+                                            "${monthOrdersList.length}",
                                             style: TextStyle(
-                                                fontSize: 16.0,
+                                                fontSize: 20.0,
                                                 color: Colors.blue,
                                                 fontWeight: FontWeight.bold),
                                           )
@@ -447,7 +474,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                   ),
                   alignment: Alignment.centerLeft,
                 ),
-                monthOrdersList.length == 0
+                recentOrdersList.length == 0
                     ? Container(
                         margin: EdgeInsets.only(top: 100),
                         child: Center(
@@ -466,8 +493,12 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                             },
                             padding: EdgeInsets.all(5),
                             scrollDirection: Axis.vertical,
-                            itemCount: monthOrdersList.length,
+                            itemCount: recentOrdersList.length,
                             itemBuilder: (BuildContext context, int index) {
+                              var pocuredColor=Colors.red[600];
+                              if(recentOrdersList[index].totalItems==recentOrdersList[index].procuredItems){
+                                pocuredColor=Colors.green[800];
+                              }
                               return GestureDetector(
                                 child: Card(
                                   elevation: 2,
@@ -488,19 +519,19 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: <Widget>[
                                                 Text(
-                                                  "#${monthOrdersList[index].orderId}",
+                                                  "#${recentOrdersList[index].orderId}",
                                                   style: TextStyle(fontSize:18,fontWeight: FontWeight.w700),
                                                 ),
                                                 Padding(
                                                   padding: EdgeInsets.all(3),
                                                 ),
-                                                Text("${monthOrdersList[index].name}",
+                                                Text("${recentOrdersList[index].name}",
                                                     style: TextStyle(
                                                         fontSize: 16, color: Colors.black54,fontWeight: FontWeight.w500)),
                                                 Padding(
                                                   padding: EdgeInsets.all(3),
                                                 ),
-                                                Text("Created @ ${DateFormat("dd-MMM-yyyy hh:mm a").format(monthOrdersList[index].createdDate)}",
+                                                Text("Created @ ${DateFormat("dd-MMM-yyyy hh:mm a").format(recentOrdersList[index].createdDate)}",
                                                     style: TextStyle(
                                                         fontSize: 15, color: Colors.black45,fontWeight: FontWeight.w300)),
                                               ],
@@ -544,7 +575,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                                     padding: EdgeInsets.all(7),
                                                     child:  Row(
                                                       children: <Widget>[
-                                                        Text("${DateFormat("dd-MMM-yyyy").format(monthOrdersList[index].date)}",
+                                                        Text("${DateFormat("dd-MMM-yyyy").format(recentOrdersList[index].date)}",
                                                             style: TextStyle(
                                                                 fontSize: 16, color: Colors.black)),
                                                       ],
@@ -593,9 +624,9 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                                       padding: EdgeInsets.all(7),
                                                       child:  Row(
                                                         children: <Widget>[
-                                                          Text("${monthOrdersList[index].totalItems??0}",
+                                                          Text("${recentOrdersList[index].totalItems??0}",
                                                               style: TextStyle(
-                                                                  fontSize: 16, color: Colors.black)),
+                                                                  fontSize: 16,fontWeight: FontWeight.w700, color: Colors.black)),
                                                         ],
                                                       ),
                                                     ),
@@ -642,9 +673,9 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                                     padding: EdgeInsets.all(7),
                                                     child:  Row(
                                                       children: <Widget>[
-                                                        Text("${monthOrdersList[index].procuredItems??0}",
+                                                        Text("${recentOrdersList[index].procuredItems??0}",
                                                             style: TextStyle(
-                                                                fontSize: 16, color: Colors.black)),
+                                                                fontSize: 16,fontWeight: FontWeight.w700, color: pocuredColor)),
                                                       ],
                                                     ),
                                                   ),
@@ -663,7 +694,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                 onTap: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => DisplayOrderScreen(repository,monthOrdersList[index].orderId)),
+                                    MaterialPageRoute(builder: (context) => DisplayOrderScreen(repository,recentOrdersList[index].orderId)),
                                   );
                                 },
                               );
