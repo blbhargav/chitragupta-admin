@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:chitragupta/app/createOrder.dart';
 import 'package:chitragupta/app/displayOrder.dart';
@@ -38,6 +39,8 @@ class _dashBoardScreenState extends State<dashBoardScreen>
   List<Order> recentOrdersList = new List();
   List<Order> todayOrdersList = new List();
   List<Order> monthOrdersList = new List();
+
+  int todaySpent=0,monthlySpent=0;
   @override
   void initState() {
     userName = "Hi ${Repository.user.name}";
@@ -74,7 +77,8 @@ class _dashBoardScreenState extends State<dashBoardScreen>
       List<Order> tempMonthOrdersList = new List();
       if (event.documents.length > 0) {
         event.documents.forEach((element) {
-          tempMonthOrdersList.add(Order.fromSnapshot(snapshot: element));
+          Order order=Order.fromSnapshot(snapshot: element);
+          tempMonthOrdersList.add(order);
         });
       }
       setState(() {
@@ -84,13 +88,17 @@ class _dashBoardScreenState extends State<dashBoardScreen>
 
     repository.getThisMonthOrdersOrders().listen((event) {
       List<Order> tempMonthOrdersList = new List();
+      int spentMonthly=0;
       if (event.documents.length > 0) {
         event.documents.forEach((element) {
-          tempMonthOrdersList.add(Order.fromSnapshot(snapshot: element));
+          Order order=Order.fromSnapshot(snapshot: element);
+          tempMonthOrdersList.add(order);
+          spentMonthly+=order.amountSpent??0;
         });
       }
       setState(() {
         monthOrdersList = tempMonthOrdersList;
+        monthlySpent=spentMonthly;
       });
     });
 
@@ -287,7 +295,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                         padding: EdgeInsets.all(3),
                                       ),
                                       Text(
-                                        "100",
+                                        "₹ $todaySpent",
                                         style: TextStyle(
                                             fontSize: 14,
                                             fontStyle: FontStyle.italic,
@@ -316,7 +324,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                         padding: EdgeInsets.all(3),
                                       ),
                                       Text(
-                                        "80",
+                                        "₹ 80",
                                         style: TextStyle(
                                             fontSize: 14,
                                             fontStyle: FontStyle.italic,
@@ -417,7 +425,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                         padding: EdgeInsets.all(3),
                                       ),
                                       Text(
-                                        "100",
+                                        "₹ $monthlySpent",
                                         style: TextStyle(
                                             fontSize: 14,
                                             fontStyle: FontStyle.italic,
@@ -446,7 +454,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                         padding: EdgeInsets.all(3),
                                       ),
                                       Text(
-                                        "80",
+                                        "₹ 80",
                                         style: TextStyle(
                                             fontSize: 14,
                                             fontStyle: FontStyle.italic,
