@@ -20,6 +20,7 @@ class Repository {
   Repository({FirebaseAuth firebaseAuth, fbDBRef}) {
     _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
     //this.fbDBRef.setPersistenceEnabled(true);
+    //databaseReference.settings(persistenceEnabled: true);
     getUserId();
   }
 
@@ -177,6 +178,9 @@ class Repository {
     return reference;
   }
   addExtraSpentToOrder(String orderId, ExtraData data) {
+    databaseReference.collection("Orders").document(orderId).updateData({
+      "amountSpent": FieldValue.increment(data.amount)
+    });
     return databaseReference
         .collection('Orders')
         .document(orderId)
@@ -191,10 +195,14 @@ class Repository {
         .collection("extraSpent")
         .snapshots();
 
+
     return reference;
   }
 
   addExtraEarnedToOrder(String orderId, ExtraData data) {
+    databaseReference.collection("Orders").document(orderId).updateData({
+      "amountEarned": FieldValue.increment(data.amount)
+    });
     return databaseReference
         .collection('Orders')
         .document(orderId)
@@ -262,4 +270,11 @@ class Repository {
 
     return reference;
   }
+  getTeamMembersOnce() {
+    return databaseReference
+        .collection("Team")
+        .where("adminId",isEqualTo: uid)
+        .getDocuments();
+  }
+
 }

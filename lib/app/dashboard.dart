@@ -42,6 +42,12 @@ class _dashBoardScreenState extends State<dashBoardScreen>
 
   int todaySpent=0,monthlySpent=0;
   int todayEarned=0,monthlyEarned=0;
+
+  List<charts.Series> todaySeriesList = new List();
+  List<charts.Series> monthSeriesList = new List();
+
+  String monthTotal="₹ 0",todayTotal="₹ 0";
+  var monthTotalColor=Colors.blue,todayTotalColor=Colors.blue;
   @override
   void initState() {
     userName = "Hi ${Repository.user.name}";
@@ -51,11 +57,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
   }
 
   void initScreen() {
-    final todayData = [
-      new LinearBudgets("Spent", 100),
-      new LinearBudgets("Earned", 120),
-    ];
-    todaySeriesList = Utils.createPieData(todayData);
+
     final now = DateTime.now();
     _orderDateController.text = DateFormat("dd-MM-yyyy")
         .format(DateTime(now.year, now.month, now.day + 2));
@@ -86,14 +88,23 @@ class _dashBoardScreenState extends State<dashBoardScreen>
         });
       }
       final todayData = [
-        new LinearBudgets("Spent", spentToday.toDouble()??0),
-        new LinearBudgets("Earned", earnedToday.toDouble()??0),
+        new LinearBudgets("Spent", spentToday==0?1:spentToday),
+        new LinearBudgets("Earned", earnedToday==0?1:earnedToday),
       ];
       setState(() {
         todayOrdersList = tempMonthOrdersList;
-        //todaySeriesList = Utils.createPieData(todayData);
+        todaySeriesList = Utils.createPieData(todayData);
         todaySpent=spentToday;
         todayEarned=earnedToday;
+
+        todayTotal="₹ ${todayEarned-todaySpent}";
+        if(todayEarned-todaySpent==0){
+          todayTotalColor=Colors.blue;
+        }else if(todayEarned-todaySpent>0){
+          todayTotalColor=Colors.green;
+        }else{
+          todayTotalColor=Colors.red;
+        }
       });
     });
 
@@ -108,17 +119,27 @@ class _dashBoardScreenState extends State<dashBoardScreen>
           earnedMonthly+=order.amountEarned??0;
         });
       }
+      final todayData = [
+        new LinearBudgets("Spent", spentMonthly==0?1:spentMonthly),
+        new LinearBudgets("Earned", earnedMonthly==0?1:earnedMonthly),
+      ];
       setState(() {
         monthOrdersList = tempMonthOrdersList;
         monthlySpent=spentMonthly;
         monthlyEarned=earnedMonthly;
+        monthSeriesList = Utils.createPieData(todayData);
+        monthTotal="₹ ${monthlyEarned-monthlySpent}";
+        if(monthlyEarned-monthlySpent==0){
+          monthTotalColor=Colors.blue;
+        }else if(monthlyEarned-monthlySpent>0){
+          monthTotalColor=Colors.green;
+        }else{
+          monthTotalColor=Colors.red;
+        }
       });
     });
 
   }
-
-//new code
-  List<charts.Series> todaySeriesList = new List();
 
   @override
   Widget build(BuildContext context) {
@@ -264,7 +285,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                             MainAxisAlignment.center,
                                         children: <Widget>[
                                           Text(
-                                            "Total Orders",
+                                            "Total",
                                             style: TextStyle(
                                                 fontSize: 12.0,
                                                 color: Colors.black54,
@@ -274,10 +295,10 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                             padding: EdgeInsets.all(2),
                                           ),
                                           Text(
-                                            "${todayOrdersList.length}",
+                                            todayTotal,
                                             style: TextStyle(
                                                 fontSize: 20.0,
-                                                color: Colors.blue,
+                                                color: todayTotalColor,
                                                 fontWeight: FontWeight.bold),
                                           )
                                         ],
@@ -372,7 +393,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                               Stack(
                                 children: <Widget>[
                                   Container(
-                                    child: charts.PieChart(todaySeriesList,
+                                    child: charts.PieChart(monthSeriesList,
                                         animate: true,
                                         animationDuration:
                                             Duration(milliseconds: 500),
@@ -394,7 +415,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                             MainAxisAlignment.center,
                                         children: <Widget>[
                                           Text(
-                                            "Total Orders",
+                                            "Total",
                                             style: TextStyle(
                                                 fontSize: 12.0,
                                                 color: Colors.black54,
@@ -404,10 +425,10 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                             padding: EdgeInsets.all(2),
                                           ),
                                           Text(
-                                            "${monthOrdersList.length}",
+                                            monthTotal,
                                             style: TextStyle(
                                                 fontSize: 20.0,
-                                                color: Colors.blue,
+                                                color: monthTotalColor,
                                                 fontWeight: FontWeight.bold),
                                           )
                                         ],

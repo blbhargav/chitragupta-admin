@@ -42,6 +42,7 @@ class Product {
     this.invoiceAmount = snapshot.data["invoiceAmount"];
     this.remarks = snapshot.data["remarks"];
     this.id = snapshot.documentID;
+    this.payer=snapshot.data["payer"];
   }
 
   Map<String, dynamic> toMap() {

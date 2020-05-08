@@ -1,3 +1,4 @@
+import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/models/Order.dart';
 import 'package:chitragupta/models/Product.dart';
 import 'package:chitragupta/progress.dart';
@@ -49,20 +50,21 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   TextEditingController _ourQtyController = new TextEditingController();
   TextEditingController _usedQtyController = new TextEditingController();
   TextEditingController _purchasedQtyController = new TextEditingController();
-  TextEditingController _actualExcessQtyController = new TextEditingController();
+  TextEditingController _actualExcessQtyController =
+      new TextEditingController();
   TextEditingController _EODExcessController = new TextEditingController();
   TextEditingController _amountSpentController = new TextEditingController();
   TextEditingController _returnQtyController = new TextEditingController();
   TextEditingController _invoiceAmountController = new TextEditingController();
   TextEditingController _remarksController = new TextEditingController();
 
-  String _descriptionErrorTv=null,_poQtyErrorTv=null;
+  String _descriptionErrorTv = null, _poQtyErrorTv = null;
 
   List<Color> saveGradient = [
     Color(0xFF0EDED2),
     Color(0xFF03A0FE),
   ];
-
+  var event;
   @override
   void initState() {
     super.initState();
@@ -75,12 +77,15 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   List<ExtraData> extraEarned = new List();
 
   List<Product> productsList = new List();
-
+  List<Member> membersList = new List();
+  String member1Name="-",member2Name="-",member3Name="-",member4Name="-";
+  int member1Amount=0,member2Amount=0,member3Amount=0,member4Amount=0;
   void initScreen() {
-    repository.getOrder(widget.orderId).listen((event) {
+    repository.getOrder(widget.orderId).listen((_event) {
       setState(() {
         _loading = false;
-        order = Order.fromSnapshot(snapshot: event);
+        event=_event;
+        order = Order.fromSnapshot(snapshot: _event);
       });
     });
 
@@ -127,6 +132,36 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
       }
       setState(() {
         productsList = productS;
+      });
+    });
+
+    repository.getTeamMembersOnce().then((value) {
+      List<Member> tempMembersList = new List();
+      if (value.documents.length > 0) {
+        var i=0;
+        value.documents.forEach((element) {
+          Member member=Member.fromSnapshot(snapshot: element);
+          tempMembersList.add(member);
+          setState(() {
+            if(i==0){
+              member1Name=member.name;
+              member1Amount= event.data[member.userId];
+            }else if(i==1){
+              member2Name=member.name;
+              member2Amount= event.data[member.userId];
+            }else if(i==2){
+              member3Name=member.name;
+              member3Amount= event.data[member.userId];
+            }else if(i==3){
+              member4Name=member.name;
+              member4Amount= event.data[member.userId];
+            }
+          });
+          i++;
+        });
+      }
+      setState(() {
+        membersList = tempMembersList;
       });
     });
   }
@@ -296,7 +331,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                             padding: EdgeInsets.all(7),
                                             child: Row(
                                               children: <Widget>[
-                                                Text("${order.totalItems??0}",
+                                                Text("${order.totalItems ?? 0}",
                                                     style: TextStyle(
                                                         fontSize: 16,
                                                         color: Colors.black)),
@@ -353,7 +388,8 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                           padding: EdgeInsets.all(7),
                                           child: Row(
                                             children: <Widget>[
-                                              Text("0",
+                                              Text(
+                                                  "${order.procuredItems ?? 0}",
                                                   style: TextStyle(
                                                       fontSize: 16,
                                                       color: Colors.black)),
@@ -409,7 +445,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                           padding: EdgeInsets.all(7),
                                           child: Row(
                                             children: <Widget>[
-                                              Text("0",
+                                              Text("${order.amountSpent ?? 0}",
                                                   style: TextStyle(
                                                       fontSize: 16,
                                                       color: Colors.black)),
@@ -465,7 +501,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                           padding: EdgeInsets.all(7),
                                           child: Row(
                                             children: <Widget>[
-                                              Text("0",
+                                              Text("${order.amountEarned ?? 0}",
                                                   style: TextStyle(
                                                       fontSize: 16,
                                                       color: Colors.black)),
@@ -521,7 +557,8 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                           padding: EdgeInsets.all(7),
                                           child: Row(
                                             children: <Widget>[
-                                              Text("0",
+                                              Text(
+                                                  "${(order.amountEarned ?? 0) - (order.amountSpent ?? 0)}",
                                                   style: TextStyle(
                                                       fontSize: 18,
                                                       color: Colors.black)),
@@ -538,6 +575,55 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15.0),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 10),
+                      ),
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        elevation: 2,
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Text(member1Name,style:TextStyle(fontSize: 18,fontWeight: FontWeight.w700),),
+                                  Padding(padding: EdgeInsets.all(2),),
+                                  Text("₹ ${member1Amount}",style: TextStyle(color: Colors.blue[900]),)
+                                ],
+                              ),
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Text(member2Name,style:TextStyle(fontSize: 18,fontWeight: FontWeight.w700),),
+                                  Padding(padding: EdgeInsets.all(2),),
+                                  Text("₹ ${member2Amount}",style: TextStyle(color: Colors.blue[900]),)
+                                ],
+                              ),
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Text(member3Name,style:TextStyle(fontSize: 18,fontWeight: FontWeight.w700),),
+                                  Padding(padding: EdgeInsets.all(2),),
+                                  Text("₹ ${member3Amount}",style: TextStyle(color: Colors.blue[900]),)
+                                ],
+                              ),
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Text(member4Name,style:TextStyle(fontSize: 18,fontWeight: FontWeight.w700),),
+                                  Padding(padding: EdgeInsets.all(2),),
+                                  Text("₹ ${member4Amount}",style: TextStyle(color: Colors.blue[900]),)
+                                ],
+                              )
+                            ],
+                          ),
                         ),
                       ),
                       Padding(
@@ -846,175 +932,249 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               children: <Widget>[
                                 Expanded(
                                   child: Container(
-                                    child: Text("Description",style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600),),
+                                    child: Text(
+                                      "Description",
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w600),
+                                    ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Container(
-                                    child: Text("PO Qty",style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600),),
+                                    child: Text(
+                                      "PO Qty",
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w600),
+                                    ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Container(
-                                    child: Text("Our Qty",style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600),),
+                                    child: Text(
+                                      "Our Qty",
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w600),
+                                    ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Container(
-                                    child: Text("Used\nQty",style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600),),
+                                    child: Text(
+                                      "Used\nQty",
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w600),
+                                    ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Container(
-                                    child: Text("Purchased",style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600),),
+                                    child: Text(
+                                      "Purchased",
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w600),
+                                    ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Container(
-                                    child: Text("Actual\nExcess\nQty",style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600),),
+                                    child: Text(
+                                      "Actual\nExcess\nQty",
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w600),
+                                    ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Container(
-                                    child: Text("Eod\nExcess",style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600),),
+                                    child: Text(
+                                      "Eod\nExcess",
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w600),
+                                    ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Container(
-                                    child: Text("Amount\nSpent",style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600),),
+                                    child: Text(
+                                      "Amount\nSpent",
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w600),
+                                    ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Container(
-                                    child: Text("Return\nQty",style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600),),
+                                    child: Text(
+                                      "Return\nQty",
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w600),
+                                    ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Container(
-                                    child: Text("Invoice\nAmount",style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600),),
+                                    child: Text(
+                                      "Invoice\nAmount",
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w600),
+                                    ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Container(
-                                    child: Text("Remarks",style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600),),
+                                    child: Text(
+                                      "Remarks",
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w600),
+                                    ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Container(
-                                    child: Text("Payer",style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600),),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    child: Text("Paid",style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600),),
+                                    child: Text(
+                                      "Payer",
+                                      style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w600),
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                            productsList.length==0?Container(
-                              height: 200,
-                              child: Center(child: Text("No data found"),),
-                            ):Container(
-                              child: ListView.separated(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  separatorBuilder: (BuildContext context, int index) {
-                                    return Container(
-                                      padding: EdgeInsets.only(top: 10,bottom: 10),
-                                      width: MediaQuery.of(context).size.width,
-                                      height: 1,
-                                      color: Colors.grey,
-                                    );
-                                  },
-                                  padding: EdgeInsets.all(5),
-                                  scrollDirection: Axis.vertical,
-                                  itemCount: productsList.length,
-                                  itemBuilder: (BuildContext context, int index) {
-                                    return GestureDetector(
-                                      child: Container(
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                          children: <Widget>[
-                                            Expanded(
-                                              child: Container(
-                                                child: Text("${productsList[index].description}"),
+                            productsList.length == 0
+                                ? Container(
+                                    height: 200,
+                                    child: Center(
+                                      child: Text("No data found"),
+                                    ),
+                                  )
+                                : Container(
+                                    child: ListView.separated(
+                                        shrinkWrap: true,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        separatorBuilder:
+                                            (BuildContext context, int index) {
+                                          return Container(
+                                            padding: EdgeInsets.only(
+                                                top: 10, bottom: 10),
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            height: 1,
+                                            color: Colors.grey,
+                                          );
+                                        },
+                                        padding: EdgeInsets.all(5),
+                                        scrollDirection: Axis.vertical,
+                                        itemCount: productsList.length,
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          return GestureDetector(
+                                            child: Container(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: <Widget>[
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                          "${productsList[index].description}"),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                          "${productsList[index].POQty}"),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                          "${productsList[index].ourQty}"),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                          "${productsList[index].usedQty}"),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                          "${productsList[index].purchasedQty}"),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                          "${productsList[index].actualExcessQty}"),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                          "${productsList[index].EODExcess}"),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                          "${productsList[index].amountSpent}"),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                          "${productsList[index].returnQty}"),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                          "${productsList[index].invoiceAmount}"),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                          "${productsList[index].remarks ?? "-"}"),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                          "${productsList[index].payer ?? "-"}"),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
+                                              padding: EdgeInsets.only(
+                                                  bottom: 10, top: 10),
                                             ),
-                                            Expanded(
-                                              child: Container(
-                                                child: Text("${productsList[index].POQty}"),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                child: Text("${productsList[index].ourQty}"),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                child: Text("${productsList[index].usedQty}"),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                child: Text("${productsList[index].purchasedQty}"),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                child: Text("${productsList[index].actualExcessQty}"),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                child: Text("${productsList[index].EODExcess}"),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                child: Text("${productsList[index].amountSpent}"),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                child: Text("${productsList[index].returnQty}"),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                child: Text("${productsList[index].invoiceAmount}"),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                child: Text("${productsList[index].remarks??"-"}"),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                child: Text("${productsList[index].payer??"-"}"),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                child: Text("${productsList[index].paid??"-"}"),
-                                              ),
-                                            ),
-
-                                          ],
-                                        ),
-                                        padding: EdgeInsets.only(bottom: 10,top: 10),
-                                      ),
-                                      onTap: (){
-                                        showEditProductAlertDialog(context,productsList[index]);
-                                      },
-                                      onLongPress: (){
-                                        showDeleteproductAlert(context,productsList[index]);
-                                      },
-                                    );
-                                  }
-                              ),
-                            )
+                                            onTap: () {
+                                              showEditProductAlertDialog(
+                                                  context, productsList[index]);
+                                            },
+                                            onLongPress: () {
+                                              showDeleteproductAlert(
+                                                  context, productsList[index]);
+                                            },
+                                          );
+                                        }),
+                                  )
                           ],
                         ),
                       ),
@@ -1471,7 +1631,6 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                             ),
                           ),
                         ),
-
                         Padding(
                           padding: EdgeInsets.only(left: 10, right: 10),
                           child: new TextField(
@@ -1548,7 +1707,6 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                 TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
-
                         Padding(
                           padding: EdgeInsets.only(left: 10, right: 10),
                           child: new TextField(
@@ -1606,7 +1764,6 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                 TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
-
                         Padding(
                           padding: EdgeInsets.only(left: 10, right: 10),
                           child: new TextField(
@@ -1626,7 +1783,6 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                 TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
-
                         Padding(
                           padding: EdgeInsets.only(left: 10, right: 10),
                           child: new TextField(
@@ -1646,7 +1802,6 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                 TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
-
                         Padding(
                           padding: EdgeInsets.only(left: 10, right: 10),
                           child: new TextField(
@@ -1667,7 +1822,6 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                             maxLengthEnforced: true,
                           ),
                         ),
-
                         Padding(
                           padding: EdgeInsets.only(top: 10),
                         ),
@@ -1684,14 +1838,18 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                         Padding(
                           padding: EdgeInsets.only(top: 10),
                         ),
-                        InkWell(child: Center(
-                          child: Container(
-                            child: Text("Cancel",style: TextStyle(color: Colors.red),),
-                            padding: EdgeInsets.all(5),
+                        InkWell(
+                          child: Center(
+                            child: Container(
+                              child: Text(
+                                "Cancel",
+                                style: TextStyle(color: Colors.red),
+                              ),
+                              padding: EdgeInsets.all(5),
+                            ),
                           ),
-                        ),
-                          onTap: (){
-                          Navigator.pop(contxt);
+                          onTap: () {
+                            Navigator.pop(contxt);
                           },
                         )
                       ],
@@ -1702,97 +1860,96 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
         });
   }
 
-  void validateNewProduct() async{
-    _descriptionErrorTv=null;
-    _poQtyErrorTv=null;
-    if(_descriptionController.text.trim().length==0){
-      _descriptionErrorTv="Enter description";
+  void validateNewProduct() async {
+    _descriptionErrorTv = null;
+    _poQtyErrorTv = null;
+    if (_descriptionController.text.trim().length == 0) {
+      _descriptionErrorTv = "Enter description";
       showAddProductAlertDialog(context);
       return;
     }
 
-    if(_poQtyController.text.trim().length==0){
-      _poQtyErrorTv="Enter PO Quantity";
+    if (_poQtyController.text.trim().length == 0) {
+      _poQtyErrorTv = "Enter PO Quantity";
       showAddProductAlertDialog(context);
       return;
     }
 
     setState(() {
-      _loading=true;
+      _loading = true;
     });
 
-    var product=Product();
-    product.description=_descriptionController.text;
-    product.POQty=int.parse(_poQtyController.text);
+    var product = Product();
+    product.description = _descriptionController.text;
+    product.POQty = int.parse(_poQtyController.text);
 
-    if(_ourQtyController.text.trim().length>0){
-      product.ourQty=int.parse(_ourQtyController.text);
-    }else{
-      product.ourQty=0;
+    if (_ourQtyController.text.trim().length > 0) {
+      product.ourQty = int.parse(_ourQtyController.text);
+    } else {
+      product.ourQty = 0;
     }
 
-    if(_usedQtyController.text.trim().length>0){
-      product.usedQty=int.parse(_usedQtyController.text);
-    }else{
-      product.usedQty=0;
+    if (_usedQtyController.text.trim().length > 0) {
+      product.usedQty = int.parse(_usedQtyController.text);
+    } else {
+      product.usedQty = 0;
     }
 
-    if(_purchasedQtyController.text.trim().length>0){
-      product.purchasedQty=int.parse(_purchasedQtyController.text);
-    }else{
-      product.purchasedQty=0;
+    if (_purchasedQtyController.text.trim().length > 0) {
+      product.purchasedQty = int.parse(_purchasedQtyController.text);
+    } else {
+      product.purchasedQty = 0;
     }
 
-    if(_actualExcessQtyController.text.trim().length>0){
-      product.actualExcessQty=int.parse(_actualExcessQtyController.text);
-    }else{
-      product.actualExcessQty=0;
+    if (_actualExcessQtyController.text.trim().length > 0) {
+      product.actualExcessQty = int.parse(_actualExcessQtyController.text);
+    } else {
+      product.actualExcessQty = 0;
     }
 
-    if(_EODExcessController.text.trim().length>0){
-      product.EODExcess=int.parse(_EODExcessController.text);
-    }else{
-      product.EODExcess=0;
+    if (_EODExcessController.text.trim().length > 0) {
+      product.EODExcess = int.parse(_EODExcessController.text);
+    } else {
+      product.EODExcess = 0;
     }
 
-    if(_amountSpentController.text.trim().length>0){
-      product.amountSpent=int.parse(_amountSpentController.text);
-    }else{
-      product.amountSpent=0;
+    if (_amountSpentController.text.trim().length > 0) {
+      product.amountSpent = int.parse(_amountSpentController.text);
+    } else {
+      product.amountSpent = 0;
     }
 
-    if(_returnQtyController.text.trim().length>0){
-      product.returnQty=int.parse(_returnQtyController.text);
-    }else{
-      product.returnQty=0;
+    if (_returnQtyController.text.trim().length > 0) {
+      product.returnQty = int.parse(_returnQtyController.text);
+    } else {
+      product.returnQty = 0;
     }
 
-    if(_invoiceAmountController.text.trim().length>0){
-      product.invoiceAmount=int.parse(_invoiceAmountController.text);
-    }else{
-      product.invoiceAmount=0;
+    if (_invoiceAmountController.text.trim().length > 0) {
+      product.invoiceAmount = int.parse(_invoiceAmountController.text);
+    } else {
+      product.invoiceAmount = 0;
     }
 
-    if(_remarksController.text.trim().length>0){
-      product.remarks=_remarksController.text;
+    if (_remarksController.text.trim().length > 0) {
+      product.remarks = _remarksController.text;
     }
 
     await repository.addProductToOrder(widget.orderId, product);
     setState(() {
-      _loading=false;
+      _loading = false;
     });
-    _descriptionController.text="";
-    _poQtyController.text="";
-    _ourQtyController.text="";
-    _usedQtyController.text="";
-    _purchasedQtyController.text="";
-    _actualExcessQtyController.text="";
-    _EODExcessController.text="";
-    _amountSpentController.text="";
-    _returnQtyController.text="";
-    _invoiceAmountController.text="";
-    _remarksController.text="";
-
+    _descriptionController.text = "";
+    _poQtyController.text = "";
+    _ourQtyController.text = "";
+    _usedQtyController.text = "";
+    _purchasedQtyController.text = "";
+    _actualExcessQtyController.text = "";
+    _EODExcessController.text = "";
+    _amountSpentController.text = "";
+    _returnQtyController.text = "";
+    _invoiceAmountController.text = "";
+    _remarksController.text = "";
   }
 
   showDeleteproductAlert(BuildContext contxt, Product product) {
@@ -1806,7 +1963,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
             content: Container(
               width: 500.0,
               padding:
-              EdgeInsets.only(top: 10, right: 15, bottom: 10, left: 15),
+                  EdgeInsets.only(top: 10, right: 15, bottom: 10, left: 15),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -1816,7 +1973,6 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                     "Delete ${product.description} ?",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                   ),
-
                   Padding(
                     padding: EdgeInsets.all(20),
                   ),
@@ -1826,7 +1982,8 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                     child: RaisedButton(
                       child: Text(
                         "Delete",
-                        style: TextStyle(color: Colors.white,fontWeight: FontWeight.w700),
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w700),
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(5.0),
@@ -1849,28 +2006,28 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
         });
   }
 
-  void deleteProduct(String id) async{
+  void deleteProduct(String id) async {
     setState(() {
-      _loading=true;
+      _loading = true;
     });
     await repository.removeProductFromOrder(widget.orderId, id);
     setState(() {
-      _loading=false;
+      _loading = false;
     });
   }
 
-  showEditProductAlertDialog(BuildContext contxt,Product product) {
-    _descriptionController.text=product.description;
-    _poQtyController.text=product.POQty.toString();
-    _ourQtyController.text=product.ourQty.toString();
-    _usedQtyController.text=product.usedQty.toString();
-    _purchasedQtyController.text=product.purchasedQty.toString();
-    _actualExcessQtyController.text=product.actualExcessQty.toString();
-    _EODExcessController.text=product.EODExcess.toString();
-    _amountSpentController.text=product.amountSpent.toString();
-    _returnQtyController.text=product.returnQty.toString();
-    _invoiceAmountController.text=product.invoiceAmount.toString();
-    _remarksController.text=product.remarks.toString();
+  showEditProductAlertDialog(BuildContext contxt, Product product) {
+    _descriptionController.text = product.description;
+    _poQtyController.text = product.POQty.toString();
+    _ourQtyController.text = product.ourQty.toString();
+    _usedQtyController.text = product.usedQty.toString();
+    _purchasedQtyController.text = product.purchasedQty.toString();
+    _actualExcessQtyController.text = product.actualExcessQty.toString();
+    _EODExcessController.text = product.EODExcess.toString();
+    _amountSpentController.text = product.amountSpent.toString();
+    _returnQtyController.text = product.returnQty.toString();
+    _invoiceAmountController.text = product.invoiceAmount.toString();
+    _remarksController.text = product.remarks.toString();
     return showDialog(
         context: contxt,
         barrierDismissible: false,
@@ -1921,7 +2078,6 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                             ),
                           ),
                         ),
-
                         Padding(
                           padding: EdgeInsets.only(left: 10, right: 10),
                           child: new TextField(
@@ -1957,7 +2113,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               //errorText: amountErrorTV
                             ),
                             keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                                TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
                         Padding(
@@ -1976,7 +2132,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               //errorText: amountErrorTV
                             ),
                             keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                                TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
                         Padding(
@@ -1995,10 +2151,9 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               //errorText: amountErrorTV
                             ),
                             keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                                TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
-
                         Padding(
                           padding: EdgeInsets.only(left: 10, right: 10),
                           child: new TextField(
@@ -2015,7 +2170,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               //errorText: amountErrorTV
                             ),
                             keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                                TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
                         Padding(
@@ -2034,7 +2189,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               //errorText: amountErrorTV
                             ),
                             keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                                TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
                         Padding(
@@ -2053,10 +2208,9 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               //errorText: amountErrorTV
                             ),
                             keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                                TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
-
                         Padding(
                           padding: EdgeInsets.only(left: 10, right: 10),
                           child: new TextField(
@@ -2073,10 +2227,9 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               //errorText: amountErrorTV
                             ),
                             keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                                TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
-
                         Padding(
                           padding: EdgeInsets.only(left: 10, right: 10),
                           child: new TextField(
@@ -2093,10 +2246,9 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               //errorText: amountErrorTV
                             ),
                             keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
+                                TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
-
                         Padding(
                           padding: EdgeInsets.only(left: 10, right: 10),
                           child: new TextField(
@@ -2117,14 +2269,13 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                             maxLengthEnforced: true,
                           ),
                         ),
-
                         Padding(
                           padding: EdgeInsets.only(top: 10),
                         ),
                         GestureDetector(
                           child: Center(
                             child:
-                            roundedRectButton("Save", saveGradient, false),
+                                roundedRectButton("Save", saveGradient, false),
                           ),
                           onTap: () {
                             Navigator.pop(contxt);
@@ -2134,13 +2285,17 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                         Padding(
                           padding: EdgeInsets.only(top: 10),
                         ),
-                        InkWell(child: Center(
-                          child: Container(
-                            child: Text("Cancel",style: TextStyle(color: Colors.red),),
-                            padding: EdgeInsets.all(5),
+                        InkWell(
+                          child: Center(
+                            child: Container(
+                              child: Text(
+                                "Cancel",
+                                style: TextStyle(color: Colors.red),
+                              ),
+                              padding: EdgeInsets.all(5),
+                            ),
                           ),
-                        ),
-                          onTap: (){
+                          onTap: () {
                             Navigator.pop(contxt);
                           },
                         )
@@ -2151,94 +2306,94 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
           );
         });
   }
-  void validateEditProduct(Product product) async{
-    _descriptionErrorTv=null;
-    _poQtyErrorTv=null;
-    if(_descriptionController.text.trim().length==0){
-      _descriptionErrorTv="Enter description";
+
+  void validateEditProduct(Product product) async {
+    _descriptionErrorTv = null;
+    _poQtyErrorTv = null;
+    if (_descriptionController.text.trim().length == 0) {
+      _descriptionErrorTv = "Enter description";
       showAddProductAlertDialog(context);
       return;
     }
 
-    if(_poQtyController.text.trim().length==0){
-      _poQtyErrorTv="Enter PO Quantity";
+    if (_poQtyController.text.trim().length == 0) {
+      _poQtyErrorTv = "Enter PO Quantity";
       showAddProductAlertDialog(context);
       return;
     }
 
     setState(() {
-      _loading=true;
+      _loading = true;
     });
-    product.description=_descriptionController.text;
-    product.POQty=int.parse(_poQtyController.text);
+    product.description = _descriptionController.text;
+    product.POQty = int.parse(_poQtyController.text);
 
-    if(_ourQtyController.text.trim().length>0){
-      product.ourQty=int.parse(_ourQtyController.text);
-    }else{
-      product.ourQty=0;
+    if (_ourQtyController.text.trim().length > 0) {
+      product.ourQty = int.parse(_ourQtyController.text);
+    } else {
+      product.ourQty = 0;
     }
 
-    if(_usedQtyController.text.trim().length>0){
-      product.usedQty=int.parse(_usedQtyController.text);
-    }else{
-      product.usedQty=0;
+    if (_usedQtyController.text.trim().length > 0) {
+      product.usedQty = int.parse(_usedQtyController.text);
+    } else {
+      product.usedQty = 0;
     }
 
-    if(_purchasedQtyController.text.trim().length>0){
-      product.purchasedQty=int.parse(_purchasedQtyController.text);
-    }else{
-      product.purchasedQty=0;
+    if (_purchasedQtyController.text.trim().length > 0) {
+      product.purchasedQty = int.parse(_purchasedQtyController.text);
+    } else {
+      product.purchasedQty = 0;
     }
 
-    if(_actualExcessQtyController.text.trim().length>0){
-      product.actualExcessQty=int.parse(_actualExcessQtyController.text);
-    }else{
-      product.actualExcessQty=0;
+    if (_actualExcessQtyController.text.trim().length > 0) {
+      product.actualExcessQty = int.parse(_actualExcessQtyController.text);
+    } else {
+      product.actualExcessQty = 0;
     }
 
-    if(_EODExcessController.text.trim().length>0){
-      product.EODExcess=int.parse(_EODExcessController.text);
-    }else{
-      product.EODExcess=0;
+    if (_EODExcessController.text.trim().length > 0) {
+      product.EODExcess = int.parse(_EODExcessController.text);
+    } else {
+      product.EODExcess = 0;
     }
 
-    if(_amountSpentController.text.trim().length>0){
-      product.amountSpent=int.parse(_amountSpentController.text);
-    }else{
-      product.amountSpent=0;
+    if (_amountSpentController.text.trim().length > 0) {
+      product.amountSpent = int.parse(_amountSpentController.text);
+    } else {
+      product.amountSpent = 0;
     }
 
-    if(_returnQtyController.text.trim().length>0){
-      product.returnQty=int.parse(_returnQtyController.text);
-    }else{
-      product.returnQty=0;
+    if (_returnQtyController.text.trim().length > 0) {
+      product.returnQty = int.parse(_returnQtyController.text);
+    } else {
+      product.returnQty = 0;
     }
 
-    if(_invoiceAmountController.text.trim().length>0){
-      product.invoiceAmount=int.parse(_invoiceAmountController.text);
-    }else{
-      product.invoiceAmount=0;
+    if (_invoiceAmountController.text.trim().length > 0) {
+      product.invoiceAmount = int.parse(_invoiceAmountController.text);
+    } else {
+      product.invoiceAmount = 0;
     }
 
-    if(_remarksController.text.trim().length>0){
-      product.remarks=_remarksController.text;
+    if (_remarksController.text.trim().length > 0) {
+      product.remarks = _remarksController.text;
     }
 
     await repository.updateProductInOrder(widget.orderId, product);
     setState(() {
-      _loading=false;
+      _loading = false;
     });
-    _descriptionController.text="";
-    _poQtyController.text="";
-    _ourQtyController.text="";
-    _usedQtyController.text="";
-    _purchasedQtyController.text="";
-    _actualExcessQtyController.text="";
-    _EODExcessController.text="";
-    _amountSpentController.text="";
-    _returnQtyController.text="";
-    _invoiceAmountController.text="";
-    _remarksController.text="";
-
+    _descriptionController.text = "";
+    _poQtyController.text = "";
+    _ourQtyController.text = "";
+    _usedQtyController.text = "";
+    _purchasedQtyController.text = "";
+    _actualExcessQtyController.text = "";
+    _EODExcessController.text = "";
+    _amountSpentController.text = "";
+    _returnQtyController.text = "";
+    _invoiceAmountController.text = "";
+    _remarksController.text = "";
   }
 }

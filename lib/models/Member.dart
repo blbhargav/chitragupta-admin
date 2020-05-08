@@ -14,14 +14,14 @@ class Member {
     email = json['email'];
     mobile = json['mobile'];
     name = json['name'];
-    userId = json['userId'];
+    userId = json['uid'];
   }
   Member.fromSnapshot({DocumentSnapshot snapshot}) {
     adminId = snapshot.data['adminId'];
     email = snapshot.data['email'];
     mobile = snapshot.data['mobile'];
     name = snapshot.data['name'];
-    userId = snapshot.data['userId'];
+    userId = snapshot.data['uid'];
     id=snapshot.documentID;
   }
 
@@ -31,7 +31,7 @@ class Member {
     data['email'] = this.email;
     data['mobile'] = this.mobile;
     data['name'] = this.name;
-    data['userId'] = this.userId;
+    data['uid'] = this.userId;
     return data;
   }
 }
