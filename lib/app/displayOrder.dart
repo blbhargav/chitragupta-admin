@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/models/Order.dart';
 import 'package:chitragupta/models/Product.dart';
@@ -9,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:chitragupta/models/ExtraData.dart';
+import 'dart:html' as html;
 
 import '../login.dart';
 
@@ -80,6 +84,16 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   List<Member> membersList = new List();
   String member1Name="-",member2Name="-",member3Name="-",member4Name="-";
   int member1Amount=0,member2Amount=0,member3Amount=0,member4Amount=0;
+
+  List<int> _selectedFile;
+  Uint8List _bytesData;
+  void _handleResult(Object result) {
+    setState(() {
+      _bytesData = Base64Decoder().convert(result.toString().split(",").last);
+      _selectedFile = _bytesData;
+    });
+  }
+
   void initScreen() {
     repository.getOrder(widget.orderId).listen((_event) {
       setState(() {
@@ -921,7 +935,25 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                     fontSize: 25,
                                     color: Utils.headingColor,
                                   ),
-                                )
+                                ),
+                                RaisedButton(child: Text("Import xlsx"),hoverColor: Colors.orange,onPressed: (){
+                                  html.InputElement uploadInput = html.FileUploadInputElement();
+                                  uploadInput.multiple = false;
+                                  uploadInput.draggable = true;
+                                  uploadInput.accept = '.xlsx';
+                                  uploadInput.click();
+                                  uploadInput.onChange.listen((e) {
+                                    final files = uploadInput.files;
+                                    final file = files[0];
+                                    final reader = new html.FileReader();
+
+                                    reader.onLoadEnd.listen((e) {
+                                      _handleResult(reader.result);
+                                    });
+                                    reader.readAsDataUrl(file);
+                                    print("BLB file ${_selectedFile.length}");
+                                  });
+                                },),
                               ],
                             ),
                             Padding(
