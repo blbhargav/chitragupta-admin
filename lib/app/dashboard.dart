@@ -41,6 +41,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
   List<Order> monthOrdersList = new List();
 
   int todaySpent=0,monthlySpent=0;
+  int todayEarned=0,monthlyEarned=0;
   @override
   void initState() {
     userName = "Hi ${Repository.user.name}";
@@ -69,36 +70,48 @@ class _dashBoardScreenState extends State<dashBoardScreen>
       }
       setState(() {
         recentOrdersList = tempMonthOrdersList;
-        todaySeriesList = Utils.createPieData(todayData);
+       // todaySeriesList = Utils.createPieData(todayData);
       });
     });
 
     repository.getTodayOrders().listen((event) {
       List<Order> tempMonthOrdersList = new List();
+      int spentToday=0,earnedToday=0;
       if (event.documents.length > 0) {
         event.documents.forEach((element) {
           Order order=Order.fromSnapshot(snapshot: element);
           tempMonthOrdersList.add(order);
+          spentToday+=order.amountSpent??0;
+          earnedToday+=order.amountEarned??0;
         });
       }
+      final todayData = [
+        new LinearBudgets("Spent", spentToday.toDouble()??0),
+        new LinearBudgets("Earned", earnedToday.toDouble()??0),
+      ];
       setState(() {
         todayOrdersList = tempMonthOrdersList;
+        //todaySeriesList = Utils.createPieData(todayData);
+        todaySpent=spentToday;
+        todayEarned=earnedToday;
       });
     });
 
     repository.getThisMonthOrdersOrders().listen((event) {
       List<Order> tempMonthOrdersList = new List();
-      int spentMonthly=0;
+      int spentMonthly=0,earnedMonthly=0;
       if (event.documents.length > 0) {
         event.documents.forEach((element) {
           Order order=Order.fromSnapshot(snapshot: element);
           tempMonthOrdersList.add(order);
           spentMonthly+=order.amountSpent??0;
+          earnedMonthly+=order.amountEarned??0;
         });
       }
       setState(() {
         monthOrdersList = tempMonthOrdersList;
         monthlySpent=spentMonthly;
+        monthlyEarned=earnedMonthly;
       });
     });
 
@@ -324,7 +337,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                         padding: EdgeInsets.all(3),
                                       ),
                                       Text(
-                                        "₹ 80",
+                                        "₹ $todayEarned",
                                         style: TextStyle(
                                             fontSize: 14,
                                             fontStyle: FontStyle.italic,
@@ -454,7 +467,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                         padding: EdgeInsets.all(3),
                                       ),
                                       Text(
-                                        "₹ 80",
+                                        "₹ $monthlyEarned",
                                         style: TextStyle(
                                             fontSize: 14,
                                             fontStyle: FontStyle.italic,
