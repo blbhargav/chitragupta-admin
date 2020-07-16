@@ -1,5 +1,5 @@
 import 'package:chitragupta/login.dart';
-import 'package:chitragupta/progress.dart';
+import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';

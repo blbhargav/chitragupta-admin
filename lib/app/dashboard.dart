@@ -4,9 +4,9 @@ import 'dart:convert';
 import 'package:chitragupta/app/createOrder.dart';
 import 'package:chitragupta/app/displayOrder.dart';
 import 'package:chitragupta/models/Order.dart';
-import 'package:chitragupta/progress.dart';
+import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/repository.dart';
-import 'package:chitragupta/util.dart';
+import 'package:chitragupta/extension/util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -143,167 +143,358 @@ class _dashBoardScreenState extends State<dashBoardScreen>
 
   @override
   Widget build(BuildContext context) {
-    return ProgressHUD(
-      child: Scaffold(
-        body: MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: ListView(
-              shrinkWrap: true,
-              children: <Widget>[
-                Container(
-                  //margin: EdgeInsets.only(top: 30,),
-                  padding:
-                      EdgeInsets.only(top: 38, left: 10, right: 10, bottom: 10),
-                  color: Colors.lightBlue[900],
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+    return MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        child: ListView(
+          shrinkWrap: true,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(
+                top: 15,
+              ),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                // Box decoration takes a gradient
+                  color: Colors.white),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.all(4),
-                      ),
-                      Card(
-                          child: Padding(
-                            padding: EdgeInsets.all(2),
-                            child: CircleAvatar(
-                              radius: 15.0,
-                              backgroundImage: AssetImage(
-                                "assets/logo.png",
-                              ),
-                              backgroundColor: Colors.white,
-                            ),
+                      Align(
+                        child: Container(
+                          child: Text(
+                            "Today insights",
+                            style: TextStyle(
+                                fontSize: 18, color: Utils.headingColor,fontWeight: FontWeight.w700),
                           ),
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          )),
-                      Padding(
-                        padding: EdgeInsets.all(4),
-                      ),
-                      Container(
-                        child: Text(
-                          "${userName}",
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white),
+                          padding: EdgeInsets.only(left: 0),
                         ),
-                        padding: EdgeInsets.only(top: 3),
+                        alignment: Alignment.centerLeft,
                       ),
-                      Spacer(),
-                      GestureDetector(
-                        child: Stack(
-                          children: <Widget>[
-                            new Icon(
-                              Icons.notifications,
-                              color: Colors.white,
-                            ),
-                            new Positioned(
-                              right: 0,
-                              child: new Container(
-                                padding: EdgeInsets.all(1),
-                                decoration: new BoxDecoration(
-                                  color: Colors.transparent,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                constraints: BoxConstraints(
-                                  minWidth: 12,
-                                  minHeight: 12,
-                                ),
-                                child: new Text(
-                                  '',
-                                  style: new TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 8,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Stack(
+                            children: <Widget>[
+                              Container(
+                                child: charts.PieChart(todaySeriesList,
+                                    animate: true,
+                                    animationDuration:
+                                    Duration(milliseconds: 500),
+                                    // Configure the width of the pie slices to 60px. The remaining space in
+                                    // the chart will be left as a hole in the center.
+                                    defaultRenderer:
+                                    new charts.ArcRendererConfig(
+                                      arcWidth: 25,
+                                    )),
+                                height: 220,
+                                width: 220,
+                              ),
+                              Container(
+                                height: 220,
+                                width: 220,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text(
+                                        "Total",
+                                        style: TextStyle(
+                                            fontSize: 12.0,
+                                            color: Colors.black54,
+                                            fontWeight: FontWeight.normal),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.all(2),
+                                      ),
+                                      Text(
+                                        todayTotal,
+                                        style: TextStyle(
+                                            fontSize: 20.0,
+                                            color: todayTotalColor,
+                                            fontWeight: FontWeight.bold),
+                                      )
+                                    ],
                                   ),
-                                  textAlign: TextAlign.center,
                                 ),
                               ),
-                            )
-                          ],
-                        ),
-                        onTap: () {},
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(5),
+                            ],
+                          ),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Container(
+                                    width: 10,
+                                    height: 10,
+                                    color: Colors.deepOrange,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(3),
+                                  ),
+                                  Text(
+                                    "Spent",
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(3),
+                                  ),
+                                  Text(
+                                    "₹ $todaySpent",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.black54),
+                                  )
+                                ],
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(2),
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  Container(
+                                    width: 10,
+                                    height: 10,
+                                    color: Colors.green,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(3),
+                                  ),
+                                  Text(
+                                    "Earned",
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(3),
+                                  ),
+                                  Text(
+                                    "₹ $todayEarned",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.black54),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(
-                    top: 15,
-                  ),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      // Box decoration takes a gradient
-                      color: Colors.white),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Align(
-                            child: Container(
-                              child: Text(
-                                "Today insights",
-                                style: TextStyle(
-                                    fontSize: 18, color: Utils.headingColor,fontWeight: FontWeight.w700),
-                              ),
-                              padding: EdgeInsets.only(left: 0),
-                            ),
-                            alignment: Alignment.centerLeft,
+                      Align(
+                        child: Container(
+                          child: Text(
+                            "${DateFormat('MMM, yyyy').format(DateTime.now())} insights",
+                            style: TextStyle(
+                                fontSize: 18,color: Utils.headingColor, fontWeight: FontWeight.w700),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                          padding: EdgeInsets.only(left: 0),
+                        ),
+                        alignment: Alignment.centerLeft,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Stack(
                             children: <Widget>[
-                              Stack(
+                              Container(
+                                child: charts.PieChart(monthSeriesList,
+                                    animate: true,
+                                    animationDuration:
+                                    Duration(milliseconds: 500),
+                                    // Configure the width of the pie slices to 60px. The remaining space in
+                                    // the chart will be left as a hole in the center.
+                                    defaultRenderer:
+                                    new charts.ArcRendererConfig(
+                                      arcWidth: 25,
+                                    )),
+                                height: 220,
+                                width: 220,
+                              ),
+                              Container(
+                                height: 220,
+                                width: 220,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text(
+                                        "Total",
+                                        style: TextStyle(
+                                            fontSize: 12.0,
+                                            color: Colors.black54,
+                                            fontWeight: FontWeight.normal),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.all(2),
+                                      ),
+                                      Text(
+                                        monthTotal,
+                                        style: TextStyle(
+                                            fontSize: 20.0,
+                                            color: monthTotalColor,
+                                            fontWeight: FontWeight.bold),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Row(
                                 children: <Widget>[
                                   Container(
-                                    child: charts.PieChart(todaySeriesList,
-                                        animate: true,
-                                        animationDuration:
-                                            Duration(milliseconds: 500),
-                                        // Configure the width of the pie slices to 60px. The remaining space in
-                                        // the chart will be left as a hole in the center.
-                                        defaultRenderer:
-                                            new charts.ArcRendererConfig(
-                                          arcWidth: 25,
-                                        )),
-                                    height: 220,
-                                    width: 220,
+                                    width: 10,
+                                    height: 10,
+                                    color: Colors.deepOrange,
                                   ),
+                                  Padding(
+                                    padding: EdgeInsets.all(3),
+                                  ),
+                                  Text(
+                                    "Spent",
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(3),
+                                  ),
+                                  Text(
+                                    "₹ $monthlySpent",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.black54),
+                                  )
+                                ],
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(2),
+                              ),
+                              Row(
+                                children: <Widget>[
                                   Container(
-                                    height: 220,
-                                    width: 220,
-                                    child: Center(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          Text(
-                                            "Total",
-                                            style: TextStyle(
-                                                fontSize: 12.0,
-                                                color: Colors.black54,
-                                                fontWeight: FontWeight.normal),
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.all(2),
-                                          ),
-                                          Text(
-                                            todayTotal,
-                                            style: TextStyle(
-                                                fontSize: 20.0,
-                                                color: todayTotalColor,
-                                                fontWeight: FontWeight.bold),
-                                          )
-                                        ],
+                                    width: 10,
+                                    height: 10,
+                                    color: Colors.green,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(3),
+                                  ),
+                                  Text(
+                                    "Earned",
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(3),
+                                  ),
+                                  Text(
+                                    "₹ $monthlyEarned",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.black54),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+            Align(
+              child: Container(
+                child: Text(
+                  "Upcoming Orders",
+                  style:
+                  TextStyle(fontSize: 18, color: Utils.headingColor,fontWeight: FontWeight.w700),
+                ),
+                padding: EdgeInsets.only(left: 15, top: 5, bottom: 5),
+              ),
+              alignment: Alignment.centerLeft,
+            ),
+            recentOrdersList.length == 0
+                ? Container(
+              margin: EdgeInsets.only(top: 100),
+              child: Center(
+                child: Text("No orders found"),
+              ),
+            )
+                : Container(
+              margin: EdgeInsets.only(top: 5),
+              child: ListView.separated(
+                  shrinkWrap: true,
+                  physics: BouncingScrollPhysics(),
+                  separatorBuilder: (BuildContext context, int index) {
+                    return SizedBox(
+                      height: 10,
+                    );
+                  },
+                  padding: EdgeInsets.all(5),
+                  scrollDirection: Axis.vertical,
+                  itemCount: recentOrdersList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    var pocuredColor=Colors.red[600];
+                    if(recentOrdersList[index].totalItems==recentOrdersList[index].procuredItems){
+                      pocuredColor=Colors.green[800];
+                    }
+                    return GestureDetector(
+                      child: Card(
+                        elevation: 2,
+                        child: Container(
+                          padding: EdgeInsets.all(12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Image.asset("assets/logo.png",width: 70,height: 70,),
+                                  Padding(
+                                    padding: EdgeInsets.all(2),
+                                  ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        "#${recentOrdersList[index].orderId}",
+                                        style: TextStyle(fontSize:18,fontWeight: FontWeight.w700),
                                       ),
-                                    ),
+                                      Padding(
+                                        padding: EdgeInsets.all(3),
+                                      ),
+                                      Text("${recentOrdersList[index].name}",
+                                          style: TextStyle(
+                                              fontSize: 16, color: Colors.black54,fontWeight: FontWeight.w500)),
+                                      Padding(
+                                        padding: EdgeInsets.all(3),
+                                      ),
+                                      Text("Created @ ${DateFormat("dd-MMM-yyyy hh:mm a").format(recentOrdersList[index].createdDate)}",
+                                          style: TextStyle(
+                                              fontSize: 15, color: Colors.black45,fontWeight: FontWeight.w300)),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -313,450 +504,697 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                 children: <Widget>[
                                   Row(
                                     children: <Widget>[
-                                      Container(
-                                        width: 10,
-                                        height: 10,
-                                        color: Colors.deepOrange,
-                                      ),
+                                      Icon(Icons.calendar_today,color: Colors.cyan,),
                                       Padding(
-                                        padding: EdgeInsets.all(3),
+                                        padding: EdgeInsets.all(2),
                                       ),
-                                      Text(
-                                        "Spent",
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(3),
-                                      ),
-                                      Text(
-                                        "₹ $todaySpent",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontStyle: FontStyle.italic,
-                                            color: Colors.black54),
-                                      )
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(2),
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Container(
-                                        width: 10,
-                                        height: 10,
-                                        color: Colors.green,
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(3),
-                                      ),
-                                      Text(
-                                        "Earned",
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(3),
-                                      ),
-                                      Text(
-                                        "₹ $todayEarned",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontStyle: FontStyle.italic,
-                                            color: Colors.black54),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Align(
-                            child: Container(
-                              child: Text(
-                                "${DateFormat('MMM, yyyy').format(DateTime.now())} insights",
-                                style: TextStyle(
-                                    fontSize: 18,color: Utils.headingColor, fontWeight: FontWeight.w700),
-                              ),
-                              padding: EdgeInsets.only(left: 0),
-                            ),
-                            alignment: Alignment.centerLeft,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              Stack(
-                                children: <Widget>[
-                                  Container(
-                                    child: charts.PieChart(monthSeriesList,
-                                        animate: true,
-                                        animationDuration:
-                                            Duration(milliseconds: 500),
-                                        // Configure the width of the pie slices to 60px. The remaining space in
-                                        // the chart will be left as a hole in the center.
-                                        defaultRenderer:
-                                            new charts.ArcRendererConfig(
-                                          arcWidth: 25,
-                                        )),
-                                    height: 220,
-                                    width: 220,
-                                  ),
-                                  Container(
-                                    height: 220,
-                                    width: 220,
-                                    child: Center(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: <Widget>[
                                           Text(
-                                            "Total",
-                                            style: TextStyle(
-                                                fontSize: 12.0,
-                                                color: Colors.black54,
-                                                fontWeight: FontWeight.normal),
+                                            "Order Date",
+                                            style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
                                           ),
-                                          Padding(
-                                            padding: EdgeInsets.all(2),
-                                          ),
-                                          Text(
-                                            monthTotal,
-                                            style: TextStyle(
-                                                fontSize: 20.0,
-                                                color: monthTotalColor,
-                                                fontWeight: FontWeight.bold),
-                                          )
                                         ],
                                       ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Row(
-                                    children: <Widget>[
-                                      Container(
-                                        width: 10,
-                                        height: 10,
-                                        color: Colors.deepOrange,
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(3),
-                                      ),
-                                      Text(
-                                        "Spent",
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(3),
-                                      ),
-                                      Text(
-                                        "₹ $monthlySpent",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontStyle: FontStyle.italic,
-                                            color: Colors.black54),
-                                      )
                                     ],
                                   ),
                                   Padding(
-                                    padding: EdgeInsets.all(2),
+                                    padding: EdgeInsets.all(6),
                                   ),
-                                  Row(
-                                    children: <Widget>[
-                                      Container(
-                                        width: 10,
-                                        height: 10,
-                                        color: Colors.green,
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(3),
-                                      ),
-                                      Text(
-                                        "Earned",
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(3),
-                                      ),
-                                      Text(
-                                        "₹ $monthlyEarned",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontStyle: FontStyle.italic,
-                                            color: Colors.black54),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-                Align(
-                  child: Container(
-                    child: Text(
-                      "Upcoming Orders",
-                      style:
-                          TextStyle(fontSize: 18, color: Utils.headingColor,fontWeight: FontWeight.w700),
-                    ),
-                    padding: EdgeInsets.only(left: 15, top: 5, bottom: 5),
-                  ),
-                  alignment: Alignment.centerLeft,
-                ),
-                recentOrdersList.length == 0
-                    ? Container(
-                        margin: EdgeInsets.only(top: 100),
-                        child: Center(
-                          child: Text("No orders found"),
-                        ),
-                      )
-                    : Container(
-                        margin: EdgeInsets.only(top: 5),
-                        child: ListView.separated(
-                          shrinkWrap: true,
-                            physics: BouncingScrollPhysics(),
-                            separatorBuilder: (BuildContext context, int index) {
-                              return SizedBox(
-                                height: 10,
-                              );
-                            },
-                            padding: EdgeInsets.all(5),
-                            scrollDirection: Axis.vertical,
-                            itemCount: recentOrdersList.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              var pocuredColor=Colors.red[600];
-                              if(recentOrdersList[index].totalItems==recentOrdersList[index].procuredItems){
-                                pocuredColor=Colors.green[800];
-                              }
-                              return GestureDetector(
-                                child: Card(
-                                  elevation: 2,
-                                  child: Container(
-                                    padding: EdgeInsets.all(12),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  Container(
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Color(0XFFF5F5F5),
+                                      borderRadius: BorderRadius.circular(10),
+                                      //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+                                    ),
+                                    child: Column(
                                       children: <Widget>[
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: <Widget>[
-                                            Image.asset("assets/logo.png",width: 70,height: 70,),
-                                            Padding(
-                                              padding: EdgeInsets.all(2),
-                                            ),
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Text(
-                                                  "#${recentOrdersList[index].orderId}",
-                                                  style: TextStyle(fontSize:18,fontWeight: FontWeight.w700),
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.all(3),
-                                                ),
-                                                Text("${recentOrdersList[index].name}",
-                                                    style: TextStyle(
-                                                        fontSize: 16, color: Colors.black54,fontWeight: FontWeight.w500)),
-                                                Padding(
-                                                  padding: EdgeInsets.all(3),
-                                                ),
-                                                Text("Created @ ${DateFormat("dd-MMM-yyyy hh:mm a").format(recentOrdersList[index].createdDate)}",
-                                                    style: TextStyle(
-                                                        fontSize: 15, color: Colors.black45,fontWeight: FontWeight.w300)),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Row(
-                                              children: <Widget>[
-                                                Icon(Icons.calendar_today,color: Colors.cyan,),
-                                                Padding(
-                                                  padding: EdgeInsets.all(2),
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: <Widget>[
-                                                    Text(
-                                                      "Order Date",
-                                                      style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.all(6),
-                                            ),
-                                            Container(
-                                              padding: EdgeInsets.all(10),
-                                              decoration: BoxDecoration(
-                                                color: Color(0XFFF5F5F5),
-                                                borderRadius: BorderRadius.circular(10),
-                                                //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
-                                              ),
-                                              child: Column(
-                                                children: <Widget>[
-                                                  Padding(
-                                                    padding: EdgeInsets.all(7),
-                                                    child:  Row(
-                                                      children: <Widget>[
-                                                        Text("${DateFormat("dd-MMM-yyyy").format(recentOrdersList[index].date)}",
-                                                            style: TextStyle(
-                                                                fontSize: 16, color: Colors.black)),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: <Widget>[
-                                            Row(
-                                              children: <Widget>[
-                                                Icon(Icons.bubble_chart,color: Colors.blueAccent,),
-                                                Padding(
-                                                  padding: EdgeInsets.all(2),
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: <Widget>[
-                                                    Text(
-                                                      "Total Items",
-                                                      style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.all(6),
-                                            ),
-                                            Center(
-                                              child: Container(
-                                                padding: EdgeInsets.all(10),
-                                                decoration: BoxDecoration(
-                                                  color: Color(0XFFF5F5F5),
-                                                  borderRadius: BorderRadius.circular(10),
-                                                  //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
-                                                ),
-                                                child: Column(
-                                                  children: <Widget>[
-                                                    Padding(
-                                                      padding: EdgeInsets.all(7),
-                                                      child:  Row(
-                                                        children: <Widget>[
-                                                          Text("${recentOrdersList[index].totalItems??0}",
-                                                              style: TextStyle(
-                                                                  fontSize: 16,fontWeight: FontWeight.w700, color: Colors.black)),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: <Widget>[
-                                            Row(
-                                              children: <Widget>[
-                                                Icon(Icons.timelapse,color: Colors.deepOrangeAccent,),
-                                                Padding(
-                                                  padding: EdgeInsets.all(2),
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: <Widget>[
-                                                    Text(
-                                                      "Procured Items",
-                                                      style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.all(6),
-                                            ),
-                                            Container(
-                                              padding: EdgeInsets.all(10),
-                                              decoration: BoxDecoration(
-                                                color: Color(0XFFF5F5F5),
-                                                borderRadius: BorderRadius.circular(10),
-                                                //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
-                                              ),
-                                              child: Column(
-                                                children: <Widget>[
-                                                  Padding(
-                                                    padding: EdgeInsets.all(7),
-                                                    child:  Row(
-                                                      children: <Widget>[
-                                                        Text("${recentOrdersList[index].procuredItems??0}",
-                                                            style: TextStyle(
-                                                                fontSize: 16,fontWeight: FontWeight.w700, color: pocuredColor)),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                          ],
+                                        Padding(
+                                          padding: EdgeInsets.all(7),
+                                          child:  Row(
+                                            children: <Widget>[
+                                              Text("${DateFormat("dd-MMM-yyyy").format(recentOrdersList[index].date)}",
+                                                  style: TextStyle(
+                                                      fontSize: 16, color: Colors.black)),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
+                                ],
+                              ),
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Row(
+                                    children: <Widget>[
+                                      Icon(Icons.bubble_chart,color: Colors.blueAccent,),
+                                      Padding(
+                                        padding: EdgeInsets.all(2),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Text(
+                                            "Total Items",
+                                            style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => DisplayOrderScreen(repository,recentOrdersList[index].orderId)),
-                                  );
-                                },
-                              );
-                            }),),
-              ],
-            )),
-        floatingActionButton: FloatingActionButton(
-          child: Image.asset(
-            'assets/feather.png',
-            height: 35,
-            width: 35,
-          ),
-          onPressed: () {
-            showAlertDialog(context);
-          },
-        ),
-      ),
-      inAsyncCall: _laoding,
-      opacity: 0.3,
-    );
+                                  Padding(
+                                    padding: EdgeInsets.all(6),
+                                  ),
+                                  Center(
+                                    child: Container(
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: Color(0XFFF5F5F5),
+                                        borderRadius: BorderRadius.circular(10),
+                                        //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+                                      ),
+                                      child: Column(
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: EdgeInsets.all(7),
+                                            child:  Row(
+                                              children: <Widget>[
+                                                Text("${recentOrdersList[index].totalItems??0}",
+                                                    style: TextStyle(
+                                                        fontSize: 16,fontWeight: FontWeight.w700, color: Colors.black)),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Row(
+                                    children: <Widget>[
+                                      Icon(Icons.timelapse,color: Colors.deepOrangeAccent,),
+                                      Padding(
+                                        padding: EdgeInsets.all(2),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Text(
+                                            "Procured Items",
+                                            style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(6),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Color(0XFFF5F5F5),
+                                      borderRadius: BorderRadius.circular(10),
+                                      //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+                                    ),
+                                    child: Column(
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: EdgeInsets.all(7),
+                                          child:  Row(
+                                            children: <Widget>[
+                                              Text("${recentOrdersList[index].procuredItems??0}",
+                                                  style: TextStyle(
+                                                      fontSize: 16,fontWeight: FontWeight.w700, color: pocuredColor)),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => DisplayOrderScreen(repository,recentOrdersList[index].orderId)),
+                        );
+                      },
+                    );
+                  }),),
+          ],
+        ));
+//    return ProgressHUD(
+//      child: Scaffold(
+//        body: MediaQuery.removePadding(
+//            context: context,
+//            removeTop: true,
+//            child: ListView(
+//              shrinkWrap: true,
+//              children: <Widget>[
+//                Container(
+//                  padding: EdgeInsets.only(
+//                    top: 15,
+//                  ),
+//                  width: double.infinity,
+//                  decoration: BoxDecoration(
+//                      // Box decoration takes a gradient
+//                      color: Colors.white),
+//                  child: Row(
+//                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                    children: <Widget>[
+//                      Column(
+//                        crossAxisAlignment: CrossAxisAlignment.center,
+//                        mainAxisSize: MainAxisSize.min,
+//                        children: <Widget>[
+//                          Align(
+//                            child: Container(
+//                              child: Text(
+//                                "Today insights",
+//                                style: TextStyle(
+//                                    fontSize: 18, color: Utils.headingColor,fontWeight: FontWeight.w700),
+//                              ),
+//                              padding: EdgeInsets.only(left: 0),
+//                            ),
+//                            alignment: Alignment.centerLeft,
+//                          ),
+//                          Row(
+//                            mainAxisAlignment: MainAxisAlignment.start,
+//                            children: <Widget>[
+//                              Stack(
+//                                children: <Widget>[
+//                                  Container(
+//                                    child: charts.PieChart(todaySeriesList,
+//                                        animate: true,
+//                                        animationDuration:
+//                                            Duration(milliseconds: 500),
+//                                        // Configure the width of the pie slices to 60px. The remaining space in
+//                                        // the chart will be left as a hole in the center.
+//                                        defaultRenderer:
+//                                            new charts.ArcRendererConfig(
+//                                          arcWidth: 25,
+//                                        )),
+//                                    height: 220,
+//                                    width: 220,
+//                                  ),
+//                                  Container(
+//                                    height: 220,
+//                                    width: 220,
+//                                    child: Center(
+//                                      child: Column(
+//                                        mainAxisAlignment:
+//                                            MainAxisAlignment.center,
+//                                        children: <Widget>[
+//                                          Text(
+//                                            "Total",
+//                                            style: TextStyle(
+//                                                fontSize: 12.0,
+//                                                color: Colors.black54,
+//                                                fontWeight: FontWeight.normal),
+//                                          ),
+//                                          Padding(
+//                                            padding: EdgeInsets.all(2),
+//                                          ),
+//                                          Text(
+//                                            todayTotal,
+//                                            style: TextStyle(
+//                                                fontSize: 20.0,
+//                                                color: todayTotalColor,
+//                                                fontWeight: FontWeight.bold),
+//                                          )
+//                                        ],
+//                                      ),
+//                                    ),
+//                                  ),
+//                                ],
+//                              ),
+//                              Column(
+//                                mainAxisSize: MainAxisSize.min,
+//                                crossAxisAlignment: CrossAxisAlignment.start,
+//                                children: <Widget>[
+//                                  Row(
+//                                    children: <Widget>[
+//                                      Container(
+//                                        width: 10,
+//                                        height: 10,
+//                                        color: Colors.deepOrange,
+//                                      ),
+//                                      Padding(
+//                                        padding: EdgeInsets.all(3),
+//                                      ),
+//                                      Text(
+//                                        "Spent",
+//                                        style: TextStyle(fontSize: 16),
+//                                      ),
+//                                      Padding(
+//                                        padding: EdgeInsets.all(3),
+//                                      ),
+//                                      Text(
+//                                        "₹ $todaySpent",
+//                                        style: TextStyle(
+//                                            fontSize: 14,
+//                                            fontStyle: FontStyle.italic,
+//                                            color: Colors.black54),
+//                                      )
+//                                    ],
+//                                  ),
+//                                  Padding(
+//                                    padding: EdgeInsets.all(2),
+//                                  ),
+//                                  Row(
+//                                    children: <Widget>[
+//                                      Container(
+//                                        width: 10,
+//                                        height: 10,
+//                                        color: Colors.green,
+//                                      ),
+//                                      Padding(
+//                                        padding: EdgeInsets.all(3),
+//                                      ),
+//                                      Text(
+//                                        "Earned",
+//                                        style: TextStyle(fontSize: 16),
+//                                      ),
+//                                      Padding(
+//                                        padding: EdgeInsets.all(3),
+//                                      ),
+//                                      Text(
+//                                        "₹ $todayEarned",
+//                                        style: TextStyle(
+//                                            fontSize: 14,
+//                                            fontStyle: FontStyle.italic,
+//                                            color: Colors.black54),
+//                                      )
+//                                    ],
+//                                  ),
+//                                ],
+//                              ),
+//                            ],
+//                          ),
+//                        ],
+//                      ),
+//                      Column(
+//                        crossAxisAlignment: CrossAxisAlignment.center,
+//                        mainAxisSize: MainAxisSize.min,
+//                        children: <Widget>[
+//                          Align(
+//                            child: Container(
+//                              child: Text(
+//                                "${DateFormat('MMM, yyyy').format(DateTime.now())} insights",
+//                                style: TextStyle(
+//                                    fontSize: 18,color: Utils.headingColor, fontWeight: FontWeight.w700),
+//                              ),
+//                              padding: EdgeInsets.only(left: 0),
+//                            ),
+//                            alignment: Alignment.centerLeft,
+//                          ),
+//                          Row(
+//                            mainAxisAlignment: MainAxisAlignment.start,
+//                            children: <Widget>[
+//                              Stack(
+//                                children: <Widget>[
+//                                  Container(
+//                                    child: charts.PieChart(monthSeriesList,
+//                                        animate: true,
+//                                        animationDuration:
+//                                            Duration(milliseconds: 500),
+//                                        // Configure the width of the pie slices to 60px. The remaining space in
+//                                        // the chart will be left as a hole in the center.
+//                                        defaultRenderer:
+//                                            new charts.ArcRendererConfig(
+//                                          arcWidth: 25,
+//                                        )),
+//                                    height: 220,
+//                                    width: 220,
+//                                  ),
+//                                  Container(
+//                                    height: 220,
+//                                    width: 220,
+//                                    child: Center(
+//                                      child: Column(
+//                                        mainAxisAlignment:
+//                                            MainAxisAlignment.center,
+//                                        children: <Widget>[
+//                                          Text(
+//                                            "Total",
+//                                            style: TextStyle(
+//                                                fontSize: 12.0,
+//                                                color: Colors.black54,
+//                                                fontWeight: FontWeight.normal),
+//                                          ),
+//                                          Padding(
+//                                            padding: EdgeInsets.all(2),
+//                                          ),
+//                                          Text(
+//                                            monthTotal,
+//                                            style: TextStyle(
+//                                                fontSize: 20.0,
+//                                                color: monthTotalColor,
+//                                                fontWeight: FontWeight.bold),
+//                                          )
+//                                        ],
+//                                      ),
+//                                    ),
+//                                  ),
+//                                ],
+//                              ),
+//                              Column(
+//                                mainAxisSize: MainAxisSize.min,
+//                                crossAxisAlignment: CrossAxisAlignment.start,
+//                                children: <Widget>[
+//                                  Row(
+//                                    children: <Widget>[
+//                                      Container(
+//                                        width: 10,
+//                                        height: 10,
+//                                        color: Colors.deepOrange,
+//                                      ),
+//                                      Padding(
+//                                        padding: EdgeInsets.all(3),
+//                                      ),
+//                                      Text(
+//                                        "Spent",
+//                                        style: TextStyle(fontSize: 16),
+//                                      ),
+//                                      Padding(
+//                                        padding: EdgeInsets.all(3),
+//                                      ),
+//                                      Text(
+//                                        "₹ $monthlySpent",
+//                                        style: TextStyle(
+//                                            fontSize: 14,
+//                                            fontStyle: FontStyle.italic,
+//                                            color: Colors.black54),
+//                                      )
+//                                    ],
+//                                  ),
+//                                  Padding(
+//                                    padding: EdgeInsets.all(2),
+//                                  ),
+//                                  Row(
+//                                    children: <Widget>[
+//                                      Container(
+//                                        width: 10,
+//                                        height: 10,
+//                                        color: Colors.green,
+//                                      ),
+//                                      Padding(
+//                                        padding: EdgeInsets.all(3),
+//                                      ),
+//                                      Text(
+//                                        "Earned",
+//                                        style: TextStyle(fontSize: 16),
+//                                      ),
+//                                      Padding(
+//                                        padding: EdgeInsets.all(3),
+//                                      ),
+//                                      Text(
+//                                        "₹ $monthlyEarned",
+//                                        style: TextStyle(
+//                                            fontSize: 14,
+//                                            fontStyle: FontStyle.italic,
+//                                            color: Colors.black54),
+//                                      )
+//                                    ],
+//                                  ),
+//                                ],
+//                              ),
+//                            ],
+//                          ),
+//                        ],
+//                      )
+//                    ],
+//                  ),
+//                ),
+//                Align(
+//                  child: Container(
+//                    child: Text(
+//                      "Upcoming Orders",
+//                      style:
+//                          TextStyle(fontSize: 18, color: Utils.headingColor,fontWeight: FontWeight.w700),
+//                    ),
+//                    padding: EdgeInsets.only(left: 15, top: 5, bottom: 5),
+//                  ),
+//                  alignment: Alignment.centerLeft,
+//                ),
+//                recentOrdersList.length == 0
+//                    ? Container(
+//                        margin: EdgeInsets.only(top: 100),
+//                        child: Center(
+//                          child: Text("No orders found"),
+//                        ),
+//                      )
+//                    : Container(
+//                        margin: EdgeInsets.only(top: 5),
+//                        child: ListView.separated(
+//                          shrinkWrap: true,
+//                            physics: BouncingScrollPhysics(),
+//                            separatorBuilder: (BuildContext context, int index) {
+//                              return SizedBox(
+//                                height: 10,
+//                              );
+//                            },
+//                            padding: EdgeInsets.all(5),
+//                            scrollDirection: Axis.vertical,
+//                            itemCount: recentOrdersList.length,
+//                            itemBuilder: (BuildContext context, int index) {
+//                              var pocuredColor=Colors.red[600];
+//                              if(recentOrdersList[index].totalItems==recentOrdersList[index].procuredItems){
+//                                pocuredColor=Colors.green[800];
+//                              }
+//                              return GestureDetector(
+//                                child: Card(
+//                                  elevation: 2,
+//                                  child: Container(
+//                                    padding: EdgeInsets.all(12),
+//                                    child: Row(
+//                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                                      children: <Widget>[
+//                                        Row(
+//                                          mainAxisSize: MainAxisSize.min,
+//                                          mainAxisAlignment: MainAxisAlignment.start,
+//                                          children: <Widget>[
+//                                            Image.asset("assets/logo.png",width: 70,height: 70,),
+//                                            Padding(
+//                                              padding: EdgeInsets.all(2),
+//                                            ),
+//                                            Column(
+//                                              crossAxisAlignment: CrossAxisAlignment.start,
+//                                              children: <Widget>[
+//                                                Text(
+//                                                  "#${recentOrdersList[index].orderId}",
+//                                                  style: TextStyle(fontSize:18,fontWeight: FontWeight.w700),
+//                                                ),
+//                                                Padding(
+//                                                  padding: EdgeInsets.all(3),
+//                                                ),
+//                                                Text("${recentOrdersList[index].name}",
+//                                                    style: TextStyle(
+//                                                        fontSize: 16, color: Colors.black54,fontWeight: FontWeight.w500)),
+//                                                Padding(
+//                                                  padding: EdgeInsets.all(3),
+//                                                ),
+//                                                Text("Created @ ${DateFormat("dd-MMM-yyyy hh:mm a").format(recentOrdersList[index].createdDate)}",
+//                                                    style: TextStyle(
+//                                                        fontSize: 15, color: Colors.black45,fontWeight: FontWeight.w300)),
+//                                              ],
+//                                            ),
+//                                          ],
+//                                        ),
+//                                        Column(
+//                                          mainAxisSize: MainAxisSize.min,
+//                                          crossAxisAlignment: CrossAxisAlignment.start,
+//                                          children: <Widget>[
+//                                            Row(
+//                                              children: <Widget>[
+//                                                Icon(Icons.calendar_today,color: Colors.cyan,),
+//                                                Padding(
+//                                                  padding: EdgeInsets.all(2),
+//                                                ),
+//                                                Column(
+//                                                  crossAxisAlignment: CrossAxisAlignment.start,
+//                                                  children: <Widget>[
+//                                                    Text(
+//                                                      "Order Date",
+//                                                      style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
+//                                                    ),
+//                                                  ],
+//                                                ),
+//                                              ],
+//                                            ),
+//                                            Padding(
+//                                              padding: EdgeInsets.all(6),
+//                                            ),
+//                                            Container(
+//                                              padding: EdgeInsets.all(10),
+//                                              decoration: BoxDecoration(
+//                                                color: Color(0XFFF5F5F5),
+//                                                borderRadius: BorderRadius.circular(10),
+//                                                //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+//                                              ),
+//                                              child: Column(
+//                                                children: <Widget>[
+//                                                  Padding(
+//                                                    padding: EdgeInsets.all(7),
+//                                                    child:  Row(
+//                                                      children: <Widget>[
+//                                                        Text("${DateFormat("dd-MMM-yyyy").format(recentOrdersList[index].date)}",
+//                                                            style: TextStyle(
+//                                                                fontSize: 16, color: Colors.black)),
+//                                                      ],
+//                                                    ),
+//                                                  ),
+//                                                ],
+//                                              ),
+//                                            ),
+//                                          ],
+//                                        ),
+//                                        Column(
+//                                          mainAxisSize: MainAxisSize.min,
+//                                          crossAxisAlignment: CrossAxisAlignment.center,
+//                                          children: <Widget>[
+//                                            Row(
+//                                              children: <Widget>[
+//                                                Icon(Icons.bubble_chart,color: Colors.blueAccent,),
+//                                                Padding(
+//                                                  padding: EdgeInsets.all(2),
+//                                                ),
+//                                                Column(
+//                                                  crossAxisAlignment: CrossAxisAlignment.start,
+//                                                  children: <Widget>[
+//                                                    Text(
+//                                                      "Total Items",
+//                                                      style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
+//                                                    ),
+//                                                  ],
+//                                                ),
+//                                              ],
+//                                            ),
+//                                            Padding(
+//                                              padding: EdgeInsets.all(6),
+//                                            ),
+//                                            Center(
+//                                              child: Container(
+//                                                padding: EdgeInsets.all(10),
+//                                                decoration: BoxDecoration(
+//                                                  color: Color(0XFFF5F5F5),
+//                                                  borderRadius: BorderRadius.circular(10),
+//                                                  //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+//                                                ),
+//                                                child: Column(
+//                                                  children: <Widget>[
+//                                                    Padding(
+//                                                      padding: EdgeInsets.all(7),
+//                                                      child:  Row(
+//                                                        children: <Widget>[
+//                                                          Text("${recentOrdersList[index].totalItems??0}",
+//                                                              style: TextStyle(
+//                                                                  fontSize: 16,fontWeight: FontWeight.w700, color: Colors.black)),
+//                                                        ],
+//                                                      ),
+//                                                    ),
+//                                                  ],
+//                                                ),
+//                                              ),
+//                                            ),
+//                                          ],
+//                                        ),
+//                                        Column(
+//                                          mainAxisSize: MainAxisSize.min,
+//                                          crossAxisAlignment: CrossAxisAlignment.center,
+//                                          children: <Widget>[
+//                                            Row(
+//                                              children: <Widget>[
+//                                                Icon(Icons.timelapse,color: Colors.deepOrangeAccent,),
+//                                                Padding(
+//                                                  padding: EdgeInsets.all(2),
+//                                                ),
+//                                                Column(
+//                                                  crossAxisAlignment: CrossAxisAlignment.start,
+//                                                  children: <Widget>[
+//                                                    Text(
+//                                                      "Procured Items",
+//                                                      style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
+//                                                    ),
+//                                                  ],
+//                                                ),
+//                                              ],
+//                                            ),
+//                                            Padding(
+//                                              padding: EdgeInsets.all(6),
+//                                            ),
+//                                            Container(
+//                                              padding: EdgeInsets.all(10),
+//                                              decoration: BoxDecoration(
+//                                                color: Color(0XFFF5F5F5),
+//                                                borderRadius: BorderRadius.circular(10),
+//                                                //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+//                                              ),
+//                                              child: Column(
+//                                                children: <Widget>[
+//                                                  Padding(
+//                                                    padding: EdgeInsets.all(7),
+//                                                    child:  Row(
+//                                                      children: <Widget>[
+//                                                        Text("${recentOrdersList[index].procuredItems??0}",
+//                                                            style: TextStyle(
+//                                                                fontSize: 16,fontWeight: FontWeight.w700, color: pocuredColor)),
+//                                                      ],
+//                                                    ),
+//                                                  ),
+//                                                ],
+//                                              ),
+//                                            )
+//                                          ],
+//                                        ),
+//                                      ],
+//                                    ),
+//                                  ),
+//                                  shape: RoundedRectangleBorder(
+//                                    borderRadius: BorderRadius.circular(15.0),
+//                                  ),
+//                                ),
+//                                onTap: () {
+//                                  Navigator.push(
+//                                    context,
+//                                    MaterialPageRoute(builder: (context) => DisplayOrderScreen(repository,recentOrdersList[index].orderId)),
+//                                  );
+//                                },
+//                              );
+//                            }),),
+//              ],
+//            )),
+//        floatingActionButton: FloatingActionButton(
+//          child: Image.asset(
+//            'assets/feather.png',
+//            height: 35,
+//            width: 35,
+//          ),
+//          onPressed: () {
+//            showAlertDialog(context);
+//          },
+//        ),
+//      ),
+//      inAsyncCall: _laoding,
+//      opacity: 0.3,
+//    );
   }
 
   void addTransactionPage() {

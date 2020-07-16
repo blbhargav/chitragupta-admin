@@ -1,9 +1,10 @@
 import 'package:chitragupta/app/dashboard.dart';
 import 'package:chitragupta/app/home.dart';
 import 'package:chitragupta/background.dart';
+import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/inputWidget.dart';
 import 'package:chitragupta/models/user.dart';
-import 'package:chitragupta/progress.dart';
+import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +49,7 @@ class _Login extends State<Login> {
     repository = Repository();
 
     _userIdController.text='bhargavbl224@gmail.com';
-    _passwordController.text='9618794545';
+    _passwordController.text='Blb@9618794545';
   }
 
   @override
@@ -91,14 +92,16 @@ class _Login extends State<Login> {
                       : Container(),
                   InputWidgetPassword(30.0, 0.0, "Password", _passwordController),
                   GestureDetector(
-                    child: Text(
-                      "Forgot password?",
-                      style: TextStyle(
-                          color: Colors.lightBlueAccent,
-                          fontStyle: FontStyle.italic,
-                          fontSize: 15,
-                          decoration: TextDecoration.underline,
-                          decorationColor: Colors.blue),
+                    child: HandCursor(
+                      child: Text(
+                        "Forgot password?",
+                        style: TextStyle(
+                            color: Colors.lightBlueAccent,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 15,
+                            decoration: TextDecoration.underline,
+                            decorationColor: Colors.blue),
+                      ),
                     ),
                     onTap: () {
                       showForgotAlert(context);
@@ -110,7 +113,7 @@ class _Login extends State<Login> {
 
                   //roundedRectButton("Let's get Started", signInGradients, false),
                   Container(
-                    child: GestureDetector(
+                    child: HandCursor(child: GestureDetector(
                       child: roundedRectButton(
                         "Login",
                         signUpGradients,
@@ -119,7 +122,7 @@ class _Login extends State<Login> {
                       onTap: () {
                         loginFunction();
                       },
-                    ),
+                    ),),
                     margin: EdgeInsets.only(right: 40),
                   ),
                   Padding(
