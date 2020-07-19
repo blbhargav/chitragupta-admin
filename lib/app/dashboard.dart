@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:chitragupta/app/createOrder.dart';
 import 'package:chitragupta/app/displayOrder.dart';
+import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/models/Order.dart';
 import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/repository.dart';
@@ -460,118 +461,70 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                       pocuredColor=Colors.green[800];
                     }
                     return GestureDetector(
-                      child: Card(
-                        elevation: 2,
-                        child: Container(
-                          padding: EdgeInsets.all(12),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Image.asset("assets/logo.png",width: 70,height: 70,),
-                                  Padding(
-                                    padding: EdgeInsets.all(2),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        "#${recentOrdersList[index].orderId}",
-                                        style: TextStyle(fontSize:18,fontWeight: FontWeight.w700),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(3),
-                                      ),
-                                      Text("${recentOrdersList[index].name}",
-                                          style: TextStyle(
-                                              fontSize: 16, color: Colors.black54,fontWeight: FontWeight.w500)),
-                                      Padding(
-                                        padding: EdgeInsets.all(3),
-                                      ),
-                                      Text("Created @ ${DateFormat("dd-MMM-yyyy hh:mm a").format(recentOrdersList[index].createdDate)}",
-                                          style: TextStyle(
-                                              fontSize: 15, color: Colors.black45,fontWeight: FontWeight.w300)),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Row(
-                                    children: <Widget>[
-                                      Icon(Icons.calendar_today,color: Colors.cyan,),
-                                      Padding(
-                                        padding: EdgeInsets.all(2),
-                                      ),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Text(
-                                            "Order Date",
-                                            style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(6),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Color(0XFFF5F5F5),
-                                      borderRadius: BorderRadius.circular(10),
-                                      //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+                      child: HandCursor(
+                        child: Card(
+                          elevation: 2,
+                          child: Container(
+                            padding: EdgeInsets.all(12),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Image.asset("assets/logo.png",width: 70,height: 70,),
+                                    Padding(
+                                      padding: EdgeInsets.all(2),
                                     ),
-                                    child: Column(
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
+                                        Text(
+                                          "#${recentOrdersList[index].orderId}",
+                                          style: TextStyle(fontSize:18,fontWeight: FontWeight.w700),
+                                        ),
                                         Padding(
-                                          padding: EdgeInsets.all(7),
-                                          child:  Row(
-                                            children: <Widget>[
-                                              Text("${DateFormat("dd-MMM-yyyy").format(recentOrdersList[index].date)}",
-                                                  style: TextStyle(
-                                                      fontSize: 16, color: Colors.black)),
-                                            ],
-                                          ),
+                                          padding: EdgeInsets.all(3),
+                                        ),
+                                        Text("${recentOrdersList[index].name}",
+                                            style: TextStyle(
+                                                fontSize: 16, color: Colors.black54,fontWeight: FontWeight.w500)),
+                                        Padding(
+                                          padding: EdgeInsets.all(3),
+                                        ),
+                                        Text("Created @ ${DateFormat("dd-MMM-yyyy hh:mm a").format(recentOrdersList[index].createdDate)}",
+                                            style: TextStyle(
+                                                fontSize: 15, color: Colors.black45,fontWeight: FontWeight.w300)),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Row(
+                                      children: <Widget>[
+                                        Icon(Icons.calendar_today,color: Colors.cyan,),
+                                        Padding(
+                                          padding: EdgeInsets.all(2),
+                                        ),
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Text(
+                                              "Order Date",
+                                              style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Row(
-                                    children: <Widget>[
-                                      Icon(Icons.bubble_chart,color: Colors.blueAccent,),
-                                      Padding(
-                                        padding: EdgeInsets.all(2),
-                                      ),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Text(
-                                            "Total Items",
-                                            style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(6),
-                                  ),
-                                  Center(
-                                    child: Container(
+                                    Padding(
+                                      padding: EdgeInsets.all(6),
+                                    ),
+                                    Container(
                                       padding: EdgeInsets.all(10),
                                       decoration: BoxDecoration(
                                         color: Color(0XFFF5F5F5),
@@ -584,71 +537,121 @@ class _dashBoardScreenState extends State<dashBoardScreen>
                                             padding: EdgeInsets.all(7),
                                             child:  Row(
                                               children: <Widget>[
-                                                Text("${recentOrdersList[index].totalItems??0}",
+                                                Text("${DateFormat("dd-MMM-yyyy").format(recentOrdersList[index].date)}",
                                                     style: TextStyle(
-                                                        fontSize: 16,fontWeight: FontWeight.w700, color: Colors.black)),
+                                                        fontSize: 16, color: Colors.black)),
                                               ],
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Row(
-                                    children: <Widget>[
-                                      Icon(Icons.timelapse,color: Colors.deepOrangeAccent,),
-                                      Padding(
-                                        padding: EdgeInsets.all(2),
-                                      ),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Text(
-                                            "Procured Items",
-                                            style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(6),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Color(0XFFF5F5F5),
-                                      borderRadius: BorderRadius.circular(10),
-                                      //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
-                                    ),
-                                    child: Column(
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Row(
                                       children: <Widget>[
+                                        Icon(Icons.bubble_chart,color: Colors.blueAccent,),
                                         Padding(
-                                          padding: EdgeInsets.all(7),
-                                          child:  Row(
-                                            children: <Widget>[
-                                              Text("${recentOrdersList[index].procuredItems??0}",
-                                                  style: TextStyle(
-                                                      fontSize: 16,fontWeight: FontWeight.w700, color: pocuredColor)),
-                                            ],
-                                          ),
+                                          padding: EdgeInsets.all(2),
+                                        ),
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Text(
+                                              "Total Items",
+                                              style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
-                                  )
-                                ],
-                              ),
-                            ],
+                                    Padding(
+                                      padding: EdgeInsets.all(6),
+                                    ),
+                                    Center(
+                                      child: Container(
+                                        padding: EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: Color(0XFFF5F5F5),
+                                          borderRadius: BorderRadius.circular(10),
+                                          //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+                                        ),
+                                        child: Column(
+                                          children: <Widget>[
+                                            Padding(
+                                              padding: EdgeInsets.all(7),
+                                              child:  Row(
+                                                children: <Widget>[
+                                                  Text("${recentOrdersList[index].totalItems??0}",
+                                                      style: TextStyle(
+                                                          fontSize: 16,fontWeight: FontWeight.w700, color: Colors.black)),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Row(
+                                      children: <Widget>[
+                                        Icon(Icons.timelapse,color: Colors.deepOrangeAccent,),
+                                        Padding(
+                                          padding: EdgeInsets.all(2),
+                                        ),
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Text(
+                                              "Procured Items",
+                                              style: TextStyle(fontSize:17,color: Utils.headingColor,fontWeight: FontWeight.w700),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(6),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: Color(0XFFF5F5F5),
+                                        borderRadius: BorderRadius.circular(10),
+                                        //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+                                      ),
+                                      child: Column(
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: EdgeInsets.all(7),
+                                            child:  Row(
+                                              children: <Widget>[
+                                                Text("${recentOrdersList[index].procuredItems??0}",
+                                                    style: TextStyle(
+                                                        fontSize: 16,fontWeight: FontWeight.w700, color: pocuredColor)),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
                         ),
                       ),
                       onTap: () {

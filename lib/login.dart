@@ -1,5 +1,5 @@
 import 'package:chitragupta/app/dashboard.dart';
-import 'package:chitragupta/app/home.dart';
+import 'package:chitragupta/app/Home/home.dart';
 import 'package:chitragupta/background.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/inputWidget.dart';

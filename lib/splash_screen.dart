@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'login.dart';
 
 class SplashScreen extends StatefulWidget {
+  final Repository repository;
+  SplashScreen({this.repository});
   @override
   _SplashScreenState createState() => new _SplashScreenState();
 }

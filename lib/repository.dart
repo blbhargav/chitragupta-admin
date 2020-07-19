@@ -277,4 +277,30 @@ class Repository {
         .getDocuments();
   }
 
+  addCity(String city, String state) async {
+    if (uid == null) {
+      getUserId();
+    }
+    var data = {
+      "createdDate": DateTime.now().millisecondsSinceEpoch,
+      "adminId": uid,
+      "city": city,
+      "state": state,
+      "status": 1
+    };
+
+    await databaseReference.collection("Counters").document("cities").updateData({"count":FieldValue.increment(1)});
+
+    var index=await databaseReference.collection("Counters").document("cities").get();
+
+    return databaseReference.collection("Cities").document("${index.data["count"]}").setData(data);
+  }
+
+  getCitiesOnce() {
+    return databaseReference
+        .collection("Cities")
+        .where("adminId",isEqualTo: uid)
+        .getDocuments();
+  }
+
 }
