@@ -303,4 +303,33 @@ class Repository {
         .getDocuments();
   }
 
+  addCustomer(String name, String mobile,String email,String address,String cityID,String city,String state) async {
+    if (uid == null) {
+      getUserId();
+    }
+    var data = {
+      "createdDate": DateTime.now().millisecondsSinceEpoch,
+      "adminId": uid,
+      "name": name,
+      "mobile": mobile,
+      "email": email,
+      "address": address,
+      "cityID": cityID,
+      "city": city,
+      "state":state,
+      "status": 1
+    };
+
+    await databaseReference.collection("Counters").document("customers").updateData({"count":FieldValue.increment(1)});
+
+    var index=await databaseReference.collection("Counters").document("customers").get();
+
+    return databaseReference.collection("Customers").document("${index.data["count"]}").setData(data);
+  }
+  getCustomersOnce() {
+    return databaseReference
+        .collection("Customers")
+        .where("adminId",isEqualTo: uid)
+        .getDocuments();
+  }
 }

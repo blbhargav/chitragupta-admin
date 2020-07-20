@@ -31,18 +31,6 @@ class CityBloc extends Bloc<CityEvent, CityState> {
         }else {
           yield DataNotFoundState();
         }
-
-//        repository.getCitiesOnce().then((value) async*{
-//          List<City> tempCityList = new List();
-//          if (value.documents.length > 0) {
-//            var i = 0;
-//            value.documents.forEach((element) {
-//              City city = City.fromSnapshot(snapshot: element);
-//              tempCityList.add(city);
-//            });
-//          }
-//          yield DisplayDataState();
-//        });
       }else if(event is AddCityEvent){
         yield ShowProgressState();
         try{

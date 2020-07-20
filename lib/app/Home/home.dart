@@ -4,6 +4,7 @@ import 'package:chitragupta/app/Home/home_bloc.dart';
 import 'package:chitragupta/app/Indent/indent_page.dart';
 import 'package:chitragupta/app/analytics.dart';
 import 'package:chitragupta/app/city/cities.dart';
+import 'package:chitragupta/app/customers/customers_list.dart';
 import 'package:chitragupta/app/dashboard.dart';
 import 'package:chitragupta/app/settings.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
@@ -105,7 +106,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
               }else if(state is ShowCustomersState){
                 resetColors();
                 pageName="Customers";
-                _container=Container(child: Center(child: Text("Customers"),),);
+                _container=CustomersListPage(widget.repository);
                 customersItemColor=Colors.black;
               }else if(state is ShowTeamState){
                 resetColors();
