@@ -330,10 +330,9 @@ class Repository {
 
   editCustomer(String customerID,String name, String mobile,String email,String address,String cityID,String city,String state) async {
     if (uid == null) {
-      getUserId();
+      await getUserId();
     }
     var data = {
-      "createdDate": DateTime.now().millisecondsSinceEpoch,
       "adminId": uid,
       "name": name,
       "mobile": mobile,
@@ -345,12 +344,78 @@ class Repository {
       "status": 1
     };
 
-    return databaseReference.collection("Customers").document("${customerID}").updateData(data);
+    return databaseReference.collection("Customers").document(customerID).updateData(data);
   }
 
   getCustomersOnce() {
     return databaseReference
         .collection("Customers")
+        .where("adminId",isEqualTo: uid)
+        .where("status", isEqualTo: 1)
+        .getDocuments();
+  }
+
+
+
+  //Team management
+  addMember(String name,String type, String mobile,String email,String address,String cityID,String city,String state) async {
+    if (uid == null) {
+      getUserId();
+    }
+    var userID="";
+    try{
+      var signUpRef=await signUp(email, "12345678");
+      userID=signUpRef.user.uid;
+    }catch(_e){
+      print("BLB member add failed repo ${_e.code}");
+      return _e.code;
+    }
+
+    var data = {
+      "createdDate": DateTime.now().millisecondsSinceEpoch,
+      "adminId": uid,
+      "uid":userID,
+      "type":type,
+      "name": name,
+      "mobile": mobile,
+      "email": email,
+      "address": address,
+      "cityID": cityID,
+      "city": city,
+      "state":state,
+      "status": 1
+    };
+
+    await databaseReference.collection("Counters").document("team").updateData({"count":FieldValue.increment(1)});
+
+    var index=await databaseReference.collection("Counters").document("team").get();
+
+    return databaseReference.collection("Team").document("${index.data["count"]}").setData(data);
+  }
+
+  editMember(String memberID,String type,String name, String mobile,String email,String address,String cityID,String city,String state) async {
+    if (uid == null) {
+      await getUserId();
+    }
+    var data = {
+      "adminId": uid,
+      "name": name,
+      "type":type,
+      "mobile": mobile,
+      "email": email,
+      "address": address,
+      "cityID": cityID,
+      "city": city,
+      "state":state,
+      "status": 1
+    };
+
+    return databaseReference.collection("Team").document(memberID).updateData(data);
+  }
+
+  getMembersOnce() {
+    return databaseReference
+        .collection("Team")
         .where("adminId",isEqualTo: uid)
         .where("status", isEqualTo: 1)
         .getDocuments();

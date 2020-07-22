@@ -187,7 +187,7 @@ class _ProfileState extends State<Profile> {
             width: 35,
           ),
           onPressed: () {
-            showAddMemberAlertDialog(context);
+            //showAddMemberAlertDialog(context);
 //            Navigator.push(
 //              context,
 //              MaterialPageRoute(

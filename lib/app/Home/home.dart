@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:chitragupta/app/Home/home_bloc.dart';
 import 'package:chitragupta/app/Indent/indent_page.dart';
+import 'package:chitragupta/app/Team/team_list.dart';
 import 'package:chitragupta/app/analytics.dart';
-import 'package:chitragupta/app/city/cities.dart';
-import 'package:chitragupta/app/customers/customers_list.dart';
+import 'package:chitragupta/app/City/cities.dart';
+import 'package:chitragupta/app/Customers/customers_list.dart';
 import 'package:chitragupta/app/dashboard.dart';
 import 'package:chitragupta/app/settings.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
@@ -111,7 +112,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
               }else if(state is ShowTeamState){
                 resetColors();
                 pageName="Team";
-                _container=Container(child: Center(child: Text("Team"),),);
+                _container=TeamListPage(widget.repository);
                 teamItemColor=Colors.black;
               }else if(state is ShowAboutState){
                 resetColors();
@@ -240,7 +241,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                                           children: [
                                             Padding(
                                               child: Icon(Icons.home,color: Colors.white,),
-                                              padding: EdgeInsets.only(right: 5,left: 10),
+                                              padding: EdgeInsets.only(right: 10,left: 10),
                                             ),
                                             Text('Dashboard',style: TextStyle(color: Colors.white,fontSize: 20),)
                                           ],
@@ -265,7 +266,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                                         children: [
                                           Padding(
                                             child: Icon(Icons.format_indent_increase,color: Colors.white,),
-                                            padding: EdgeInsets.only(right: 5,left: 10),
+                                            padding: EdgeInsets.only(right: 10,left: 10),
                                           ),
                                           Text('Indent',style: TextStyle(color: Colors.white,fontSize: 20),)
                                         ],
@@ -289,7 +290,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                                         children: [
                                           Padding(
                                             child: Icon(Icons.track_changes,color: Colors.white,),
-                                            padding: EdgeInsets.only(right: 5,left: 10),
+                                            padding: EdgeInsets.only(right: 10,left: 10),
                                           ),
                                           Text('Expenses',style: TextStyle(color: Colors.white,fontSize: 20),)
                                         ],
@@ -313,7 +314,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                                         children: [
                                           Padding(
                                             child: Icon(Icons.insert_chart,color: Colors.white,),
-                                            padding: EdgeInsets.only(right: 5,left: 10),
+                                            padding: EdgeInsets.only(right: 10,left: 10),
                                           ),
                                           Text('Analytics',style: TextStyle(color: Colors.white,fontSize: 20),)
                                         ],
@@ -337,7 +338,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                                         children: [
                                           Padding(
                                             child: Icon(Icons.history,color: Colors.white,),
-                                            padding: EdgeInsets.only(right: 5,left: 10),
+                                            padding: EdgeInsets.only(right: 10,left: 10),
                                           ),
                                           Text('History',style: TextStyle(color: Colors.white,fontSize: 20),)
                                         ],
@@ -361,7 +362,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                                         children: [
                                           Padding(
                                             child: Icon(Icons.location_city,color: Colors.white,),
-                                            padding: EdgeInsets.only(right: 5,left: 10),
+                                            padding: EdgeInsets.only(right: 10,left: 10),
                                           ),
                                           Text('Cities',style: TextStyle(color: Colors.white,fontSize: 20),)
                                         ],
@@ -385,7 +386,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                                         children: [
                                           Padding(
                                             child: Icon(Icons.people,color: Colors.white,),
-                                            padding: EdgeInsets.only(right: 5,left: 10),
+                                            padding: EdgeInsets.only(right: 10,left: 10),
                                           ),
                                           Text('Customers',style: TextStyle(color: Colors.white,fontSize: 20),)
                                         ],
@@ -409,7 +410,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                                         children: [
                                           Padding(
                                             child: Icon(Icons.supervised_user_circle,color: Colors.white,),
-                                            padding: EdgeInsets.only(right: 5,left: 10),
+                                            padding: EdgeInsets.only(right: 10,left: 10),
                                           ),
                                           Text('Team',style: TextStyle(color: Colors.white,fontSize: 20),)
                                         ],
@@ -433,7 +434,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                                         children: [
                                           Padding(
                                             child: Icon(Icons.info,color: Colors.white,),
-                                            padding: EdgeInsets.only(right: 5,left: 10),
+                                            padding: EdgeInsets.only(right: 10,left: 10),
                                           ),
                                           Text('About',style: TextStyle(color: Colors.white,fontSize: 20),)
                                         ],
@@ -456,7 +457,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                                         children: [
                                           Padding(
                                             child: Icon(Icons.exit_to_app,color: Colors.white,),
-                                            padding: EdgeInsets.only(right: 5,left: 10),
+                                            padding: EdgeInsets.only(right: 10,left: 10),
                                           ),
                                           Text('Logout',style: TextStyle(color: Colors.white,fontSize: 20),)
                                         ],

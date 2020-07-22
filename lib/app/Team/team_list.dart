@@ -1,4 +1,4 @@
-import 'package:chitragupta/app/customers/customers_bloc.dart';
+import 'package:chitragupta/app/Team/team_bloc.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/extension/util.dart';
@@ -10,17 +10,17 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-class CustomersListPage extends StatefulWidget {
+class TeamListPage extends StatefulWidget {
   final Repository repository;
-  CustomersListPage(this.repository);
+  TeamListPage(this.repository);
 
   @override
-  _CustomersListPageState createState() => _CustomersListPageState();
+  _TeamListPageState createState() => _TeamListPageState();
 }
 
-class _CustomersListPageState extends State<CustomersListPage> {
+class _TeamListPageState extends State<TeamListPage> {
   bool _loading = false;
-  CustomersBloc _bloc;
+  TeamBloc _bloc;
 
   TextEditingController _nameController = new TextEditingController();
   TextEditingController _emailController = new TextEditingController();
@@ -32,14 +32,15 @@ class _CustomersListPageState extends State<CustomersListPage> {
   List<City> cityList = new List();
   List<String> cityNames = new List();
   String selectedCity="Select City";
+  String selectedRole="Select User Type";
 
   List<Customer> customerList = new List();
-  var title="Add Customer";
+  var title="Add Member";
   var editCustomerID="";
   @override
   void initState() {
-    _bloc=CustomersBloc(repository: widget.repository);
-    _bloc.add(FetchCustomersEvent());
+    _bloc=TeamBloc(repository: widget.repository);
+    _bloc.add(FetchTeamMembersEvent());
     _bloc.add(FetchCitiesEvent());
     super.initState();
   }
@@ -57,7 +58,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
     return Scaffold(
       body: BlocProvider(
         create: (_) => _bloc,
-        child: BlocListener<CustomersBloc, CustomersState>(
+        child: BlocListener<TeamBloc, TeamState>(
             listener: (context, state) {
               if(state is LoadCitiesState){
                 cityList=state.cityList;
@@ -69,17 +70,20 @@ class _CustomersListPageState extends State<CustomersListPage> {
                 _loading=true;
               }else if(state is HideProgressState){
                 _loading=false;
-              }else if(state is LoadCustomersState){
-                customerList=state.customerList;
+              }else if(state is LoadTeamMembersState){
+                customerList=state.teamList;
               }else if(state is AddingSuccessState){
-                _bloc.add(FetchCustomersEvent());
+                _bloc.add(FetchTeamMembersEvent());
               }else if(state is AddingFailedState){
 
+              }else if(state is EmailAlreadyInUseState){
+                _emailErrorTV="Email already in use.";
+                showAlertDialog(context,null);
               }
             },
-            child: BlocBuilder<CustomersBloc, CustomersState>(
+            child: BlocBuilder<TeamBloc, TeamState>(
                 bloc: _bloc,
-                builder: (BuildContext context, CustomersState state) {
+                builder: (BuildContext context, TeamState state) {
                   if (state is CustomersInitial)
                     return Center(
                       child: CircularProgressIndicator(),
@@ -95,13 +99,13 @@ class _CustomersListPageState extends State<CustomersListPage> {
                           child: RaisedButton(
                             hoverColor: Colors.red,
                             child: Text(
-                              "+Add Customer",
+                              "+Add Member",
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w700),
                             ),
                             onPressed: () {
-                              title="Add Customer";
+                              title="Add Member";
                               resetForm();
                               showAlertDialog(context,null);
                             },
@@ -118,7 +122,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  "Customer",
+                                  "Member",
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w600),
@@ -284,7 +288,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
       _mobileController.text=customer.mobile;
       _addressController.text=customer.address;
       selectedCity=customer.city;
-      title="Edit Customer";
+      title="Edit Member";
       customer=null;
     }
     return showDialog(
@@ -330,6 +334,28 @@ class _CustomersListPageState extends State<CustomersListPage> {
                         ),
                       )
                     ],
+                  ),
+                  Container(
+                    child: HandCursor(
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        underline: Container(color: Colors.pinkAccent,height: 1,width: double.maxFinite,),
+                        items: <String>["Admin","Employee"].map((String value) {
+                          return new DropdownMenuItem<String>(
+                            value: value,
+                            child: new Text(value),
+                          );
+                        }).toList(),
+                        hint: selectedRole=="Select User Type"?Text("$selectedRole"):Text("$selectedRole",style: TextStyle(color: Colors.black),),
+                        onChanged: (_val) {
+                          selectedRole=_val;
+                          Navigator.pop(contxt);
+                          showAlertDialog(contxt,null);
+                        },
+                      ),
+                    ),
+                    padding: EdgeInsets.only(left: 5,right: 5,top: 5,bottom: 0),
+                    margin: EdgeInsets.only(bottom: 10,left: 5,right: 5),
                   ),
                   Container(
                     margin: EdgeInsets.only(top: 10, bottom: 10),
@@ -453,7 +479,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
                       padding: EdgeInsets.only(top: 15, bottom: 15),
                       onPressed: () {
                         Navigator.pop(contxt);
-                        addCustomer();
+                        addMember();
                       },
                     ),
                   ),
@@ -467,7 +493,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
         });
   }
 
-  void addCustomer() {
+  void addMember() {
     var error="Please enter this field";
     _nameErrorTV = ""; _emailErrorTV = "";_mobileErrorTV = "";_addressErrorTV = "";_commonError = "";
     if(_nameController.text.isEmpty){
@@ -495,7 +521,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
     }
 
     if(!Utils.isEmailValid(_emailController.text)){
-      _emailErrorTV="Please enter valid email number";
+      _emailErrorTV="Please enter valid email";
       showAlertDialog(context,null);
       return;
     }
@@ -507,14 +533,21 @@ class _CustomersListPageState extends State<CustomersListPage> {
     }
 
     if(selectedCity=="Select City"){
-      _commonError=error;
+      _commonError="Please select city";
       showAlertDialog(context,null);
       return;
     }
+
+    if(selectedRole=="Select User Type"){
+      _commonError="Please select user type";
+      showAlertDialog(context,null);
+      return;
+    }
+
     var index=cityNames.indexWhere((note) => note.startsWith(selectedCity));
     City city=cityList[index];
     if(title.contains("Edit")){
-      _bloc.add(EditCustomerEvent(
+      _bloc.add(EditTeamMembersEvent(
           name: _nameController.text,
           mobile: _mobileController.text,
           email: _emailController.text,
@@ -522,17 +555,19 @@ class _CustomersListPageState extends State<CustomersListPage> {
           city: city.city,
           state: city.state,
           cityID: city.cityID,
-        customerID: editCustomerID
+        userID: editCustomerID,
+
       ));
     }else
-    _bloc.add(AddCustomerEvent(
+    _bloc.add(AddMemberEvent(
       name: _nameController.text,
       mobile: _mobileController.text,
       email: _emailController.text,
       address: _addressController.text,
       city: city.city,
       state: city.state,
-      cityID: city.cityID
+      cityID: city.cityID,
+        type: selectedRole
     ));
   }
 
@@ -568,7 +603,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
                       Expanded(
                         child: Center(
                           child: Text(
-                            "Delete Customer?",
+                            "Delete Member?",
                             style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w700,
