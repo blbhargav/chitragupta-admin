@@ -48,7 +48,6 @@ class _CitiesPageState extends State<CitiesPage> {
             listener: (context, state) {
               if (state is DisplayDataState) {
                 cityList = state.cityList;
-                print("BLB ${cityList.length}");
               }else if(state is AddingSuccessState){
                 _cityController.text="";
                 _stateController.text="";

@@ -26,3 +26,8 @@ class HideProgressState extends CustomersState {}
 class AddingSuccessState extends CustomersState {}
 
 class AddingFailedState extends CustomersState {}
+
+class LoadCustomersState extends CustomersState {
+  final List<Customer> customerList;
+  LoadCustomersState({this.customerList});
+}

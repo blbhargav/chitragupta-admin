@@ -300,6 +300,7 @@ class Repository {
     return databaseReference
         .collection("Cities")
         .where("adminId",isEqualTo: uid)
+        .where("status", isEqualTo: 1)
         .getDocuments();
   }
 
@@ -326,10 +327,32 @@ class Repository {
 
     return databaseReference.collection("Customers").document("${index.data["count"]}").setData(data);
   }
+
+  editCustomer(String customerID,String name, String mobile,String email,String address,String cityID,String city,String state) async {
+    if (uid == null) {
+      getUserId();
+    }
+    var data = {
+      "createdDate": DateTime.now().millisecondsSinceEpoch,
+      "adminId": uid,
+      "name": name,
+      "mobile": mobile,
+      "email": email,
+      "address": address,
+      "cityID": cityID,
+      "city": city,
+      "state":state,
+      "status": 1
+    };
+
+    return databaseReference.collection("Customers").document("${customerID}").updateData(data);
+  }
+
   getCustomersOnce() {
     return databaseReference
         .collection("Customers")
         .where("adminId",isEqualTo: uid)
+        .where("status", isEqualTo: 1)
         .getDocuments();
   }
 }

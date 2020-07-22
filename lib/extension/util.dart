@@ -82,6 +82,51 @@ class Utils {
       )
     ];
   }
+
+  static bool isEmailValid(String email){
+    //Regex pattern for matching email
+    Pattern pattern = r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
+    RegExp regex = new RegExp(pattern);
+    if (email.isEmpty) {
+      return false;
+    } else {
+      if (!regex.hasMatch(email))
+        return false;
+      else
+        return true;
+    }
+  }
+  static bool isNameValid(String name){
+    //Regex pattern for matching only alphabets and white spaces:
+    Pattern pattern = r"^[a-zA-Z]+[\-'\s]?[a-zA-Z ]+$";
+    RegExp regex = new RegExp(pattern);
+    if (name.isEmpty) {
+      return false;
+    } else {
+      if (!regex.hasMatch(name))
+        return false;
+      else
+        return true;
+    }
+  }
+
+  static bool isMobileValid(String name){
+    //Regex pattern for matching only alphabets and white spaces:
+    Pattern pattern = r"^[6-9]\d{9}$";
+    RegExp regex = new RegExp(pattern);
+    if (name.isEmpty) {
+      return false;
+    } else {
+      if (!regex.hasMatch(name))
+        return false;
+      else
+        return true;
+    }
+  }
+
+  static void hideKeyboard(BuildContext context){
+    FocusScope.of(context).requestFocus(FocusNode());
+  }
 }
 
 class LinearBudgets {
