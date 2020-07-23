@@ -3,6 +3,7 @@ import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/extension/util.dart';
 import 'package:chitragupta/models/City.dart';
+import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/models/customer.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,7 @@ class _TeamListPageState extends State<TeamListPage> {
   String selectedCity="Select City";
   String selectedRole="Select User Type";
 
-  List<Customer> customerList = new List();
+  List<Member> teamList = new List();
   var title="Add Member";
   var editCustomerID="";
   @override
@@ -71,7 +72,8 @@ class _TeamListPageState extends State<TeamListPage> {
               }else if(state is HideProgressState){
                 _loading=false;
               }else if(state is LoadTeamMembersState){
-                customerList=state.teamList;
+                teamList=state.teamList;
+                print("BLB team ${teamList.length}");
               }else if(state is AddingSuccessState){
                 _bloc.add(FetchTeamMembersEvent());
               }else if(state is AddingFailedState){
@@ -91,6 +93,7 @@ class _TeamListPageState extends State<TeamListPage> {
 
                   return ProgressHUD(
                     child: Column(
+                      mainAxisSize: MainAxisSize.max,
                       children: [
 //                  Align(child: Text("Indents",style: TextStyle(color: Colors.lightBlue[900],fontSize: 25,fontWeight: FontWeight.w700),),
 //                    alignment: Alignment.center,),
@@ -175,7 +178,7 @@ class _TeamListPageState extends State<TeamListPage> {
                           ),
                         ),
 
-                        (customerList.length>0)?Container(
+                        (teamList.length>0)?Container(
                           margin: EdgeInsets.only(top: 10,left: 10,right: 10),
                           child: ListView.separated(
                             shrinkWrap: true,
@@ -185,10 +188,10 @@ class _TeamListPageState extends State<TeamListPage> {
                                 padding: EdgeInsets.only(top: 5, bottom: 5),
                               );
                             },
-                            itemCount: customerList.length,
+                            itemCount: teamList.length,
                             itemBuilder: (BuildContext context, int index) {
-                              Customer customer=customerList[index];
-                              var date = new DateTime.fromMillisecondsSinceEpoch(customer.createdDate );
+                              Member member=teamList[index];
+                              var date = new DateTime.fromMillisecondsSinceEpoch(member.createdDate );
                               var format = DateFormat('dd-MMM-yyy hh:mm a');
                               var createdDate=format.format(date);
                               return InkWellMouseRegion(
@@ -199,7 +202,7 @@ class _TeamListPageState extends State<TeamListPage> {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          "${customer.name}",
+                                          "${member.name}",
                                           style: TextStyle(
                                               color: Colors.black,
                                               fontSize: 18),
@@ -209,7 +212,7 @@ class _TeamListPageState extends State<TeamListPage> {
                                       Padding(padding: EdgeInsets.all(5),),
                                       Expanded(
                                         child: Text(
-                                          "${customer.mobile}",
+                                          "${member.mobile}",
                                           style: TextStyle(
                                               color: Colors.black,fontSize: 18),
                                         ),
@@ -218,7 +221,7 @@ class _TeamListPageState extends State<TeamListPage> {
                                       Padding(padding: EdgeInsets.all(5),),
                                       Expanded(
                                         child: Text(
-                                          "${customer.email}",
+                                          "${member.email}",
                                           style: TextStyle(
                                               color: Colors.black,fontSize: 18
                                           ),
@@ -228,7 +231,7 @@ class _TeamListPageState extends State<TeamListPage> {
                                       Padding(padding: EdgeInsets.all(5),),
                                       Expanded(
                                         child: Text(
-                                          "${customer.address} - ${customer.city}, ${customer.state}",
+                                          "${member.address} - ${member.city}, ${member.state}",
                                           style: TextStyle(
                                               color: Colors.black,fontSize: 18),
                                         ),
@@ -243,15 +246,15 @@ class _TeamListPageState extends State<TeamListPage> {
                                             InkWellMouseRegion(
                                               child: Icon(Icons.edit,color: Colors.black,),
                                               onTap: (){
-                                                showAlertDialog(context,customer);
-                                                editCustomerID=customer.customerID;
+                                                showAlertDialog(context,member);
+                                                editCustomerID=member.uid;
                                               },
                                             ),
                                             Padding(padding: EdgeInsets.all(10),),
                                             InkWellMouseRegion(
                                               child: Icon(Icons.delete,color: Colors.red,),
                                               onTap: (){
-                                                showDeleteCustomerDialog(context,customer);
+                                                showDeleteCustomerDialog(context,member);
                                               },
                                             )
                                           ],
@@ -281,15 +284,15 @@ class _TeamListPageState extends State<TeamListPage> {
       ),
     );
   }
-  showAlertDialog(BuildContext contxt,Customer customer) {
-    if(customer!=null){
-      _nameController.text=customer.name;
-      _emailController.text=customer.email;
-      _mobileController.text=customer.mobile;
-      _addressController.text=customer.address;
-      selectedCity=customer.city;
+  showAlertDialog(BuildContext contxt,Member member) {
+    if(member!=null){
+      _nameController.text=member.name;
+      _emailController.text=member.email;
+      _mobileController.text=member.mobile;
+      _addressController.text=member.address;
+      selectedCity=member.city;
       title="Edit Member";
-      customer=null;
+      member=null;
     }
     return showDialog(
         context: contxt,
@@ -579,7 +582,7 @@ class _TeamListPageState extends State<TeamListPage> {
     selectedCity="Select City";
   }
 
-  showDeleteCustomerDialog(BuildContext contxt, Customer customer) {
+  showDeleteCustomerDialog(BuildContext contxt, Member member) {
     return showDialog(
         context: contxt,
         barrierDismissible: false,
@@ -627,7 +630,7 @@ class _TeamListPageState extends State<TeamListPage> {
                   Container(
                     margin: EdgeInsets.only(top: 30, bottom: 30),
                     padding: EdgeInsets.only(left: 10, right: 10,bottom: 10,top: 10),
-                    child: Text("Are you sure you want to delete ${customer.name} ?"),
+                    child: Text("Are you sure you want to delete ${member.name} ?"),
                   ),
                   SizedBox(
                     width: double.infinity,

@@ -28,7 +28,7 @@ class AddingSuccessState extends TeamState {}
 class AddingFailedState extends TeamState {}
 
 class LoadTeamMembersState extends TeamState {
-  final List<Customer> teamList;
+  final List<Member> teamList;
   LoadTeamMembersState({this.teamList});
 }
 

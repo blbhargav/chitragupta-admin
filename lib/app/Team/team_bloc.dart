@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:chitragupta/models/City.dart';
+import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/models/customer.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:meta/meta.dart';
@@ -15,7 +16,7 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
 
   TeamBloc({this.repository}) : super(CustomersInitial());
   List<City> cityList = new List();
-  List<Customer> customerList = new List();
+  List<Member> customerList = new List();
 
   @override
   Stream<TeamState> mapEventToState(
@@ -50,11 +51,11 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
       }
     }else if(event is FetchTeamMembersEvent){
       yield ShowProgressState();
-      var snapshot=await repository.getCustomersOnce();
-      List<Customer> tempCustomersList = new List();
+      var snapshot=await repository.getMembersOnce();
+      List<Member> tempCustomersList = new List();
       if (snapshot.documents.length > 0) {
         snapshot.documents.forEach((element) {
-          Customer customer = Customer.fromSnapshot(snapshot: element);
+          Member customer = Member.fromSnapshot(snapshot: element);
           tempCustomersList.add(customer);
         });
         customerList=tempCustomersList;
