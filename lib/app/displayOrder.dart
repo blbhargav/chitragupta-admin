@@ -159,16 +159,16 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
           setState(() {
             if(i==0){
               member1Name=member.name;
-              member1Amount= event.data[member.userId];
+              member1Amount= event.data[member.uid];
             }else if(i==1){
               member2Name=member.name;
-              member2Amount= event.data[member.userId];
+              member2Amount= event.data[member.uid];
             }else if(i==2){
               member3Name=member.name;
-              member3Amount= event.data[member.userId];
+              member3Amount= event.data[member.uid];
             }else if(i==3){
               member4Name=member.name;
-              member4Amount= event.data[member.userId];
+              member4Amount= event.data[member.uid];
             }
           });
           i++;

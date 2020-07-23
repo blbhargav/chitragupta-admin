@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:core';
-import 'package:chitragupta/models/user.dart';
+import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/models/ExtraData.dart';
 import 'package:chitragupta/models/Product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,7 +15,7 @@ class Repository {
   SharedPreferences prefs;
   final databaseReference = Firestore.instance;
   static String uid = globals.UID;
-  static AdminUser user;
+  static Member user;
 
   Repository({FirebaseAuth firebaseAuth, fbDBRef}) {
     _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
@@ -92,10 +92,9 @@ class Repository {
 
   getProfile() async {
     if (uid == null) {
-      getUserId();
+      await getUserId();
     }
-
-    return databaseReference.collection("Profile").document(uid).get();
+    return databaseReference.collection("Users").document(uid).get();
   }
 
   createOrder(String date, String name) {
@@ -386,11 +385,7 @@ class Repository {
       "status": 1
     };
 
-    await databaseReference.collection("Counters").document("team").updateData({"count":FieldValue.increment(1)});
-
-    var index=await databaseReference.collection("Counters").document("team").get();
-
-    return databaseReference.collection("Team").document("${index.data["count"]}").setData(data);
+    return databaseReference.collection("Users").document(uid).setData(data);
   }
 
   editMember(String memberID,String type,String name, String mobile,String email,String address,String cityID,String city,String state) async {
@@ -410,12 +405,12 @@ class Repository {
       "status": 1
     };
 
-    return databaseReference.collection("Team").document(memberID).updateData(data);
+    return databaseReference.collection("Users").document(memberID).updateData(data);
   }
 
   getMembersOnce() {
     return databaseReference
-        .collection("Team")
+        .collection("Users")
         .where("adminId",isEqualTo: uid)
         .where("status", isEqualTo: 1)
         .getDocuments();

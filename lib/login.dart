@@ -3,7 +3,7 @@ import 'package:chitragupta/app/Home/home.dart';
 import 'package:chitragupta/background.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/inputWidget.dart';
-import 'package:chitragupta/models/user.dart';
+import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class loginRoot extends StatefulWidget {
+  final Repository repository;
+  loginRoot({this.repository});
   @override
   _loginRootState createState() => _loginRootState();
 }
@@ -24,13 +26,15 @@ class _loginRootState extends State<loginRoot> with TickerProviderStateMixin {
       //resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       body: Stack(
-        children: <Widget>[Background(), Login()],
+        children: <Widget>[Background(), Login(repository: widget.repository,)],
       ),
     );
   }
 }
 
 class Login extends StatefulWidget {
+  final Repository repository;
+  Login({this.repository});
   TextEditingController _userIdController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   @override
@@ -42,11 +46,9 @@ class _Login extends State<Login> {
   String error;
   bool _loading = false;
   _Login(this._userIdController, this._passwordController);
-  Repository repository;
   @override
   void initState() {
     super.initState();
-    repository = Repository();
 
     _userIdController.text='bhargavbl224@gmail.com';
     _passwordController.text='Blb@9618794545';
@@ -161,18 +163,20 @@ class _Login extends State<Login> {
         _loading = true;
       });
       SystemChannels.textInput.invokeMethod('TextInput.hide');
-      repository
+      widget.repository
           .signInWithCredentials(
               _userIdController.text, _passwordController.text)
           .then((res) async {
         setState(() {
           _loading = false;
         });
-        await repository.updateUserSignedLocally(true, res.user.uid);
+        await widget.repository.updateUserSignedLocally(true, res.user.uid);
         Repository.uid=res.user.uid;
-        AdminUser user;
-        repository.getProfile().then((value) {
-          user = new AdminUser.fromSnapshot(snapshot: value);
+        Member user;
+        widget.repository.getProfile().then((value) {
+          print("BLB ${user.toString()}");
+          user = new Member.fromSnapshot(snapshot: value);
+          print("BLB ${user.toJson()}");
         }).whenComplete(() {
           Repository.user = user;
           navigateToHome();
@@ -215,7 +219,7 @@ class _Login extends State<Login> {
   void navigateToHome() {
     Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => homeScreen(repository)),
+        MaterialPageRoute(builder: (context) => homeScreen(widget.repository)),
         ModalRoute.withName("/Home"));
   }
 
@@ -324,7 +328,7 @@ class _Login extends State<Login> {
     setState(() {
       _loading = true;
     });
-    repository.sendResetLink(email).then((res) {
+    widget.repository.sendResetLink(email).then((res) {
       setState(() {
         _loading = false;
       });

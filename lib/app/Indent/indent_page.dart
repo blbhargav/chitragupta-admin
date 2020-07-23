@@ -162,7 +162,7 @@ class _IndentScreenState extends State<IndentScreen>{
                     ],
                   ),
 
-                  (Repository.user.role=="SuperAdmin")?Container(
+                  (Repository.user.type=="SuperAdmin")?Container(
                     margin: EdgeInsets.only(top: 10,bottom: 10),
                     padding: EdgeInsets.only(left: 10, right: 10),
                     child: new TextField(

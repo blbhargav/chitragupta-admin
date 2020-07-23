@@ -1,15 +1,16 @@
 import 'dart:io';
 
 import 'package:chitragupta/login.dart';
-import 'package:chitragupta/models/user.dart';
+import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditProfile extends StatefulWidget {
-  AdminUser user; Repository repository;
-  EditProfile(AdminUser user, Repository repository){
+  Member user; Repository repository;
+
+  EditProfile(Member user, Repository repository){
     this.user=user;
     this.repository=repository;
   }
@@ -32,8 +33,8 @@ class _EditProfileState extends State<EditProfile> {
     Color(0xFF03A0FE),
   ];
   Repository repository;
-  AdminUser user;
-  _EditProfileState(AdminUser user, Repository repository){
+  Member user;
+  _EditProfileState(Member user, Repository repository){
     this.user=user;
     this.repository=repository;
     _nameController.text=user.name;

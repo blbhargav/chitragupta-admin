@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:chitragupta/app/editProfile.dart';
 import 'package:chitragupta/models/Member.dart';
-import 'package:chitragupta/models/user.dart';
 import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:chitragupta/extension/util.dart';
@@ -23,7 +22,7 @@ class _ProfileState extends State<Profile> {
   var userName = "Name";
   var email = "Email";
   bool _laoding = true;
-  AdminUser user;
+  Member user;
   StreamSubscription _subscriptionTodo;
   List<Member> membersList = new List();
   _ProfileState(Repository repository)
@@ -33,7 +32,7 @@ class _ProfileState extends State<Profile> {
     super.initState();
 
     repository.getProfile().then((value) {
-      this.user = new AdminUser.fromSnapshot(snapshot: value);
+      this.user = new Member.fromSnapshot(snapshot: value);
       setState(() {
         _laoding = false;
         userName = user.name;

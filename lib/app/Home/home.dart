@@ -9,7 +9,7 @@ import 'package:chitragupta/app/Customers/customers_list.dart';
 import 'package:chitragupta/app/dashboard.dart';
 import 'package:chitragupta/app/settings.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
-import 'package:chitragupta/models/user.dart';
+import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +35,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
   String pageName = "Dashbaord";
 
   StreamSubscription _subscriptionTodo;
-  AdminUser user;
+  Member user;
 
   HomeBloc _homeBloc;
   Widget _container;
@@ -349,7 +349,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                                     ),
                                   ),
                                 ),
-                                (Repository.user.role=="SuperAdmin")?Container(
+                                (Repository.user.type=="SuperAdmin")?Container(
                                   margin: EdgeInsets.only(top: 10),
                                   width: double.maxFinite,
                                   padding: EdgeInsets.all(10),
@@ -548,7 +548,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
 
     Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => SplashScreen()),
+        MaterialPageRoute(builder: (context) => SplashScreen(repository: widget.repository,)),
         ModalRoute.withName("/Splash"));
   }
 
@@ -564,7 +564,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
     widget.repository.getUserId();
     widget.repository.getProfile().then((value) {
       setState(() {
-        user = new AdminUser.fromSnapshot(snapshot: value);
+        user = new Member.fromSnapshot(snapshot: value);
         userName=user.name;
       });
     });

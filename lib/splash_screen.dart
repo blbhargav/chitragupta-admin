@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-            builder: (context) => loginRoot()
+            builder: (context) => loginRoot(repository: widget.repository,)
         ),
         ModalRoute.withName("/login")
     );
