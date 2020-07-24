@@ -45,7 +45,6 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
         }else
           yield AddingSuccessState();
       }catch(_e){
-        print("BLB member add failed ${_e.code}");
         yield HideProgressState();
         yield AddingFailedState();
       }

@@ -52,7 +52,7 @@ class _IndentScreenState extends State<IndentScreen>{
 
               },
               child: BlocBuilder<IndentBloc,IndentState>(
-                  bloc: _indentBloc,
+                  cubit: _indentBloc,
                   builder: (BuildContext context, IndentState state){
 //              if(state is IndentInitial)
 //                return Center(child: CircularProgressIndicator(),);

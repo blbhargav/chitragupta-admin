@@ -61,7 +61,7 @@ class _CitiesPageState extends State<CitiesPage> {
               }
             },
             child: BlocBuilder<CityBloc, CityState>(
-                bloc: _cityBloc,
+                cubit: _cityBloc,
                 builder: (BuildContext context, CityState state) {
                   if (state is CityInitial)
                     return Center(

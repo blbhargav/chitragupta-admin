@@ -84,7 +84,7 @@ class _TeamListPageState extends State<TeamListPage> {
               }
             },
             child: BlocBuilder<TeamBloc, TeamState>(
-                bloc: _bloc,
+                cubit: _bloc,
                 builder: (BuildContext context, TeamState state) {
                   if (state is CustomersInitial)
                     return Center(

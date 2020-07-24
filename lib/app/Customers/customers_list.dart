@@ -78,7 +78,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
               }
             },
             child: BlocBuilder<CustomersBloc, CustomersState>(
-                bloc: _bloc,
+                cubit: _bloc,
                 builder: (BuildContext context, CustomersState state) {
                   if (state is CustomersInitial)
                     return Center(

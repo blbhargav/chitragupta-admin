@@ -122,7 +122,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
               }
             },
             child: BlocBuilder<HomeBloc,HomeState>(
-              bloc: _homeBloc,
+              cubit: _homeBloc,
               builder: (BuildContext context, HomeState state){
                 return Column(
                   mainAxisSize: MainAxisSize.max,
