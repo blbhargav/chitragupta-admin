@@ -46,20 +46,10 @@ class CustomersBloc extends Bloc<CustomersEvent, CustomersState> {
       }
     }else if(event is FetchCustomersEvent){
       yield ShowProgressState();
-      var snapshot=await repository.getCustomersOnce();
-      List<Customer> tempCustomersList = new List();
-      if (snapshot.documents.length > 0) {
-        snapshot.documents.forEach((element) {
-          Customer customer = Customer.fromSnapshot(snapshot: element);
-          tempCustomersList.add(customer);
-        });
-        customerList=tempCustomersList;
-        yield HideProgressState();
-        yield LoadCustomersState(customerList: tempCustomersList);
-      }else {
-        yield HideProgressState();
-        yield LoadCustomersState(customerList: []);
-      }
+      var customers=await repository.getCustomersOnce();
+      customerList=customers;
+      yield HideProgressState();
+      yield LoadCustomersState(customerList: customers);
     }else if(event is EditCustomerEvent){
       yield ShowProgressState();
       try{

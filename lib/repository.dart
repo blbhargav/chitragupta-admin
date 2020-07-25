@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:core';
 import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/models/ExtraData.dart';
+import 'package:chitragupta/models/Order.dart';
 import 'package:chitragupta/models/Product.dart';
+import 'package:chitragupta/models/customer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
@@ -124,7 +126,7 @@ class Repository {
         .collection("Orders")
         .where("year", isEqualTo: DateTime.now().year)
         .where("uid", isEqualTo: uid)
-        .where("status", isEqualTo: 1)
+        .where("status", isEqualTo: 0)
         .orderBy("createdDate", descending: true)
         .limit(15)
         .snapshots();
@@ -356,20 +358,32 @@ class Repository {
     return databaseReference.collection("Customers").document(customerID).updateData(data);
   }
 
-  getCustomersOnce() {
+  Future<List<Customer>> getCustomersOnce() async {
+    List<Customer> tempCustomersList = new List();
+    var customersDBRef=databaseReference
+        .collection("Customers")
+        .where("adminId",isEqualTo: uid)
+        .where("status", isEqualTo: 1)
+        .reference();
+
     if(user.type=="Admin"){
-      return databaseReference
+      customersDBRef= databaseReference
           .collection("Customers")
           .where("adminId",isEqualTo: user.adminId)
           .where("cityID", isEqualTo: user.cityID)
           .where("status", isEqualTo: 1)
-          .getDocuments();
+          .reference();
     }
-    return databaseReference
-        .collection("Customers")
-        .where("adminId",isEqualTo: uid)
-        .where("status", isEqualTo: 1)
-        .getDocuments();
+
+    var snapshot=await customersDBRef.getDocuments();
+    if (snapshot.documents.length > 0) {
+      snapshot.documents.forEach((element) {
+        Customer customer = Customer.fromSnapshot(snapshot: element);
+        tempCustomersList.add(customer);
+      });
+    }
+    return tempCustomersList;
+
   }
 
 
@@ -426,19 +440,92 @@ class Repository {
     return databaseReference.collection("Users").document(memberID).updateData(data);
   }
 
-  getMembersOnce() {
+  Future<List<Member>> getMembersOnce() async{
+    List<Member> tempTeamList = new List();
+    var membersDBRef=databaseReference
+        .collection("Users")
+        .where("adminId",isEqualTo: uid)
+        .where("status", isEqualTo: 1)
+        .reference();
     if(user.type=="Admin"){
-      return databaseReference
+      membersDBRef= databaseReference
           .collection("Users")
           .where("adminId",isEqualTo: user.adminId)
           .where("cityID", isEqualTo: user.cityID)
           .where("status", isEqualTo: 1)
-          .getDocuments();
+          .reference();
     }
-    return databaseReference
-        .collection("Users")
-        .where("adminId",isEqualTo: uid)
+
+    var snapshot=await membersDBRef.getDocuments();
+    if (snapshot.documents.length > 0) {
+      snapshot.documents.forEach((element) {
+        Member member = Member.fromSnapshot(snapshot: element);
+        if(member.uid!=user.uid)
+          tempTeamList.add(member);
+      });
+    }
+    return tempTeamList;
+  }
+
+
+
+
+  //indent
+  createIndent(Customer customer, DateTime orderDate) async{
+    if (uid == null) {
+      getUserId();
+    }
+    var data = {
+      "date": orderDate.millisecondsSinceEpoch,
+      "createdDate": DateTime.now().millisecondsSinceEpoch,
+      "year": orderDate.year,
+      "month": orderDate.month,
+      "day": orderDate.day,
+      "uid": uid,
+      "adminId":user.adminId,
+      "name": customer.name,
+      "cityID":customer.cityID,
+      "city":customer.city,
+      "customerID":customer.customerID,
+      "amountEarned":0,
+      "amountSpent":0,
+      "status": 1
+    };
+
+    await databaseReference.collection("Counters").document("orders").updateData({"count":FieldValue.increment(1)});
+
+    var index=await databaseReference.collection("Counters").document("orders").get();
+
+    return await databaseReference.collection("Orders").document("${index.data["count"]}").setData(data);
+  }
+  Future<List<Order>> getActiveIndents() async{
+    var ordersReference = databaseReference
+        .collection("Orders")
         .where("status", isEqualTo: 1)
-        .getDocuments();
+        .where("adminId", arrayContains: [user.adminId])
+        .orderBy("date", descending: true)
+        .reference();
+    if(user.type=="Admin"){
+      ordersReference= databaseReference
+          .collection("Orders")
+          .where("status", isEqualTo: 1)
+          .where("adminId",isEqualTo: user.adminId)
+          .where("cityID", isEqualTo: user.cityID)
+          .orderBy("date", descending: true)
+          .reference();
+    }
+    List<Order> tempOrdersList=List();
+    var snapshot=await ordersReference.getDocuments();
+    if (snapshot.documents.length > 0) {
+      snapshot.documents.forEach((element) {
+        Order order = Order.fromSnapshot(snapshot: element);
+        if(order.status==1 && order.adminId==user.adminId){
+          tempOrdersList.add(order);
+        }
+
+      });
+    }
+
+    return tempOrdersList;
   }
 }

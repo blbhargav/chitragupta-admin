@@ -50,20 +50,10 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
       }
     }else if(event is FetchTeamMembersEvent){
       yield ShowProgressState();
-      var snapshot=await repository.getMembersOnce();
-      List<Member> tempCustomersList = new List();
-      if (snapshot.documents.length > 0) {
-        snapshot.documents.forEach((element) {
-          Member customer = Member.fromSnapshot(snapshot: element);
-          tempCustomersList.add(customer);
-        });
-        customerList=tempCustomersList;
-        yield HideProgressState();
-        yield LoadTeamMembersState(teamList: tempCustomersList);
-      }else {
-        yield HideProgressState();
-        yield LoadTeamMembersState(teamList: []);
-      }
+      var members=await repository.getMembersOnce();
+      customerList=members;
+      yield HideProgressState();
+      yield LoadTeamMembersState(teamList: members);
     }else if(event is EditTeamMembersEvent){
       yield ShowProgressState();
       try{
