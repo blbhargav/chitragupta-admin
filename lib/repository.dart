@@ -276,6 +276,16 @@ class Repository {
         .getDocuments();
   }
 
+
+  /*
+  *
+  *
+  *
+  * new APIS
+  *
+  *
+  * */
+
   addCity(String city, String state) async {
     if (uid == null) {
       getUserId();
@@ -309,7 +319,7 @@ class Repository {
     }
     var data = {
       "createdDate": DateTime.now().millisecondsSinceEpoch,
-      "adminId": uid,
+      "adminId": user.adminId,
       "name": name,
       "mobile": mobile,
       "email": email,
@@ -328,11 +338,11 @@ class Repository {
   }
 
   editCustomer(String customerID,String name, String mobile,String email,String address,String cityID,String city,String state) async {
-    if (uid == null) {
-      await getUserId();
+    if (user == null) {
+      await getProfile();
     }
     var data = {
-      "adminId": uid,
+      "adminId": user.adminId,
       "name": name,
       "mobile": mobile,
       "email": email,
@@ -347,6 +357,14 @@ class Repository {
   }
 
   getCustomersOnce() {
+    if(user.type=="Admin"){
+      return databaseReference
+          .collection("Customers")
+          .where("adminId",isEqualTo: user.adminId)
+          .where("cityID", isEqualTo: user.cityID)
+          .where("status", isEqualTo: 1)
+          .getDocuments();
+    }
     return databaseReference
         .collection("Customers")
         .where("adminId",isEqualTo: uid)
@@ -372,7 +390,7 @@ class Repository {
 
     var data = {
       "createdDate": DateTime.now().millisecondsSinceEpoch,
-      "adminId": uid,
+      "adminId": user.adminId,
       "uid":userID,
       "type":type,
       "name": name,
@@ -385,7 +403,7 @@ class Repository {
       "status": 1
     };
 
-    return databaseReference.collection("Users").document(uid).setData(data);
+    return databaseReference.collection("Users").document(userID).setData(data);
   }
 
   editMember(String memberID,String type,String name, String mobile,String email,String address,String cityID,String city,String state) async {
@@ -393,7 +411,7 @@ class Repository {
       await getUserId();
     }
     var data = {
-      "adminId": uid,
+      "adminId": user.adminId,
       "name": name,
       "type":type,
       "mobile": mobile,
@@ -409,6 +427,14 @@ class Repository {
   }
 
   getMembersOnce() {
+    if(user.type=="Admin"){
+      return databaseReference
+          .collection("Users")
+          .where("adminId",isEqualTo: user.adminId)
+          .where("cityID", isEqualTo: user.cityID)
+          .where("status", isEqualTo: 1)
+          .getDocuments();
+    }
     return databaseReference
         .collection("Users")
         .where("adminId",isEqualTo: uid)

@@ -174,9 +174,7 @@ class _Login extends State<Login> {
         Repository.uid=res.user.uid;
         Member user;
         widget.repository.getProfile().then((value) {
-          print("BLB ${user.toString()}");
           user = new Member.fromSnapshot(snapshot: value);
-          print("BLB ${user.toJson()}");
         }).whenComplete(() {
           Repository.user = user;
           navigateToHome();
