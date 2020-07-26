@@ -126,7 +126,7 @@ class Repository {
         .collection("Orders")
         .where("year", isEqualTo: DateTime.now().year)
         .where("uid", isEqualTo: uid)
-        .where("status", isEqualTo: 0)
+        .where("status", isEqualTo: 1)
         .orderBy("createdDate", descending: true)
         .limit(15)
         .snapshots();
@@ -442,28 +442,35 @@ class Repository {
 
   Future<List<Member>> getMembersOnce() async{
     List<Member> tempTeamList = new List();
-    var membersDBRef=databaseReference
-        .collection("Users")
-        .where("adminId",isEqualTo: uid)
-        .where("status", isEqualTo: 1)
-        .reference();
-    if(user.type=="Admin"){
-      membersDBRef= databaseReference
+    if(user.type=="SuperAdmin"){
+      var snapshot=await databaseReference
+          .collection("Users")
+          .where("adminId",isEqualTo: uid)
+          .where("status", isEqualTo: 1)
+          .getDocuments();
+      if (snapshot.documents.length > 0) {
+        snapshot.documents.forEach((element) {
+          Member member = Member.fromSnapshot(snapshot: element);
+          if(member.uid!=user.uid)
+            tempTeamList.add(member);
+        });
+      }
+    }else if(user.type=="Admin"){
+      var snapshot=await databaseReference
           .collection("Users")
           .where("adminId",isEqualTo: user.adminId)
           .where("cityID", isEqualTo: user.cityID)
           .where("status", isEqualTo: 1)
-          .reference();
+          .getDocuments();
+      if (snapshot.documents.length > 0) {
+        snapshot.documents.forEach((element) {
+          Member member = Member.fromSnapshot(snapshot: element);
+          if(member.uid!=user.uid)
+            tempTeamList.add(member);
+        });
+      }
     }
 
-    var snapshot=await membersDBRef.getDocuments();
-    if (snapshot.documents.length > 0) {
-      snapshot.documents.forEach((element) {
-        Member member = Member.fromSnapshot(snapshot: element);
-        if(member.uid!=user.uid)
-          tempTeamList.add(member);
-      });
-    }
     return tempTeamList;
   }
 
@@ -499,33 +506,85 @@ class Repository {
     return await databaseReference.collection("Orders").document("${index.data["count"]}").setData(data);
   }
   Future<List<Order>> getActiveIndents() async{
-    var ordersReference = databaseReference
-        .collection("Orders")
-        .where("status", isEqualTo: 1)
-        .where("adminId", arrayContains: [user.adminId])
-        .orderBy("date", descending: true)
-        .reference();
-    if(user.type=="Admin"){
-      ordersReference= databaseReference
+    List<Order> tempOrdersList=List();
+
+   if(user.type=="SuperAdmin"){
+     var orderSnapshot = await databaseReference
+         .collection("Orders")
+         .where("status", isEqualTo: 1)
+         .where("adminId", isEqualTo: user.adminId)
+         .orderBy("date", descending: true)
+         .getDocuments();
+     if (orderSnapshot.documents.length > 0) {
+       orderSnapshot.documents.forEach((element) {
+         Order order = Order.fromSnapshot(snapshot: element);
+         tempOrdersList.add(order);
+       });
+     }
+   }else if(user.type=="Admin"){
+     var orderSnapshot=await databaseReference
           .collection("Orders")
           .where("status", isEqualTo: 1)
           .where("adminId",isEqualTo: user.adminId)
           .where("cityID", isEqualTo: user.cityID)
           .orderBy("date", descending: true)
-          .reference();
-    }
-    List<Order> tempOrdersList=List();
-    var snapshot=await ordersReference.getDocuments();
-    if (snapshot.documents.length > 0) {
-      snapshot.documents.forEach((element) {
-        Order order = Order.fromSnapshot(snapshot: element);
-        if(order.status==1 && order.adminId==user.adminId){
-          tempOrdersList.add(order);
-        }
+          .getDocuments();
+     if (orderSnapshot.documents.length > 0) {
+       orderSnapshot.documents.forEach((element) {
+         Order order = Order.fromSnapshot(snapshot: element);
+         tempOrdersList.add(order);
+       });
+      }
 
-      });
     }
 
     return tempOrdersList;
+  }
+
+
+  //category
+  addCategory(String name,String city,String cityID,String state) async {
+    if (uid == null) {
+      getUserId();
+    }
+    var data = {
+      "createdDate": DateTime.now().millisecondsSinceEpoch,
+      "adminId": user.adminId,
+      "name":name,
+      "city": city,
+      "cityID":cityID,
+      "state": state,
+      "status": 1
+    };
+
+    await databaseReference.collection("Counters").document("category").updateData({"count":FieldValue.increment(1)});
+
+    var index=await databaseReference.collection("Counters").document("category").get();
+
+    return databaseReference.collection("Category").document("${index.data["count"]}").setData(data);
+  }
+
+  editCategory(String id,String name,String cityID,String city,String state) async {
+    if (uid == null) {
+      await getUserId();
+    }
+    var data = {
+      "adminId": user.adminId,
+      "name": name,
+      "cityID": cityID,
+      "city": city,
+      "state":state,
+      "status": 1
+    };
+
+    return databaseReference.collection("Category").document(id).updateData(data);
+  }
+
+  getCategoriesOnce() {
+    return databaseReference
+        .collection("Category")
+        .where("adminId",isEqualTo: user.adminId)
+        .where("status", isEqualTo: 1)
+        .getDocuments();
   }
 }

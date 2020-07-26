@@ -13,6 +13,10 @@ class SuccessAlertFinishEvent extends HomeEvent{}
 class DashboardItemClickedEvent extends HomeEvent{}
 
 class IndentItemClickedEvent extends HomeEvent{}
+class DisplayIndentClickedEvent extends HomeEvent{
+  final String orderId;
+  DisplayIndentClickedEvent(this.orderId);
+}
 
 class ExpensesItemClickedEvent extends HomeEvent{}
 
@@ -26,4 +30,6 @@ class AboutItemClickedEvent extends HomeEvent{}
 class CitiesItemClickedEvent extends HomeEvent{}
 class CustomersItemClickedEvent extends HomeEvent{}
 class TeamItemClickedEvent extends HomeEvent{}
+class CategoryItemClickedEvent extends HomeEvent{}
+class ProductsClickedEvent extends HomeEvent{}
 class LogoutItemClickedEvent extends HomeEvent{}

@@ -24,4 +24,10 @@ class ShowSettingsState extends HomeState {}
 class ShowCitiesState extends HomeState {}
 class ShowCustomersState extends HomeState {}
 class ShowTeamState extends HomeState {}
+class ShowCategoryState extends HomeState {}
+class ShowProductsState extends HomeState {}
 class ShowAboutState extends HomeState {}
+class DisplayIndentState extends HomeState {
+  final String orderId;
+  DisplayIndentState(this.orderId);
+}

@@ -1,12 +1,15 @@
 import 'dart:async';
 
 import 'package:chitragupta/app/Home/home_bloc.dart';
+import 'package:chitragupta/app/Indent/DisplayIndent/display_indent.dart';
 import 'package:chitragupta/app/Indent/indent_page.dart';
 import 'package:chitragupta/app/Team/team_list.dart';
 import 'package:chitragupta/app/analytics.dart';
 import 'package:chitragupta/app/City/cities.dart';
 import 'package:chitragupta/app/Customers/customers_list.dart';
+import 'package:chitragupta/app/category/category.dart';
 import 'package:chitragupta/app/dashboard.dart';
+import 'package:chitragupta/app/product/product.dart';
 import 'package:chitragupta/app/settings.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/models/Member.dart';
@@ -15,6 +18,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../../splash_screen.dart';
 
@@ -61,6 +65,13 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
   var customersItemColor=Colors.lightBlue[900];
   var teamItemColor=Colors.lightBlue[900];
   var aboutItemColor=Colors.lightBlue[900];
+  var categoryItemColor=Colors.lightBlue[900];
+  var productItemColor=Colors.lightBlue[900];
+
+  indentCallback(String indentID) {
+    _homeBloc.add(DisplayIndentClickedEvent(indentID));
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -77,7 +88,12 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
               }else if(state is ShowIndentState){
                 resetColors();
                 pageName="Indents";
-                _container=IndentScreen(widget.repository);
+                _container=IndentScreen(widget.repository,callback: indentCallback,);
+                indentItemColor=Colors.black;
+              }else if(state is DisplayIndentState){
+                resetColors();
+                pageName="Indent : ${state.orderId}";
+                _container=DisplayIndent(widget.repository,state.orderId);
                 indentItemColor=Colors.black;
               }else if(state is ShowExpensesState){
                 resetColors();
@@ -114,6 +130,16 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                 pageName="Team";
                 _container=TeamListPage(widget.repository);
                 teamItemColor=Colors.black;
+              }else if(state is ShowCategoryState){
+                resetColors();
+                pageName="Categories";
+                _container=CategoriesPage(widget.repository);
+                categoryItemColor=Colors.black;
+              }else if(state is ShowProductsState){
+                resetColors();
+                pageName="Products";
+                _container=ProductsPage(widget.repository);
+                productItemColor=Colors.black;
               }else if(state is ShowAboutState){
                 resetColors();
                 pageName="About";
@@ -425,6 +451,54 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                                   margin: EdgeInsets.only(top: 10),
                                   width: double.maxFinite,
                                   padding: EdgeInsets.all(10),
+                                  color: categoryItemColor,
+                                  child: HandCursor(
+                                    child: InkWell(
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            child: Icon(Icons.category,color: Colors.white,),
+                                            padding: EdgeInsets.only(right: 10,left: 10),
+                                          ),
+                                          Text('Categories',style: TextStyle(color: Colors.white,fontSize: 20),)
+                                        ],
+                                      ),
+                                      onTap: (){
+                                        _homeBloc.add(CategoryItemClickedEvent());
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(top: 10),
+                                  width: double.maxFinite,
+                                  padding: EdgeInsets.all(10),
+                                  color: productItemColor,
+                                  child: HandCursor(
+                                    child: InkWell(
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            child: Icon(Icons.folder,color: Colors.white,),
+                                            padding: EdgeInsets.only(right: 10,left: 10),
+                                          ),
+                                          Text('Products',style: TextStyle(color: Colors.white,fontSize: 20),)
+                                        ],
+                                      ),
+                                      onTap: (){
+                                        _homeBloc.add(ProductsClickedEvent());
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(top: 10),
+                                  width: double.maxFinite,
+                                  padding: EdgeInsets.all(10),
                                   color: aboutItemColor,
                                   child: HandCursor(
                                     child: InkWell(
@@ -521,23 +595,48 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(15.0))),
             contentPadding: EdgeInsets.only(top: 10.0),
-            content: Text(""),
-            actions: <Widget>[
-              // usually buttons at the bottom of the dialog
-              new FlatButton(
-                child: new Text("Logout",style: TextStyle(fontSize: 20),),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _logout();
-                },
-              ),
-              new FlatButton(
-                child: new Text("No",style: TextStyle(fontSize: 20)),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RaisedButton(
+                  child: new Text("Logout",style: TextStyle(fontSize: 20,color: Colors.white),),
+                  color: Colors.lightBlue[900],
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _logout();
+                  },
+                ),
+                Padding(padding: EdgeInsets.all(10),),
+                InkWellMouseRegion(
+                  child: Container(
+                    padding: EdgeInsets.all(5),
+                    child: Text("Cancel",style: TextStyle(color: Colors.lightBlue[900]),),
+                  ),
+                  onTap: (){
+                    Navigator.of(context).pop();
+                  },
+                ),
+                Padding(padding: EdgeInsets.all(5),),
+              ],
+            ),
+//            actions: <Widget>[
+//              // usually buttons at the bottom of the dialog
+//              RaisedButton(
+//                child: new Text("Logout",style: TextStyle(fontSize: 20,color: Colors.white),),
+//                color: Colors.lightBlue[900],
+//                onPressed: () {
+//                  Navigator.of(context).pop();
+//                  _logout();
+//                },
+//              ),
+//              Padding(padding: EdgeInsets.all(5),),
+//              RaisedButton(
+//                child: new Text("No",style: TextStyle(fontSize: 20)),
+//                onPressed: () {
+//                  Navigator.of(context).pop();
+//                },
+//              ),
+//            ],
           );
         });
   }
@@ -581,6 +680,8 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
     customersItemColor=Colors.lightBlue[900];
     teamItemColor=Colors.lightBlue[900];
     aboutItemColor=Colors.lightBlue[900];
+    categoryItemColor=Colors.lightBlue[900];
+    productItemColor=Colors.lightBlue[900];
   }
 }
 

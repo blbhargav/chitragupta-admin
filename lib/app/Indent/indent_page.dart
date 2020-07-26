@@ -1,3 +1,4 @@
+import 'package:chitragupta/app/Indent/DisplayIndent/display_indent.dart';
 import 'package:chitragupta/app/Indent/indent_bloc.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/extension/progress.dart';
@@ -15,7 +16,8 @@ import 'package:intl/intl.dart';
 
 class IndentScreen extends StatefulWidget {
   final Repository repository;
-  IndentScreen(Repository repository)
+  Function(String) callback;
+  IndentScreen(Repository repository,{this.callback})
       : repository = repository ?? Repository();
 
   @override
@@ -99,8 +101,8 @@ class _IndentScreenState extends State<IndentScreen>{
             child: BlocBuilder<IndentBloc,IndentState>(
                 cubit: _indentBloc,
                 builder: (BuildContext context, IndentState state){
-              if(state is InitialLoadingState)
-                return Center(child: CircularProgressIndicator(),);
+                  if(state is InitialLoadingState)
+                    return Center(child: CircularProgressIndicator(),);
 
                   return ProgressHUD(
                     child: Column(
@@ -160,7 +162,7 @@ class _IndentScreenState extends State<IndentScreen>{
                         (orderList.length > 0)
                             ? Expanded(
                               child: Container(
-                                margin: EdgeInsets.only(top: 2,left: 10,right: 10),
+                                margin: EdgeInsets.only(top: 3,left: 2,right: 2),
                                 padding: EdgeInsets.all(5),
                                 child: ListView.separated(
                                   shrinkWrap: true,
@@ -176,28 +178,31 @@ class _IndentScreenState extends State<IndentScreen>{
                                     var format = DateFormat('dd-MMM-yyy hh:mm a');
                                     var createdDate=format.format(order.createdDate);
                                     var orderDate=format.format(order.date);
-                                    return HandCursor(
+                                    return InkWellMouseRegion(
                                       child: Container(
-                                        margin: EdgeInsets.only(top: 10),
-                                        padding: EdgeInsets.all(10),
+                                        padding: EdgeInsets.only(top: 15,bottom: 15,left: 5),
                                         color: Colors.white,
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.start,
                                           children: [
                                             Expanded(
-                                              child: Text("${order.orderId}",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w400),),
+                                              child: Text("${order.orderId}",style: TextStyle(color: Colors.black,
+                                                  fontWeight: FontWeight.w400,fontSize: 16),),
                                               flex: 1,
                                             ),
                                             Expanded(
-                                              child: Text("${order.name}",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w400),),
+                                              child: Text("${order.name}",style: TextStyle(color: Colors.black,
+                                                  fontWeight: FontWeight.w400,fontSize: 16),),
                                               flex: 2,
                                             ),
                                             Expanded(
-                                              child: Text("$orderDate",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w400),),
+                                              child: Text("$orderDate",style: TextStyle(color: Colors.black,
+                                                  fontWeight: FontWeight.w400,fontSize: 16),),
                                               flex: 1,
                                             ),
                                             Expanded(
-                                              child: Text("$createdDate",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w400),),
+                                              child: Text("$createdDate",style: TextStyle(color: Colors.black,
+                                                  fontWeight: FontWeight.w400,fontSize: 16),),
                                               flex: 1,
                                             ),
                                             Expanded(
@@ -212,6 +217,9 @@ class _IndentScreenState extends State<IndentScreen>{
                                           ],
                                         ),
                                       ),
+                                      onTap: (){
+                                        widget.callback(order.orderId);
+                                      },
                                     );
                                   },
                                 ),
