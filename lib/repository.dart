@@ -6,6 +6,7 @@ import 'package:chitragupta/models/Order.dart';
 import 'package:chitragupta/models/Product.dart';
 import 'package:chitragupta/models/category.dart';
 import 'package:chitragupta/models/customer.dart';
+import 'package:chitragupta/models/product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
@@ -592,6 +593,65 @@ class Repository {
     if (snapshot.documents.length > 0) {
       snapshot.documents.forEach((element) {
         Category order = Category.fromSnapshot(snapshot: element);
+        categoryList.add(order);
+      });
+    }
+    return categoryList;
+  }
+
+  //products
+  addProduct(String name,String city,String cityID,String state,String categoryId,String category) async {
+    if (uid == null) {
+      getUserId();
+    }
+    var data = {
+      "createdDate": DateTime.now().millisecondsSinceEpoch,
+      "adminId": user.adminId,
+      "name":name,
+      "city": city,
+      "cityID":cityID,
+      "state": state,
+      "categoryId":categoryId,
+      "category":category,
+      "status": 1
+    };
+
+    await databaseReference.collection("Counters").document("product").updateData({"count":FieldValue.increment(1)});
+
+    var index=await databaseReference.collection("Counters").document("product").get();
+
+    return databaseReference.collection("Products").document("${index.data["count"]}").setData(data);
+  }
+
+  editProduct(String id,String name,String cityID,String city,String state,String categoryId,String category) async {
+    if (uid == null) {
+      await getUserId();
+    }
+    var data = {
+      "adminId": user.adminId,
+      "name": name,
+      "cityID": cityID,
+      "city": city,
+      "state":state,
+      "categoryId":categoryId,
+      "category":category,
+      "status": 1
+    };
+
+    return databaseReference.collection("Products").document(id).updateData(data);
+  }
+
+  Future<List<ProductModel>> getProductsOnce() async{
+    List<ProductModel> categoryList=List();
+    var snapshot=await databaseReference
+        .collection("Products")
+        .where("adminId",isEqualTo: user.adminId)
+        .where("status", isEqualTo: 1)
+        .getDocuments();
+
+    if (snapshot.documents.length > 0) {
+      snapshot.documents.forEach((element) {
+        ProductModel order = ProductModel.fromSnapshot(snapshot: element);
         categoryList.add(order);
       });
     }

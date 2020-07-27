@@ -37,7 +37,7 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     }else if(event is AddCategoryEvent){
       yield ShowProgressState();
       try{
-      await repository.addCategory(event.name, event.cityID,event.city,event.state);
+      await repository.addCategory(event.name, event.city,event.cityID,event.state);
       yield HideProgressState();
       yield AddingSuccessState();
       }catch(_e){

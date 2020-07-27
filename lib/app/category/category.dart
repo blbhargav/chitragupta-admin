@@ -39,6 +39,12 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: BlocProvider(
@@ -57,6 +63,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
                 _loading=false;
               }else if(state is LoadCategoriesState){
                 categoryList=state.categoryList;
+              }else if(state is AddingSuccessState){
+                _bloc.add(FetchCategoriesEvent());
               }
 
             },
@@ -175,8 +183,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                       child: Text(
                                         "${category.id}",
                                         style: TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w600),
+                                            color: Colors.black,fontSize: 16,
+                                            fontWeight: FontWeight.w400),
                                       ),
                                       flex: 1,
                                     ),
@@ -185,8 +193,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                       child: Text(
                                         "${category.name}",
                                         style: TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w600),
+                                            color: Colors.black,fontSize: 16,
+                                            fontWeight: FontWeight.w400),
                                       ),
                                       flex: 2,
                                     ),
@@ -195,8 +203,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                       child: Text(
                                         "${category.city}",
                                         style: TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w600),
+                                            color: Colors.black,fontSize: 16,
+                                            fontWeight: FontWeight.w400),
                                       ),
                                       flex: 1,
                                     ),
@@ -205,20 +213,32 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                       child: Text(
                                         "$createdDate",
                                         style: TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w600),
+                                            color: Colors.black,fontSize: 16,
+                                            fontWeight: FontWeight.w400),
                                       ),
                                       flex: 2,
                                     ),
                                     Padding(padding: EdgeInsets.all(5),),
                                     Expanded(
-                                      child: Center(
-                                        child: Text(
-                                          "Action",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w600),
-                                        ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+//                                          InkWellMouseRegion(
+//                                            child: Icon(Icons.edit,color: Colors.black,),
+//                                            onTap: (){
+//                                              showAlertDialog(context,customer);
+//                                              editCustomerID=customer.customerID;
+//                                            },
+//                                          ),
+//                                          Padding(padding: EdgeInsets.all(10),),
+                                          InkWellMouseRegion(
+                                            child: Icon(Icons.delete,color: Colors.red,),
+                                            onTap: (){
+                                              showDeleteCategoryDialog(context,category);
+                                            },
+                                          )
+                                        ],
                                       ),
                                       flex: 1,
                                     ),
@@ -405,6 +425,98 @@ class _CategoriesPageState extends State<CategoriesPage> {
       ));
     }
       
+  }
+
+  showDeleteCategoryDialog(BuildContext contxt, Category category) {
+    return showDialog(
+        context: contxt,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            contentPadding: EdgeInsets.only(top: 10.0),
+            content: Container(
+              width: 500.0,
+              padding:
+              EdgeInsets.only(top: 10, right: 15, bottom: 10, left: 15),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            "Delete Category?",
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.lightBlue[900]),
+                          ),
+                        ),
+                      ),
+                      HandCursor(
+                        child: GestureDetector(
+                          child: Icon(
+                            Icons.cancel,
+                            color: Colors.red,
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 30, bottom: 30),
+                    padding: EdgeInsets.only(left: 10, right: 10,bottom: 10,top: 10),
+                    child: Text("Are you sure you want to delete ${category.name} ?"),
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    // height: double.infinity,
+                    child: RaisedButton(
+                      child: Text(
+                        "Delete",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w700),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(5.0),
+                      ),
+                      color: Colors.lightBlue[900],
+                      padding: EdgeInsets.only(top: 15, bottom: 15),
+                      onPressed: () {
+                        Navigator.pop(contxt);
+
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  ),
+                  HandCursor(
+                    child: InkWell(
+                      child: Container(
+                        child: Text("Cancel"),
+                        margin: EdgeInsets.only(top: 10,bottom: 5),
+                        padding: EdgeInsets.only(left: 10,right: 10,top: 5,bottom: 5),
+                      ),
+                      onTap: (){
+                        Navigator.pop(contxt);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 
 }
