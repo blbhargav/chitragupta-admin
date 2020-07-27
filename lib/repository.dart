@@ -4,6 +4,7 @@ import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/models/ExtraData.dart';
 import 'package:chitragupta/models/Order.dart';
 import 'package:chitragupta/models/Product.dart';
+import 'package:chitragupta/models/category.dart';
 import 'package:chitragupta/models/customer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -580,11 +581,20 @@ class Repository {
     return databaseReference.collection("Category").document(id).updateData(data);
   }
 
-  getCategoriesOnce() {
-    return databaseReference
+  Future<List<Category>> getCategoriesOnce() async{
+    List<Category> categoryList=List();
+    var snapshot=await databaseReference
         .collection("Category")
         .where("adminId",isEqualTo: user.adminId)
         .where("status", isEqualTo: 1)
         .getDocuments();
+
+    if (snapshot.documents.length > 0) {
+      snapshot.documents.forEach((element) {
+        Category order = Category.fromSnapshot(snapshot: element);
+        categoryList.add(order);
+      });
+    }
+    return categoryList;
   }
 }

@@ -21,7 +21,20 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
   Stream<CategoryState> mapEventToState(
     CategoryEvent event,
   ) async* {
-    if(event is AddCategoryEvent){
+    if(event is FetchCitiesEvent){
+      var snapshot=await repository.getCitiesOnce();
+      List<City> tempCityList = new List();
+      if (snapshot.documents.length > 0) {
+        snapshot.documents.forEach((element) {
+          City city = City.fromSnapshot(snapshot: element);
+          tempCityList.add(city);
+        });
+        cityList=tempCityList;
+        yield LoadCitiesState(cityList: tempCityList);
+      }else {
+        yield LoadCitiesState(cityList: []);
+      }
+    }else if(event is AddCategoryEvent){
       yield ShowProgressState();
       try{
       await repository.addCategory(event.name, event.cityID,event.city,event.state);

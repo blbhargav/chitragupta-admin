@@ -31,6 +31,14 @@ class _CategoriesPageState extends State<CategoriesPage> {
   List<Category> categoryList = new List();
 
   @override
+  void initState() {
+    _bloc=CategoryBloc(repository: widget.repository);
+    _bloc.add(FetchCategoriesEvent());
+    _bloc.add(FetchCitiesEvent());
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: BlocProvider(
@@ -47,6 +55,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
                 _loading=true;
               }else if(state is HideProgressState){
                 _loading=false;
+              }else if(state is LoadCategoriesState){
+                categoryList=state.categoryList;
               }
 
             },
@@ -165,7 +175,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                       child: Text(
                                         "${category.id}",
                                         style: TextStyle(
-                                            color: Colors.white,
+                                            color: Colors.black,
                                             fontWeight: FontWeight.w600),
                                       ),
                                       flex: 1,
@@ -175,7 +185,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                       child: Text(
                                         "${category.name}",
                                         style: TextStyle(
-                                            color: Colors.white,
+                                            color: Colors.black,
                                             fontWeight: FontWeight.w600),
                                       ),
                                       flex: 2,
@@ -185,7 +195,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                       child: Text(
                                         "${category.city}",
                                         style: TextStyle(
-                                            color: Colors.white,
+                                            color: Colors.black,
                                             fontWeight: FontWeight.w600),
                                       ),
                                       flex: 1,
@@ -195,7 +205,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                       child: Text(
                                         "$createdDate",
                                         style: TextStyle(
-                                            color: Colors.white,
+                                            color: Colors.black,
                                             fontWeight: FontWeight.w600),
                                       ),
                                       flex: 2,
