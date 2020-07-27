@@ -16,7 +16,7 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
 
   TeamBloc({this.repository}) : super(CustomersInitial());
   List<City> cityList = new List();
-  List<Member> customerList = new List();
+  List<Member> teamList = new List();
 
   @override
   Stream<TeamState> mapEventToState(
@@ -51,7 +51,7 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
     }else if(event is FetchTeamMembersEvent){
       yield ShowProgressState();
       var members=await repository.getMembersOnce();
-      customerList=members;
+      teamList=members;
       yield HideProgressState();
       yield LoadTeamMembersState(teamList: members);
     }else if(event is EditTeamMembersEvent){

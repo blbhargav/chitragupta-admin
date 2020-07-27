@@ -128,24 +128,24 @@ class _IndentScreenState extends State<IndentScreen>{
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Expanded(
-                                child: Text("ID",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
+                                child: Text("ID",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
                                 flex: 1,
                               ),
                               Expanded(
-                                child: Text("Customer",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
+                                child: Text("Customer",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
                                 flex: 2,
                               ),
                               Expanded(
-                                child: Text("Order Date",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
+                                child: Text("Order Date",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
                                 flex: 1,
                               ),
                               Expanded(
-                                child: Text("Created at",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
+                                child: Text("Created at",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
                                 flex: 1,
                               ),
                               Expanded(
                                 child: Center(
-                                  child: Text("Action",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
+                                  child: Text("Action",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
                                 ),
                                 flex: 1,
                               ),
@@ -187,22 +187,22 @@ class _IndentScreenState extends State<IndentScreen>{
                                           children: [
                                             Expanded(
                                               child: Text("${order.orderId}",style: TextStyle(color: Colors.black,
-                                                  fontWeight: FontWeight.w400,fontSize: 16),),
+                                                  fontWeight: FontWeight.w400,fontSize: 16),textAlign:TextAlign.center ,),
                                               flex: 1,
                                             ),
                                             Expanded(
                                               child: Text("${order.name}",style: TextStyle(color: Colors.black,
-                                                  fontWeight: FontWeight.w400,fontSize: 16),),
+                                                  fontWeight: FontWeight.w400,fontSize: 16),textAlign:TextAlign.center ,),
                                               flex: 2,
                                             ),
                                             Expanded(
                                               child: Text("$orderDate",style: TextStyle(color: Colors.black,
-                                                  fontWeight: FontWeight.w400,fontSize: 16),),
+                                                  fontWeight: FontWeight.w400,fontSize: 16),textAlign:TextAlign.center ,),
                                               flex: 1,
                                             ),
                                             Expanded(
                                               child: Text("$createdDate",style: TextStyle(color: Colors.black,
-                                                  fontWeight: FontWeight.w400,fontSize: 16),),
+                                                  fontWeight: FontWeight.w400,fontSize: 16),textAlign:TextAlign.center ,),
                                               flex: 1,
                                             ),
                                             Expanded(

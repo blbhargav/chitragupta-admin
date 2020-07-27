@@ -433,6 +433,13 @@ class _ProductsPageState extends State<ProductsPage> {
   void addProduct(ProductModel product) {
     var error="Please enter this field";
     _commonError = "";
+
+    if(selectedCategory=="Select Category"){
+      _commonError="Please select category";
+      showAlertDialog(context,null);
+      return;
+    }
+
     if(_nameController.text.isEmpty){
       _commonError="Please enter category name";
       showAlertDialog(context,null);
@@ -440,6 +447,7 @@ class _ProductsPageState extends State<ProductsPage> {
     }
 
     if(showCity){
+      //validation for SuperAdmin
       if(selectedCity=="Select City"){
         _commonError="Please select city";
         showAlertDialog(context,null);

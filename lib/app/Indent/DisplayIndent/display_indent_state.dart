@@ -7,3 +7,25 @@ abstract class DisplayIndentState extends Equatable{
 }
 
 class DisplayIndentInitial extends DisplayIndentState {}
+
+class LoadProductsState extends DisplayIndentState {
+  final List<ProductModel> productList;
+  LoadProductsState({this.productList});
+}
+
+class LoadCategoriesState extends DisplayIndentState {
+  final List<Category> categoryList;
+  LoadCategoriesState({this.categoryList});
+}
+class ShowProgressState extends DisplayIndentState {}
+
+class HideProgressState extends DisplayIndentState {}
+
+class AddingSuccessState extends DisplayIndentState {}
+
+class AddingFailedState extends DisplayIndentState {}
+
+class LoadTeamMembersState extends DisplayIndentState {
+  final List<Member> teamList;
+  LoadTeamMembersState({this.teamList});
+}
