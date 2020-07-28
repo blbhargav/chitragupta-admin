@@ -29,3 +29,11 @@ class LoadTeamMembersState extends DisplayIndentState {
   final List<Member> teamList;
   LoadTeamMembersState({this.teamList});
 }
+
+class LoadIndentProductsState extends DisplayIndentState {
+  final List<Indent> indentProductList;
+  LoadIndentProductsState({this.indentProductList});
+}
+
+class ShowSpreadSheetImportState extends DisplayIndentState {}
+class HideSpreadSheetImportState extends DisplayIndentState {}

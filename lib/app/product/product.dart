@@ -39,6 +39,7 @@ class _ProductsPageState extends State<ProductsPage> {
   @override
   void initState() {
     _bloc=ProductBloc(repository: widget.repository);
+    _bloc.add(FetchProductsEvent());
     _bloc.add(ProductInitEvent());
     _bloc.add(FetchCategoriesEvent());
     _bloc.add(FetchCitiesEvent());
@@ -445,6 +446,8 @@ class _ProductsPageState extends State<ProductsPage> {
       showAlertDialog(context,null);
       return;
     }
+    var categoryIndex=categoryNames.indexWhere((note) => note.startsWith(selectedCategory));
+    Category category=categoryList[categoryIndex];
 
     if(showCity){
       //validation for SuperAdmin
@@ -455,18 +458,23 @@ class _ProductsPageState extends State<ProductsPage> {
       }
       var index=cityNames.indexWhere((note) => note.startsWith(selectedCity));
       City city=cityList[index];
+
       _bloc.add(AddProductEvent(
           name: _nameController.text,
           city: city.city,
           state: city.state,
-          cityID: city.cityID
+          cityID: city.cityID,
+          category: category.name,
+          categoryId: category.id
       ));
     }else {
       _bloc.add(AddProductEvent(
           name: _nameController.text,
           city: Repository.user.city,
           state: Repository.user.state,
-          cityID: Repository.user.cityID
+          cityID: Repository.user.cityID,
+          category: category.name,
+          categoryId: category.id
       ));
     }
 

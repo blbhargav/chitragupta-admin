@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:core';
+import 'package:chitragupta/extension/Constants.dart';
 import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/models/ExtraData.dart';
 import 'package:chitragupta/models/Order.dart';
 import 'package:chitragupta/models/Product.dart';
 import 'package:chitragupta/models/category.dart';
 import 'package:chitragupta/models/customer.dart';
+import 'package:chitragupta/models/indent.dart';
 import 'package:chitragupta/models/product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -444,20 +446,20 @@ class Repository {
 
   Future<List<Member>> getMembersOnce() async{
     List<Member> tempTeamList = new List();
-    if(user.type=="SuperAdmin"){
+    if(user.type==Constants.superAdmin){
       var snapshot=await databaseReference
           .collection("Users")
           .where("adminId",isEqualTo: uid)
           .where("status", isEqualTo: 1)
           .getDocuments();
+      print("BLB super member team ${snapshot.documents.length}");
       if (snapshot.documents.length > 0) {
         snapshot.documents.forEach((element) {
           Member member = Member.fromSnapshot(snapshot: element);
-          if(member.uid!=user.uid)
-            tempTeamList.add(member);
+          tempTeamList.add(member);
         });
       }
-    }else if(user.type=="Admin"){
+    }else if(user.type==Constants.admin){
       var snapshot=await databaseReference
           .collection("Users")
           .where("adminId",isEqualTo: user.adminId)
@@ -467,8 +469,7 @@ class Repository {
       if (snapshot.documents.length > 0) {
         snapshot.documents.forEach((element) {
           Member member = Member.fromSnapshot(snapshot: element);
-          if(member.uid!=user.uid)
-            tempTeamList.add(member);
+          tempTeamList.add(member);
         });
       }
     }
@@ -656,5 +657,30 @@ class Repository {
       });
     }
     return categoryList;
+  }
+
+  //add indent
+  addIndentProduct(Indent indent)async{
+    return await databaseReference
+        .collection('Orders')
+        .document(indent.orderId)
+        .collection("products")
+        .document()
+        .setData(indent.toJson());
+  }
+  Future<List<Indent>> getIndentProducts(String indentId) async{
+    List<Indent> indentList=List();
+    var snapshot=await databaseReference
+        .collection('Orders')
+        .document(indentId)
+        .collection("products")
+        .getDocuments();
+    if (snapshot.documents.length > 0) {
+      snapshot.documents.forEach((element) {
+        Indent order = Indent.fromSnapshot(snapshot: element);
+        indentList.add(order);
+      });
+    }
+    return indentList;
   }
 }

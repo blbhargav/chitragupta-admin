@@ -1,13 +1,23 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:chitragupta/app/Indent/DisplayIndent/display_indent_bloc.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/models/category.dart';
+import 'package:chitragupta/models/indent.dart';
 import 'package:chitragupta/models/product.dart';
 import 'package:chitragupta/repository.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'dart:html' as html;
+
+import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
 
 class DisplayIndent extends StatefulWidget {
   final Repository repository;
@@ -43,12 +53,20 @@ class _DisplayIndentState extends State<DisplayIndent>{
   GlobalKey employeeKey = new GlobalKey<AutoCompleteTextFieldState<Member>>();
   GlobalKey categoryKey = new GlobalKey<AutoCompleteTextFieldState<Category>>();
 
+  List<Indent> indentList=List();
+
+  List<int> _selectedFile;
+  Uint8List _bytesData;
+
+
   @override
   void initState() {
     _indentBloc=DisplayIndentBloc(repository: widget.repository,orderID: widget.orderID);
+    _indentBloc.add(FetchIndentProductsEvent());
     super.initState();
     _indentBloc.add(FetchCategoriesEvent());
     _indentBloc.add(FetchProductsEvent());
+    _indentBloc.add(FetchTeamMembersEvent());
 
   }
   @override
@@ -66,27 +84,32 @@ class _DisplayIndentState extends State<DisplayIndent>{
           create: (_) => _indentBloc,
           child: BlocListener<DisplayIndentBloc, DisplayIndentState>(
             listener: (context, state) {
-              if(state is LoadCategoriesState){
+              if(state is LoadIndentProductsState){
+                indentList=state.indentProductList;
+              }else if(state is LoadCategoriesState){
                 categoryList=state.categoryList;
-//                categoryNames.clear();
-//                categoryList.forEach((element) {
-//                  categoryNames.add(element.name);
-//                });
               }else if(state is LoadProductsState){
                 productList=state.productList;
-//                productNames.clear();
-//                productList.forEach((element) {
-//                  productNames.add(element.name);
-//                });
               }else if(state is LoadTeamMembersState){
                 employeeList=state.teamList;
+              }else if(state is ShowProgressState){
+                _loading=true;
+              }else if(state is HideProgressState){
+                _loading=false;
+              }else if(state is AddingSuccessState){
+                _indentBloc.add(FetchIndentProductsEvent());
+              }else if(state is ShowSpreadSheetImportState){
+                importProgressDialog();
+              }else if(state is HideSpreadSheetImportState){
+                Navigator.pop(context);
+                _indentBloc.add(FetchIndentProductsEvent());
               }
             },
             child: BlocBuilder<DisplayIndentBloc,DisplayIndentState>(
               cubit: _indentBloc,
               builder: (BuildContext context, DisplayIndentState state){
-//                if(state is DisplayIndentInitial)
-//                  return Center(child: CircularProgressIndicator(),);
+                if(state is DisplayIndentInitial)
+                  return Center(child: CircularProgressIndicator(),);
 
                 return ProgressHUD(
                   child: Column(
@@ -106,6 +129,7 @@ class _DisplayIndentState extends State<DisplayIndent>{
                             child: Text("Import Indent",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w700),),
                             onPressed: () {
                               //_indentBloc.add(CreateIndentButtonClickedEvent());
+                              importExcelData();
                             },
                             color: Colors.lightBlue[900],
                           ),
@@ -115,6 +139,7 @@ class _DisplayIndentState extends State<DisplayIndent>{
                             child: Text("+Add Product",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w700),),
                             onPressed: () {
                              // _indentBloc.add(CreateIndentButtonClickedEvent());
+                              resetForm();
                               showAlertDialog(context);
                             },
                             color: Colors.lightBlue[900],
@@ -164,6 +189,86 @@ class _DisplayIndentState extends State<DisplayIndent>{
                         ),
                       ),
 
+                      (indentList.length > 0)
+                          ? Expanded(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 3,left: 2,right: 2),
+                          padding: EdgeInsets.all(5),
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            separatorBuilder: (BuildContext context, int index) {
+                              return Padding(
+                                child: Divider(thickness: 1,),
+                                padding: EdgeInsets.only(top: 5, bottom: 5),
+                              );
+                            },
+                            itemCount: indentList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              Indent indentProduct=indentList[index];
+                              var format = DateFormat('dd-MMM-yyy hh:mm a');
+//                              var createdDate=format.format(order.createdDate);
+//                              var orderDate=format.format(order.date);
+                              return InkWellMouseRegion(
+                                child: Container(
+                                  padding: EdgeInsets.only(top: 15,bottom: 15,left: 5),
+                                  color: Colors.white,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Text("${index+1}",textAlign:TextAlign.center ,
+                                          style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
+                                        flex: 1,
+                                      ),
+                                      Expanded(
+                                        child: Text("${indentProduct.product}",textAlign:TextAlign.start ,
+                                          style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
+                                        flex: 4,
+                                      ),
+                                      Expanded(
+                                        child: Text("${indentProduct.purchaseOrderQty}",textAlign:TextAlign.center ,
+                                          style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
+                                        flex: 2,
+                                      ),
+                                      Expanded(
+                                        child: Text("${indentProduct.purchaseQty}",textAlign:TextAlign.center ,
+                                          style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
+                                        flex: 2,
+                                      ),
+                                      Expanded(
+                                        child: Text("${indentProduct.employee}",textAlign:TextAlign.start,
+                                          style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
+                                        flex: 3,
+                                      ),
+//                                      Expanded(
+//                                        child: Center(
+//                                          child: Text("Action",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
+//                                        ),
+//                                        flex: 2,
+//                                      ),
+                                      Expanded(
+                                        child: InkWell(
+                                          child: Icon(Icons.delete,color: Colors.red,),
+                                        ),
+                                        flex: 2,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                onTap: (){
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      )
+                          : Expanded(
+                        child: Center(
+                          child: Text("No Active Orders Found"),
+                        ),
+
+                      )
+
                     ],
                   ),
                   inAsyncCall: _loading,
@@ -174,6 +279,15 @@ class _DisplayIndentState extends State<DisplayIndent>{
           )
         )
     );
+  }
+
+  resetForm(){
+    selectedEmployee=null;
+    selectedProduct=null;
+    selectedCategory=null;
+    _purchaseQtyController.text="";
+    _purchaseOrderQtyController.text="";
+    _commonError="";
   }
 
   showAlertDialog(BuildContext contxt) {
@@ -219,69 +333,105 @@ class _DisplayIndentState extends State<DisplayIndent>{
                       )
                     ],
                   ),
+
                   Container(
-                    child: AutoCompleteTextField<Category>(
-                      decoration: new InputDecoration(
-                          hintText: "Search Category:", suffixIcon: new Icon(Icons.search)),
-                      itemSubmitted: (item) => setState(() => selectedCategory = item),
-                      key: categoryKey,
-                      suggestions: categoryList,
-                      itemBuilder: (context, suggestion) => new Padding(
-                          child: new ListTile(
-                              title: new Text(suggestion.name),
-                              trailing: new Text("${suggestion.name}")),
-                          padding: EdgeInsets.all(8.0)),
-                      itemSorter: (a, b) => a.name == b.name ? 0 : a.name.contains(b.name) ? -1 : 1,
-                      itemFilter: (suggestion, input) =>
-                          suggestion.name.toLowerCase().startsWith(input.toLowerCase()),
+                    child: DropdownSearch<Category>(
+                      items: categoryList,
+                      itemAsString: (Category p) => p.name,
+                      maxHeight: 300,
+                      isFilteredOnline: false,
+                      //onFind: (String filter) => getData(filter),
+                      label: "Select Category",
+                      onChanged: (val){
+                        selectedCategory=val;
+                      },
+                      showSearchBox: true,
                     ),
                     margin: EdgeInsets.only(top: 10, bottom: 10),
-                    padding: EdgeInsets.only(left: 10, right: 10),
                   ),
 
                   Container(
-                    child: AutoCompleteTextField<ProductModel>(
-                      decoration: new InputDecoration(
-                          hintText: "Search Product:", suffixIcon: new Icon(Icons.search)),
-                      itemSubmitted: (item) => setState(() => selectedProduct = item),
-                      key: key,
-                      suggestions: productList,
-                      itemBuilder: (context, suggestion) => new Padding(
-                          child: new ListTile(
-                              title: new Text(suggestion.name),
-                              trailing: new Text("${suggestion.category}")),
-                          padding: EdgeInsets.all(8.0)),
-                      itemSorter: (a, b) => a.name == b.name ? 0 : a.name.contains(b.name) ? -1 : 1,
-                      itemFilter: (suggestion, input) =>
-                          suggestion.name.toLowerCase().startsWith(input.toLowerCase()),
+                    child: DropdownSearch<ProductModel>(
+                      items: productList,
+                      itemAsString: (ProductModel p) => p.name,
+                      maxHeight: 300,
+                      isFilteredOnline: false,
+                      //onFind: (String filter) => getData(filter),
+                      label: "Select Product",
+                      onChanged: (val){
+                        selectedProduct=val;
+                      },
+                      showSearchBox: true,
                     ),
                     margin: EdgeInsets.only(top: 10, bottom: 10),
-                    padding: EdgeInsets.only(left: 10, right: 10),
                   ),
 
                   Container(
-                    child: AutoCompleteTextField<Member>(
+                    child: TextField(
+                      minLines: 1,
+                      maxLines: 10,
+                      controller: _purchaseOrderQtyController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[
+                        WhitelistingTextInputFormatter.digitsOnly
+                      ],
                       decoration: new InputDecoration(
-                          hintText: "Search Employee:", suffixIcon: new Icon(Icons.search)),
-                      itemSubmitted: (item) => setState(() => selectedEmployee = item),
-                      key: employeeKey,
-                      suggestions: employeeList,
-                      itemBuilder: (context, suggestion) => new Padding(
-                          child: new ListTile(
-                              title: new Text(suggestion.name),
-                              trailing: new Text("${suggestion.name}")),
-                          padding: EdgeInsets.all(8.0)),
-                      itemSorter: (a, b) => a.name == b.name ? 0 : a.name.contains(b.name) ? -1 : 1,
-                      itemFilter: (suggestion, input) =>
-                          suggestion.name.toLowerCase().startsWith(input.toLowerCase()),
+                        fillColor: Colors.white, filled: true,
+                        border: new OutlineInputBorder(
+                          borderSide: new BorderSide(color: Colors.black26),
+                          borderRadius: new BorderRadius.circular(5.0),
+                        ),
+                        //hintText: 'Reason for pending',
+                        //helperText: 'Keep it short, this is just a demo.',
+                        labelText: 'Purchase Order Quantity',
+                      ),
                     ),
                     margin: EdgeInsets.only(top: 10, bottom: 10),
-                    padding: EdgeInsets.only(left: 10, right: 10),
+                  ),
+
+                  Container(
+                    child: TextField(
+                      minLines: 1,
+                      maxLines: 10,
+                      controller: _purchaseQtyController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[
+                        WhitelistingTextInputFormatter.digitsOnly
+                      ],
+                      decoration: new InputDecoration(
+                        fillColor: Colors.white, filled: true,
+                        border: new OutlineInputBorder(
+                          borderSide: new BorderSide(color: Colors.black26),
+                          borderRadius: new BorderRadius.circular(5.0),
+                        ),
+                        //hintText: 'Reason for pending',
+                        //helperText: 'Keep it short, this is just a demo.',
+                        labelText: 'Purchase Quantity',
+                      ),
+                    ),
+                    margin: EdgeInsets.only(top: 10, bottom: 10),
+                  ),
+
+                  Container(
+                    child: DropdownSearch<Member>(
+                      items: employeeList,
+                      itemAsString: (Member p) => p.name,
+                      maxHeight: 300,
+                      isFilteredOnline: false,
+                      //onFind: (String filter) => getData(filter),
+                      label: "Select Employee",
+                      onChanged: (val){
+                        selectedEmployee=val;
+                      },
+                      showSearchBox: true,
+                    ),
+                    margin: EdgeInsets.only(top: 10, bottom: 10),
                   ),
 
                   _commonError.isNotEmpty?Container(
+                    padding: EdgeInsets.all(10),
                     child: Center(child: Text("$_commonError",style: TextStyle(color: Colors.red),),),
-                  ):Container(),
+                  ):Container(padding: EdgeInsets.all(10),),
 
                   SizedBox(
                     width: double.infinity,
@@ -299,7 +449,7 @@ class _DisplayIndentState extends State<DisplayIndent>{
                       padding: EdgeInsets.only(top: 15, bottom: 15),
                       onPressed: () {
                         Navigator.pop(contxt);
-                        //addCategory();
+                        addProduct();
                       },
                     ),
                   ),
@@ -312,4 +462,144 @@ class _DisplayIndentState extends State<DisplayIndent>{
           );
         });
   }
+  void addProduct() {
+    _commonError="";
+    if(selectedProduct==null){
+      _commonError="Please select product";
+      showAlertDialog(context);
+      return;
+    }
+
+    if(selectedEmployee==null){
+      _commonError="Please select employee";
+      showAlertDialog(context);
+      return;
+    }
+    if(_purchaseOrderQtyController.text.isEmpty){
+      _commonError="Please select this field";
+      showAlertDialog(context);
+      return;
+    }
+
+    if(_purchaseQtyController.text.isEmpty){
+      _commonError="Please select this field";
+      showAlertDialog(context);
+      return;
+    }
+
+    Indent indent=Indent();
+    indent.orderId=widget.orderID;
+    indent.category=selectedProduct.category;
+    indent.categoryId=selectedProduct.categoryId;
+    indent.product=selectedProduct.name;
+    indent.productId=selectedProduct.id;
+    indent.purchaseOrderQty=int.parse(_purchaseOrderQtyController.text);
+    indent.purchaseQty=int.parse(_purchaseQtyController.text);
+    indent.employee=selectedEmployee.name;
+    indent.employeeId=selectedEmployee.uid;
+    _indentBloc.add(AddIndentProductEvent(indent: indent));
+  }
+
+  void importExcelData() {
+    html.InputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.multiple = false;
+    uploadInput.draggable = true;
+    uploadInput.accept = '.xlsx';
+    uploadInput.click();
+    uploadInput.onChange.listen((e) {
+      final files = uploadInput.files;
+      final file = files[0];
+      final reader = new html.FileReader();
+      reader.readAsDataUrl(file);
+      reader.onLoadEnd.listen((e) {
+        _handleResult(reader.result);
+      });
+
+    });
+  }
+
+  void _handleResult(Object result) {
+    _bytesData = Base64Decoder().convert(result.toString().split(",").last);
+   _selectedFile = _bytesData;
+    var decoder = SpreadsheetDecoder.decodeBytes(_bytesData);
+
+//    for (var table in decoder.tables.keys) {
+//      print("BLB ${table}");
+//      if()
+//    }
+    var table = decoder.tables['Sheet1'];
+    if(table!=null){
+     _indentBloc.add(ImportFromExcelEvent(table));
+    }else{
+      showExcelFormatError();
+    }
+   
+
+  }
+
+  void showExcelFormatError() {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            title: new Text("Wrong Spread Sheet Format",style: TextStyle(fontSize: 25),textAlign: TextAlign.center,),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            contentPadding: EdgeInsets.only(top: 10.0),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(20),
+                  child: Text("Please make sure have saved spreadsheet in '.xlsx' format. Tab/Page name should be 'Sheet1'. "
+                      "Containing 4 colums 'Description' or 'Product', 'Purchase Order Qty', 'Purchase Qty' and 'Employee' respectively. "),
+                ),
+                RaisedButton(
+                  child: new Text("Ok",style: TextStyle(fontSize: 20,color: Colors.white),),
+                  color: Colors.lightBlue[900],
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                Padding(padding: EdgeInsets.all(10),),
+              ],
+            ),
+          );
+        });
+  }
+
+  void importProgressDialog() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          // return object of type Dialog
+          return AlertDialog(
+            title: new Text("Importing from Spread sheet...",style: TextStyle(fontSize: 25),textAlign: TextAlign.center,),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            contentPadding: EdgeInsets.only(top: 10.0),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(20),
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(20),
+                  child: Text("Please don't close or navigate.",style: TextStyle(color: Colors.black54),),
+                ),
+
+                Padding(padding: EdgeInsets.all(10),),
+              ],
+            ),
+          );
+        });
+  }
+
 }

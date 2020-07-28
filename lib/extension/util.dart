@@ -127,6 +127,20 @@ class Utils {
   static void hideKeyboard(BuildContext context){
     FocusScope.of(context).requestFocus(FocusNode());
   }
+
+  static bool isValidNumber(String number){
+    Pattern pattern = r"^[0-9]*$";
+    RegExp regex = new RegExp(pattern);
+    if (number==null) {
+      return false;
+    } else {
+      if (!regex.hasMatch(number))
+        return false;
+      else
+        return true;
+    }
+  }
+
 }
 
 class LinearBudgets {

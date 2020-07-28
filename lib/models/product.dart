@@ -7,7 +7,7 @@ class ProductModel {
   String _cityID;
   String _city;
   String _name;
-  String _categoryId;
+  int _categoryId;
   String _category;
 
   int get createdDate => _createdDate;
@@ -16,7 +16,7 @@ class ProductModel {
   String get name => _name;
   String get city => _city;
   String get id =>_id;
-  String get categoryId =>_categoryId;
+  int get categoryId =>_categoryId;
   String get category =>_category;
 
   ProductModel({
