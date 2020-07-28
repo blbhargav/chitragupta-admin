@@ -14,8 +14,8 @@ class DashboardItemClickedEvent extends HomeEvent{}
 
 class IndentItemClickedEvent extends HomeEvent{}
 class DisplayIndentClickedEvent extends HomeEvent{
-  final String orderId;
-  DisplayIndentClickedEvent(this.orderId);
+  final Order order;
+  DisplayIndentClickedEvent(this.order);
 }
 
 class ExpensesItemClickedEvent extends HomeEvent{}

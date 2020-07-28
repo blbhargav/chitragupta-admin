@@ -245,22 +245,7 @@ class Repository {
     return reference;
   }
 
-  removeProductFromOrder(String orderId, String productId) {
-    databaseReference.collection("Orders").document(orderId).updateData({"totalItems":FieldValue.increment(-1)});
-    return databaseReference
-        .collection('Orders')
-        .document(orderId)
-        .collection("products")
-        .document(productId).delete();
-  }
-  updateProductInOrder(String orderId, Product data) {
-    return databaseReference
-        .collection('Orders')
-        .document(orderId)
-        .collection("products")
-        .document(data.id)
-        .updateData(data.toJson());
-  }
+
 
   addTeamMember(String userId, String name,String email,String mobile) {
     return databaseReference
@@ -477,6 +462,43 @@ class Repository {
     return tempTeamList;
   }
 
+  Future<List<Member>> getEmployeesOnceByCity(String cityId) async{
+
+    List<Member> tempTeamList = new List();
+    if(user.type==Constants.superAdmin){
+      var snapshot=await databaseReference
+          .collection("Users")
+          .where("adminId",isEqualTo: uid)
+          .where("cityID", isEqualTo: cityId)
+          .where("type",isEqualTo: Constants.employee)
+          .where("status", isEqualTo: 1)
+          .getDocuments();
+      print("BLB super member team  for city $cityId ${snapshot.documents.length}");
+      if (snapshot.documents.length > 0) {
+        snapshot.documents.forEach((element) {
+          Member member = Member.fromSnapshot(snapshot: element);
+          tempTeamList.add(member);
+        });
+      }
+    }else if(user.type==Constants.admin){
+      var snapshot=await databaseReference
+          .collection("Users")
+          .where("adminId",isEqualTo: user.adminId)
+          .where("cityID", isEqualTo: user.cityID)
+          .where("type",isEqualTo: Constants.employee)
+          .where("status", isEqualTo: 1)
+          .getDocuments();
+      if (snapshot.documents.length > 0) {
+        snapshot.documents.forEach((element) {
+          Member member = Member.fromSnapshot(snapshot: element);
+          tempTeamList.add(member);
+        });
+      }
+    }
+
+    return tempTeamList;
+  }
+
 
 
 
@@ -674,6 +696,7 @@ class Repository {
         .collection('Orders')
         .document(indentId)
         .collection("products")
+        .orderBy("product",descending: true)
         .getDocuments();
     if (snapshot.documents.length > 0) {
       snapshot.documents.forEach((element) {
@@ -682,5 +705,20 @@ class Repository {
       });
     }
     return indentList;
+  }
+  removeProductFromOrder(String orderId, String productId) {
+    return databaseReference
+        .collection('Orders')
+        .document(orderId)
+        .collection("products")
+        .document(productId).delete();
+  }
+  updateProductInOrder(String orderId, Indent data) {
+    return databaseReference
+        .collection('Orders')
+        .document(orderId)
+        .collection("products")
+        .document(data.id)
+        .updateData(data.toJson());
   }
 }

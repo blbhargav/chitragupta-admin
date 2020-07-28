@@ -6,6 +6,7 @@ import 'package:chitragupta/app/Indent/DisplayIndent/display_indent_bloc.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/models/Member.dart';
+import 'package:chitragupta/models/Order.dart';
 import 'package:chitragupta/models/category.dart';
 import 'package:chitragupta/models/indent.dart';
 import 'package:chitragupta/models/product.dart';
@@ -21,9 +22,9 @@ import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
 
 class DisplayIndent extends StatefulWidget {
   final Repository repository;
-  final String orderID;
-  DisplayIndent(Repository repository,String orderId)
-      : repository = repository ?? Repository(),orderID=orderId;
+  final Order order;
+  DisplayIndent(Repository repository,Order order)
+      : repository = repository ?? Repository(),order=order;
 
   @override
   _DisplayIndentState createState() => _DisplayIndentState();
@@ -61,7 +62,7 @@ class _DisplayIndentState extends State<DisplayIndent>{
 
   @override
   void initState() {
-    _indentBloc=DisplayIndentBloc(repository: widget.repository,orderID: widget.orderID);
+    _indentBloc=DisplayIndentBloc(repository: widget.repository,order: widget.order);
     _indentBloc.add(FetchIndentProductsEvent());
     super.initState();
     _indentBloc.add(FetchCategoriesEvent());
@@ -103,6 +104,8 @@ class _DisplayIndentState extends State<DisplayIndent>{
               }else if(state is HideSpreadSheetImportState){
                 Navigator.pop(context);
                 _indentBloc.add(FetchIndentProductsEvent());
+              }else if(state is RefreshState){
+                _indentBloc.add(FetchIndentProductsEvent());
               }
             },
             child: BlocBuilder<DisplayIndentBloc,DisplayIndentState>(
@@ -140,7 +143,7 @@ class _DisplayIndentState extends State<DisplayIndent>{
                             onPressed: () {
                              // _indentBloc.add(CreateIndentButtonClickedEvent());
                               resetForm();
-                              showAlertDialog(context);
+                              showAddIndentAlertDialog(context);
                             },
                             color: Colors.lightBlue[900],
                           ),
@@ -157,34 +160,33 @@ class _DisplayIndentState extends State<DisplayIndent>{
                               child: Text("ID",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
                               flex: 1,
                             ),
+                            Padding(padding: EdgeInsets.all(5),),
                             Expanded(
-                              child: Text("Product",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
+                              child: Text("Product",textAlign:TextAlign.start ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
                               flex: 4,
                             ),
+                            Padding(padding: EdgeInsets.all(5),),
                             Expanded(
                               child: Text("Purchase Order Qty",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
                               flex: 2,
                             ),
+                            Padding(padding: EdgeInsets.all(5),),
                             Expanded(
                               child: Text("Purchase Qty",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
                               flex: 2,
                             ),
+                            Padding(padding: EdgeInsets.all(5),),
                             Expanded(
-                              child: Text("Employee",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
+                              child: Text("Employee",textAlign:TextAlign.start ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
                               flex: 3,
                             ),
+                            Padding(padding: EdgeInsets.all(5),),
                             Expanded(
                               child: Center(
                                 child: Text("Action",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
                               ),
                               flex: 2,
                             ),
-//                              Expanded(
-//                                child: InkWell(
-//                                  child: Icon(Icons.delete,color: Colors.red,),
-//                                ),
-//                                flex: 1,
-//                              ),
                           ],
                         ),
                       ),
@@ -220,24 +222,46 @@ class _DisplayIndentState extends State<DisplayIndent>{
                                           style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
                                         flex: 1,
                                       ),
+                                      Padding(padding: EdgeInsets.all(5),),
                                       Expanded(
                                         child: Text("${indentProduct.product}",textAlign:TextAlign.start ,
                                           style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
                                         flex: 4,
                                       ),
+                                      Padding(padding: EdgeInsets.all(5),),
                                       Expanded(
                                         child: Text("${indentProduct.purchaseOrderQty}",textAlign:TextAlign.center ,
                                           style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
                                         flex: 2,
                                       ),
+                                      Padding(padding: EdgeInsets.all(5),),
                                       Expanded(
                                         child: Text("${indentProduct.purchaseQty}",textAlign:TextAlign.center ,
                                           style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
                                         flex: 2,
                                       ),
+                                      Padding(padding: EdgeInsets.all(5),),
                                       Expanded(
-                                        child: Text("${indentProduct.employee}",textAlign:TextAlign.start,
-                                          style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
+                                        child: (indentProduct.employee!=null)?Text("${indentProduct.employee}",
+                                          textAlign:TextAlign.start,
+                                          style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),
+                                        ):Container(
+                                          child: DropdownSearch<Member>(
+                                            items: employeeList,
+                                            itemAsString: (Member p) => p.name,
+                                            maxHeight: 300,
+                                            isFilteredOnline: false,
+                                            //onFind: (String filter) => getData(filter),
+                                            label: "Select Employee",
+                                            onChanged: (val){
+                                              indentProduct.employee=val.name;
+                                              indentProduct.employeeId=val.uid;
+                                              _indentBloc.add(UpdateIndentProductsEvent(product: indentProduct));
+                                            },
+                                            showSearchBox: true,
+                                          ),
+                                          padding: EdgeInsets.only(left: 5,right: 5),
+                                        ),
                                         flex: 3,
                                       ),
 //                                      Expanded(
@@ -246,9 +270,26 @@ class _DisplayIndentState extends State<DisplayIndent>{
 //                                        ),
 //                                        flex: 2,
 //                                      ),
+                                      Padding(padding: EdgeInsets.all(5),),
                                       Expanded(
-                                        child: InkWell(
-                                          child: Icon(Icons.delete,color: Colors.red,),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            InkWellMouseRegion(
+                                              child: Icon(Icons.edit,color: Colors.black,),
+                                              onTap: (){
+                                                resetForm();
+                                                showEditIndentAlertDialog(context,indentProduct);
+                                              },
+                                            ),
+                                            InkWellMouseRegion(
+                                              child: Icon(Icons.delete,color: Colors.red,),
+                                              onTap: (){
+                                                showDeleteProductDialog(context,indentProduct);
+                                              },
+                                            )
+                                          ],
                                         ),
                                         flex: 2,
                                       ),
@@ -290,7 +331,217 @@ class _DisplayIndentState extends State<DisplayIndent>{
     _commonError="";
   }
 
-  showAlertDialog(BuildContext contxt) {
+  showEditIndentAlertDialog(BuildContext contxt, Indent indent) {
+
+
+    if(indent.employee!=null){
+      employeeList.forEach((employee) {
+        if(employee.uid==indent.employeeId){
+          selectedEmployee=employee;
+        }
+      });
+    }
+
+
+    if(indent.purchaseQty!=null){
+      _purchaseQtyController.text="${indent.purchaseQty}";
+    }
+
+    if(indent.purchaseOrderQty!=null){
+      _purchaseOrderQtyController.text="${indent.purchaseOrderQty}";
+    }
+
+
+    return showDialog(
+        context: contxt,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            contentPadding: EdgeInsets.only(top: 10.0),
+            content: Container(
+              width: 500.0,
+              padding:
+              EdgeInsets.only(top: 10, right: 15, bottom: 10, left: 15),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            "Edit ${indent.product}",
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.lightBlue[900]),
+                          ),
+                        ),
+                      ),
+                      InkWellMouseRegion(
+                        child: Icon(
+                          Icons.cancel,
+                          color: Colors.red,
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                      )
+                    ],
+                  ),
+
+                  Container(
+                    child: TextField(
+                      minLines: 1,
+                      maxLines: 10,
+                      controller: _purchaseOrderQtyController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[
+                        WhitelistingTextInputFormatter.digitsOnly
+                      ],
+                      decoration: new InputDecoration(
+                        fillColor: Colors.white, filled: true,
+                        border: new OutlineInputBorder(
+                          borderSide: new BorderSide(color: Colors.black26),
+                          borderRadius: new BorderRadius.circular(5.0),
+                        ),
+                        //hintText: 'Reason for pending',
+                        //helperText: 'Keep it short, this is just a demo.',
+                        labelText: 'Purchase Order Quantity',
+                      ),
+                    ),
+                    margin: EdgeInsets.only(top: 10, bottom: 10),
+                  ),
+
+                  Container(
+                    child: TextField(
+                      minLines: 1,
+                      maxLines: 10,
+                      controller: _purchaseQtyController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[
+                        WhitelistingTextInputFormatter.digitsOnly
+                      ],
+                      decoration: new InputDecoration(
+                        fillColor: Colors.white, filled: true,
+                        border: new OutlineInputBorder(
+                          borderSide: new BorderSide(color: Colors.black26),
+                          borderRadius: new BorderRadius.circular(5.0),
+                        ),
+                        //hintText: 'Reason for pending',
+                        //helperText: 'Keep it short, this is just a demo.',
+                        labelText: 'Purchase Quantity',
+                      ),
+                    ),
+                    margin: EdgeInsets.only(top: 10, bottom: 10),
+                  ),
+
+                  Container(
+                    child: DropdownSearch<Member>(
+                      items: employeeList,
+                      itemAsString: (Member p) => p.name,
+                      maxHeight: 300,
+                      isFilteredOnline: false,
+                      selectedItem: selectedEmployee,
+                      //onFind: (String filter) => getData(filter),
+                      label: "Select Employee",
+                      onChanged: (val){
+                        selectedEmployee=val;
+                      },
+                      showSearchBox: true,
+                    ),
+                    margin: EdgeInsets.only(top: 10, bottom: 10),
+                  ),
+
+                  _commonError.isNotEmpty?Container(
+                    padding: EdgeInsets.all(10),
+                    child: Center(child: Text("$_commonError",style: TextStyle(color: Colors.red),),),
+                  ):Container(padding: EdgeInsets.all(10),),
+
+                  SizedBox(
+                    width: double.infinity,
+                    // height: double.infinity,
+                    child: RaisedButton(
+                      child: Text(
+                        "Submit",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w700),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(5.0),
+                      ),
+                      color: Colors.blue[900],
+                      padding: EdgeInsets.only(top: 15, bottom: 15),
+                      onPressed: () {
+                        if(_purchaseOrderQtyController.text.isNotEmpty && _purchaseQtyController.text.isNotEmpty && selectedEmployee!=null){
+                          Navigator.pop(contxt);
+
+                          indent.employee=selectedEmployee.name;
+                          indent.employeeId=selectedEmployee.uid;
+                          indent.purchaseOrderQty=int.parse(_purchaseOrderQtyController.text);
+                          indent.purchaseQty=int.parse(_purchaseQtyController.text);
+                          _indentBloc.add(UpdateIndentProductsEvent(product: indent));
+                        }
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+  void addProduct() {
+    _commonError="";
+    if(selectedProduct==null){
+      _commonError="Please select product";
+      showAddIndentAlertDialog(context);
+      return;
+    }
+
+    if(selectedEmployee==null){
+      _commonError="Please select employee";
+      showAddIndentAlertDialog(context);
+      return;
+    }
+    if(_purchaseOrderQtyController.text.isEmpty){
+      _commonError="Please select this field";
+      showAddIndentAlertDialog(context);
+      return;
+    }
+
+    if(_purchaseQtyController.text.isEmpty){
+      _commonError="Please select this field";
+      showAddIndentAlertDialog(context);
+      return;
+    }
+
+    Indent indent=Indent();
+    indent.orderId=widget.order.orderId;
+    indent.category=selectedProduct.category;
+    indent.categoryId=selectedProduct.categoryId;
+    indent.product=selectedProduct.name;
+    indent.productId=selectedProduct.id;
+    indent.purchaseOrderQty=int.parse(_purchaseOrderQtyController.text);
+    indent.purchaseQty=int.parse(_purchaseQtyController.text);
+    indent.employee=selectedEmployee.name;
+    indent.employeeId=selectedEmployee.uid;
+    _indentBloc.add(AddIndentProductEvent(indent: indent));
+  }
+
+  void updateProduct(){
+
+  }
+
+  showAddIndentAlertDialog(BuildContext contxt) {
     return showDialog(
         context: contxt,
         barrierDismissible: false,
@@ -462,43 +713,6 @@ class _DisplayIndentState extends State<DisplayIndent>{
           );
         });
   }
-  void addProduct() {
-    _commonError="";
-    if(selectedProduct==null){
-      _commonError="Please select product";
-      showAlertDialog(context);
-      return;
-    }
-
-    if(selectedEmployee==null){
-      _commonError="Please select employee";
-      showAlertDialog(context);
-      return;
-    }
-    if(_purchaseOrderQtyController.text.isEmpty){
-      _commonError="Please select this field";
-      showAlertDialog(context);
-      return;
-    }
-
-    if(_purchaseQtyController.text.isEmpty){
-      _commonError="Please select this field";
-      showAlertDialog(context);
-      return;
-    }
-
-    Indent indent=Indent();
-    indent.orderId=widget.orderID;
-    indent.category=selectedProduct.category;
-    indent.categoryId=selectedProduct.categoryId;
-    indent.product=selectedProduct.name;
-    indent.productId=selectedProduct.id;
-    indent.purchaseOrderQty=int.parse(_purchaseOrderQtyController.text);
-    indent.purchaseQty=int.parse(_purchaseQtyController.text);
-    indent.employee=selectedEmployee.name;
-    indent.employeeId=selectedEmployee.uid;
-    _indentBloc.add(AddIndentProductEvent(indent: indent));
-  }
 
   void importExcelData() {
     html.InputElement uploadInput = html.FileUploadInputElement();
@@ -597,6 +811,98 @@ class _DisplayIndentState extends State<DisplayIndent>{
 
                 Padding(padding: EdgeInsets.all(10),),
               ],
+            ),
+          );
+        });
+  }
+
+  showDeleteProductDialog(BuildContext contxt, Indent indent) {
+    return showDialog(
+        context: contxt,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            contentPadding: EdgeInsets.only(top: 10.0),
+            content: Container(
+              width: 500.0,
+              padding:
+              EdgeInsets.only(top: 10, right: 15, bottom: 10, left: 15),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            "Delete Product?",
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.lightBlue[900]),
+                          ),
+                        ),
+                      ),
+                      HandCursor(
+                        child: GestureDetector(
+                          child: Icon(
+                            Icons.cancel,
+                            color: Colors.red,
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 30, bottom: 30),
+                    padding: EdgeInsets.only(left: 10, right: 10,bottom: 10,top: 10),
+                    child: Text("Are you sure you want to delete ${indent.product} ?"),
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    // height: double.infinity,
+                    child: RaisedButton(
+                      child: Text(
+                        "Delete",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w700),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(5.0),
+                      ),
+                      color: Colors.lightBlue[900],
+                      padding: EdgeInsets.only(top: 15, bottom: 15),
+                      onPressed: () {
+                        Navigator.pop(contxt);
+                        _indentBloc.add(DeleteIndentProductsEvent(product: indent));
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  ),
+                  HandCursor(
+                    child: InkWell(
+                      child: Container(
+                        child: Text("Cancel"),
+                        margin: EdgeInsets.only(top: 10,bottom: 5),
+                        padding: EdgeInsets.only(left: 10,right: 10,top: 5,bottom: 5),
+                      ),
+                      onTap: (){
+                        Navigator.pop(contxt);
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         });

@@ -16,7 +16,7 @@ import 'package:intl/intl.dart';
 
 class IndentScreen extends StatefulWidget {
   final Repository repository;
-  Function(String) callback;
+  Function(Order) callback;
   IndentScreen(Repository repository,{this.callback})
       : repository = repository ?? Repository();
 
@@ -218,7 +218,7 @@ class _IndentScreenState extends State<IndentScreen>{
                                         ),
                                       ),
                                       onTap: (){
-                                        widget.callback(order.orderId);
+                                        widget.callback(order);
                                       },
                                     );
                                   },

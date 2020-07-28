@@ -2412,7 +2412,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
       product.remarks = _remarksController.text;
     }
 
-    await repository.updateProductInOrder(widget.orderId, product);
+    //await repository.updateProductInOrder(widget.orderId, product);
     setState(() {
       _loading = false;
     });

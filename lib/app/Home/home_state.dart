@@ -28,6 +28,6 @@ class ShowCategoryState extends HomeState {}
 class ShowProductsState extends HomeState {}
 class ShowAboutState extends HomeState {}
 class DisplayIndentState extends HomeState {
-  final String orderId;
-  DisplayIndentState(this.orderId);
+  final Order order;
+  DisplayIndentState(this.order);
 }

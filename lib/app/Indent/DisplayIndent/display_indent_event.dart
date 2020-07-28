@@ -25,3 +25,13 @@ class ImportFromExcelEvent extends DisplayIndentEvent{
   final SpreadsheetTable table;
   ImportFromExcelEvent(this.table);
 }
+
+class UpdateIndentProductsEvent extends DisplayIndentEvent{
+  final Indent product;
+  UpdateIndentProductsEvent({this.product});
+}
+
+class DeleteIndentProductsEvent extends DisplayIndentEvent{
+  final Indent product;
+  DeleteIndentProductsEvent({this.product});
+}

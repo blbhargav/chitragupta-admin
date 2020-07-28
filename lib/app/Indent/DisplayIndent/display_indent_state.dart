@@ -37,3 +37,5 @@ class LoadIndentProductsState extends DisplayIndentState {
 
 class ShowSpreadSheetImportState extends DisplayIndentState {}
 class HideSpreadSheetImportState extends DisplayIndentState {}
+
+class RefreshState extends DisplayIndentState {}

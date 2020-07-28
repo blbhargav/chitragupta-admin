@@ -135,6 +135,16 @@ class _TeamListPageState extends State<TeamListPage> {
                               Padding(padding: EdgeInsets.all(5),),
                               Expanded(
                                 child: Text(
+                                  "Type",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                flex: 1,
+                              ),
+                              Padding(padding: EdgeInsets.all(5),),
+                              Expanded(
+                                child: Text(
                                   "Mobile",
                                   style: TextStyle(
                                       color: Colors.white,
@@ -208,6 +218,15 @@ class _TeamListPageState extends State<TeamListPage> {
                                               fontSize: 18),
                                         ),
                                         flex: 2,
+                                      ),
+                                      Padding(padding: EdgeInsets.all(5),),
+                                      Expanded(
+                                        child: Text(
+                                          "${member.type}",
+                                          style: TextStyle(
+                                              color: Colors.black,fontSize: 18),
+                                        ),
+                                        flex: 1,
                                       ),
                                       Padding(padding: EdgeInsets.all(5),),
                                       Expanded(

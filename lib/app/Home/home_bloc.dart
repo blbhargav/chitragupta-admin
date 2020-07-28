@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
+import 'package:chitragupta/models/Order.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -40,7 +41,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }else if(event is TeamItemClickedEvent){
         yield ShowTeamState();
       }else if(event is DisplayIndentClickedEvent){
-        yield DisplayIndentState(event.orderId);
+        yield DisplayIndentState(event.order);
       }else if(event is CategoryItemClickedEvent){
         yield ShowCategoryState();
       }else if(event is ProductsClickedEvent){

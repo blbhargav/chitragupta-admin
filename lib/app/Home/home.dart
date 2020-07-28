@@ -13,6 +13,7 @@ import 'package:chitragupta/app/product/product.dart';
 import 'package:chitragupta/app/settings.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/models/Member.dart';
+import 'package:chitragupta/models/Order.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -68,8 +69,8 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
   var categoryItemColor=Colors.lightBlue[900];
   var productItemColor=Colors.lightBlue[900];
 
-  indentCallback(String indentID) {
-    _homeBloc.add(DisplayIndentClickedEvent(indentID));
+  indentCallback(Order order) {
+    _homeBloc.add(DisplayIndentClickedEvent(order));
   }
 
   @override
@@ -92,8 +93,8 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                 indentItemColor=Colors.black;
               }else if(state is DisplayIndentState){
                 resetColors();
-                pageName="Indent : ${state.orderId}";
-                _container=DisplayIndent(widget.repository,state.orderId);
+                pageName="Indent : ${state.order.orderId}";
+                _container=DisplayIndent(widget.repository,state.order);
                 indentItemColor=Colors.black;
               }else if(state is ShowExpensesState){
                 resetColors();

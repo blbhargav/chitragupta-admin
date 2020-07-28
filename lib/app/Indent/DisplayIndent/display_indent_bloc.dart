@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:chitragupta/extension/util.dart';
 import 'package:chitragupta/models/Member.dart';
+import 'package:chitragupta/models/Order.dart';
 import 'package:chitragupta/models/category.dart';
 import 'package:chitragupta/models/indent.dart';
 import 'package:chitragupta/models/product.dart';
@@ -16,8 +17,8 @@ part 'display_indent_state.dart';
 
 class DisplayIndentBloc extends Bloc<DisplayIndentEvent, DisplayIndentState> {
   Repository repository;
-  String orderID;
-  DisplayIndentBloc({this.repository,this.orderID}) : super(DisplayIndentInitial());
+  Order order;
+  DisplayIndentBloc({this.repository,this.order}) : super(DisplayIndentInitial());
 
   List<Category> categoryList=List();
   List<ProductModel> productsList=List();
@@ -28,7 +29,7 @@ class DisplayIndentBloc extends Bloc<DisplayIndentEvent, DisplayIndentState> {
   Stream<DisplayIndentState> mapEventToState(DisplayIndentEvent event,) async* {
     if(event is FetchIndentProductsEvent){
       yield DisplayIndentInitial();
-      var products=await repository.getIndentProducts(orderID);
+      var products=await repository.getIndentProducts(order.orderId);
       indentList=products;
       yield HideProgressState();
       yield LoadIndentProductsState(indentProductList: products);
@@ -46,7 +47,7 @@ class DisplayIndentBloc extends Bloc<DisplayIndentEvent, DisplayIndentState> {
       yield LoadCategoriesState(categoryList: categories);
     }else if(event is FetchTeamMembersEvent){
       yield ShowProgressState();
-      var members=await repository.getMembersOnce();
+      var members=await repository.getEmployeesOnceByCity(order.cityID);
       teamList=members;
       yield HideProgressState();
       yield LoadTeamMembersState(teamList: members);
@@ -61,7 +62,7 @@ class DisplayIndentBloc extends Bloc<DisplayIndentEvent, DisplayIndentState> {
       var createdDate=DateTime.now().millisecondsSinceEpoch;
       for(int i=1;i<table.rows.length;i++){
         var data=table.rows[i];
-        var indent=Indent(orderId: orderID,createdDate: createdDate,purchaseOrderQty: 0,purchaseQty: 0);
+        var indent=Indent(orderId: order.orderId,createdDate: createdDate,purchaseOrderQty: 0,purchaseQty: 0);
 
         if(data[0]!=null){
           indent.product=data[0];
@@ -96,6 +97,16 @@ class DisplayIndentBloc extends Bloc<DisplayIndentEvent, DisplayIndentState> {
       }
 
       yield HideSpreadSheetImportState();
+    }else if(event is UpdateIndentProductsEvent){
+      yield ShowProgressState();
+      await repository.updateProductInOrder(order.orderId, event.product);
+      yield HideProgressState();
+      yield RefreshState();
+    }else if(event is DeleteIndentProductsEvent){
+      yield ShowProgressState();
+      await repository.removeProductFromOrder(order.orderId, event.product.id);
+      yield HideProgressState();
+      yield RefreshState();
     }
 
   }
