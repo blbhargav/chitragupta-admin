@@ -47,6 +47,10 @@ class _IndentScreenState extends State<IndentScreen>{
 
   List<Order> orderList=List();
 
+  List<String> datesList = new List();
+  String selectedDate="Select Order Date";
+
+  var dateFormat = DateFormat('EEEE, dd-MMM-yyy');
   @override
   void initState() {
     _indentBloc=IndentBloc(repository: widget.repository);
@@ -54,6 +58,16 @@ class _IndentScreenState extends State<IndentScreen>{
     _indentBloc.add(FetchCitiesEvent());
     _indentBloc.add(FetchCustomersEvent());
     super.initState();
+
+    var now=DateTime.now();
+
+    datesList.add(dateFormat.format(now));
+    datesList.add(dateFormat.format(DateTime(now.year, now.month, now.day + 1)));
+    datesList.add(dateFormat.format(DateTime(now.year, now.month, now.day + 2)));
+    datesList.add(dateFormat.format(DateTime(now.year, now.month, now.day + 3)));
+    datesList.add(dateFormat.format(DateTime(now.year, now.month, now.day + 4)));
+    datesList.add(dateFormat.format(DateTime(now.year, now.month, now.day + 5)));
+    datesList.add(dateFormat.format(DateTime(now.year, now.month, now.day + 6)));
   }
   
   @override
@@ -257,10 +271,8 @@ class _IndentScreenState extends State<IndentScreen>{
               width: 500.0,
               padding:
               EdgeInsets.only(top: 10, right: 15, bottom: 10, left: 15),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
+              child: ListView(
+                shrinkWrap: true,
                 children: <Widget>[
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -333,53 +345,78 @@ class _IndentScreenState extends State<IndentScreen>{
                   ),
 
                   Container(
-                    child: CalendarCarousel<Event>(
-                      onDayPressed: (DateTime date, List<Event> events) {
-                        _currentDate = date;
-                        Navigator.pop(contxt);
-                        showAlertDialog(contxt);
-                      },
-                      weekendTextStyle: TextStyle(
-                        color: Colors.red,
+                    child: HandCursor(
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        underline: Container(color: Colors.pinkAccent,height: 1,width: double.maxFinite,),
+                        items: datesList.map((String value) {
+                          return new DropdownMenuItem<String>(
+                            value: value,
+                            child: new Text(value),
+                          );
+                        }).toList(),
+                        hint: selectedDate=="Select Order Date"?Text("$selectedDate"):Text("$selectedDate",style: TextStyle(color: Colors.black),),
+                        onChanged: (_val) {
+                          selectedDate=_val;
+                          _currentDate=dateFormat.parse(selectedDate);
+                          Navigator.pop(contxt);
+                          _createIndentError="";
+                          showAlertDialog(contxt);
+                        },
                       ),
-                      thisMonthDayBorderColor: Colors.grey,
-                      //      weekDays: null, /// for pass null when you do not want to render weekDays
-                      //      headerText: Container( /// Example for rendering custom header
-                      //        child: Text('Custom Header'),
-                      //      ),
-                      customDayBuilder: (   /// you can provide your own build function to make custom day containers
-                          bool isSelectable,
-                          int index,
-                          bool isSelectedDay,
-                          bool isToday,
-                          bool isPrevMonthDay,
-                          TextStyle textStyle,
-                          bool isNextMonthDay,
-                          bool isThisMonthDay,
-                          DateTime day,
-                          ) {
-                        /// If you return null, [CalendarCarousel] will build container for current [day] with default function.
-                        /// This way you can build custom containers for specific days only, leaving rest as default.
-
-                        // Example: every 15th of month, we have a flight, we can place an icon in the container like that:
-//                      if (day.day == 15) {
-//                        return Center(
-//                          child: Icon(Icons.local_airport),
-//                        );
-//                      } else {
-//                        return null;
-//                      }
-                        return null;
-                      },
-                      weekFormat: false,
-                      //markedDatesMap: _markedDateMap,
-                      height: 450.0,
-                      selectedDateTime: _currentDate,
-                      minSelectedDate: DateTime.now(),
-                      maxSelectedDate: DateTime.now().add(Duration(days: 7)),
-                      daysHaveCircularBorder: false, /// null for not rendering any border, true for circular border, false for rectangular border
                     ),
+                    padding: EdgeInsets.only(left: 5,right: 5,top: 5,bottom: 0),
+                    margin: EdgeInsets.only(bottom: 10,left: 5,right: 5,top: 5),
                   ),
+
+//                  Container(
+//                    child: CalendarCarousel<Event>(
+//                      onDayPressed: (DateTime date, List<Event> events) {
+//                        _currentDate = date;
+//                        Navigator.pop(contxt);
+//                        showAlertDialog(contxt);
+//                      },
+//                      weekendTextStyle: TextStyle(
+//                        color: Colors.red,
+//                      ),
+//                      thisMonthDayBorderColor: Colors.grey,
+//                      //      weekDays: null, /// for pass null when you do not want to render weekDays
+//                      //      headerText: Container( /// Example for rendering custom header
+//                      //        child: Text('Custom Header'),
+//                      //      ),
+//                      customDayBuilder: (   /// you can provide your own build function to make custom day containers
+//                          bool isSelectable,
+//                          int index,
+//                          bool isSelectedDay,
+//                          bool isToday,
+//                          bool isPrevMonthDay,
+//                          TextStyle textStyle,
+//                          bool isNextMonthDay,
+//                          bool isThisMonthDay,
+//                          DateTime day,
+//                          ) {
+//                        /// If you return null, [CalendarCarousel] will build container for current [day] with default function.
+//                        /// This way you can build custom containers for specific days only, leaving rest as default.
+//
+//                        // Example: every 15th of month, we have a flight, we can place an icon in the container like that:
+////                      if (day.day == 15) {
+////                        return Center(
+////                          child: Icon(Icons.local_airport),
+////                        );
+////                      } else {
+////                        return null;
+////                      }
+//                        return null;
+//                      },
+//                      weekFormat: false,
+//                      //markedDatesMap: _markedDateMap,
+//                      height: 450.0,
+//                      selectedDateTime: _currentDate,
+//                      minSelectedDate: DateTime.now(),
+//                      maxSelectedDate: DateTime.now().add(Duration(days: 7)),
+//                      daysHaveCircularBorder: false, /// null for not rendering any border, true for circular border, false for rectangular border
+//                    ),
+//                  ),
 
                   _createIndentError.isNotEmpty?Center(
                     child: Padding(child: Text("$_createIndentError",style: TextStyle(color: Colors.red),),padding: EdgeInsets.all(10),),
