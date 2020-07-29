@@ -249,9 +249,8 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                             height: double.maxFinite,
                             color: Colors.lightBlue[900],
                             width: 200,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: ListView(
+                              shrinkWrap: true,
                               children: [
                                 Container(
                                   margin: EdgeInsets.only(top: 10),
