@@ -17,7 +17,10 @@ class DisplayIndentClickedEvent extends HomeEvent{
   final Order order;
   DisplayIndentClickedEvent(this.order);
 }
-
+class DisplayExpenseClickedEvent extends HomeEvent{
+  final Order order;
+  DisplayExpenseClickedEvent(this.order);
+}
 class ExpensesItemClickedEvent extends HomeEvent{}
 
 class AnalyticsItemClickedEvent extends HomeEvent{}

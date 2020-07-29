@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chitragupta/app/Expenses/expenses_page.dart';
 import 'package:chitragupta/app/Home/home_bloc.dart';
 import 'package:chitragupta/app/Indent/DisplayIndent/display_indent.dart';
 import 'package:chitragupta/app/Indent/indent_page.dart';
@@ -72,6 +73,9 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
   indentCallback(Order order) {
     _homeBloc.add(DisplayIndentClickedEvent(order));
   }
+  expenseCallback(Order order) {
+    _homeBloc.add(DisplayIndentClickedEvent(order));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +103,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
               }else if(state is ShowExpensesState){
                 resetColors();
                 pageName="Expenses";
-                _container=Container(child: Center(child: Text("Expenses"),),);
+                _container=ExpensesScreen(widget.repository,callback: expenseCallback,);
                 expensesItemColor=Colors.black;
               }else if(state is ShowAnalyticsState){
                 resetColors();

@@ -27,7 +27,7 @@ class Repository {
     _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
     //this.fbDBRef.setPersistenceEnabled(true);
     //databaseReference.settings(persistenceEnabled: true);
-    getUserId();
+    //getUserId();
   }
 
   Future signInWithCredentials(String email, String password) {

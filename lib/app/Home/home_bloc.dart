@@ -42,6 +42,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         yield ShowTeamState();
       }else if(event is DisplayIndentClickedEvent){
         yield DisplayIndentState(event.order);
+      }else if(event is DisplayExpenseClickedEvent){
+        yield DisplayExpenseState(event.order);
       }else if(event is CategoryItemClickedEvent){
         yield ShowCategoryState();
       }else if(event is ProductsClickedEvent){

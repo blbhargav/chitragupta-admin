@@ -31,3 +31,8 @@ class DisplayIndentState extends HomeState {
   final Order order;
   DisplayIndentState(this.order);
 }
+
+class DisplayExpenseState extends HomeState {
+  final Order order;
+  DisplayExpenseState(this.order);
+}
