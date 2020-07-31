@@ -87,7 +87,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                 fontWeight: FontWeight.w700),
                           ),
                           onPressed: () {
-                            title="Add Customer";
+                            title="Add Category";
                             //resetForm();
                             showAlertDialog(context,null);
                           },
@@ -287,10 +287,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
               width: 500.0,
               padding:
               EdgeInsets.only(top: 10, right: 15, bottom: 10, left: 15),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
+              child: ListView(
+                shrinkWrap: true,
                 children: <Widget>[
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
