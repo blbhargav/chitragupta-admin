@@ -31,7 +31,7 @@ class LoadTeamMembersState extends DisplayIndentState {
 }
 
 class LoadIndentProductsState extends DisplayIndentState {
-  final List<Indent> indentProductList;
+  final List<Product> indentProductList;
   LoadIndentProductsState({this.indentProductList});
 }
 

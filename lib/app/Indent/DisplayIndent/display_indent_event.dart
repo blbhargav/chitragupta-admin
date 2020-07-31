@@ -12,7 +12,7 @@ class FetchTeamMembersEvent extends DisplayIndentEvent{
 }
 
 class AddIndentProductEvent extends DisplayIndentEvent{
-  final Indent indent;
+  final Product indent;
   AddIndentProductEvent({this.indent});
 }
 
@@ -27,11 +27,11 @@ class ImportFromExcelEvent extends DisplayIndentEvent{
 }
 
 class UpdateIndentProductsEvent extends DisplayIndentEvent{
-  final Indent product;
+  final Product product;
   UpdateIndentProductsEvent({this.product});
 }
 
 class DeleteIndentProductsEvent extends DisplayIndentEvent{
-  final Indent product;
+  final Product product;
   DeleteIndentProductsEvent({this.product});
 }

@@ -15,7 +15,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Product {
   int ourQty;
-  int usedQty;
+  int deliveredQty;
   int purchasedQty;
   int actualExcessQty;
   int EODExcess;
@@ -37,12 +37,11 @@ class Product {
   int purchaseOrderQty;
   int purchaseQty;
 
-  Product({this.ourQty, this.usedQty, this.purchasedQty, this.actualExcessQty, this.EODExcess, this.amountSpent,
-    this.returnQty, this.invoiceAmount, this.remarks, this.id});
+  Product({this.ourQty, this.deliveredQty, this.purchasedQty, this.actualExcessQty, this.EODExcess, this.amountSpent,
+    this.returnQty, this.invoiceAmount, this.remarks, this.id,this.orderId,this.purchaseQty,this.purchaseOrderQty,this.categoryId,this.createdDate});
 
   Product.fromSnapshot({DocumentSnapshot snapshot}) {
-    this.ourQty = snapshot.data["ourQty"];
-    this.usedQty = snapshot.data["usedQty"];
+    this.deliveredQty = snapshot.data["deliveredQty"];
     this.purchasedQty = snapshot.data["purchasedQty"];
     this.actualExcessQty = snapshot.data["actualExcessQty"];
     this.EODExcess = snapshot.data["EODExcess"];
@@ -51,7 +50,6 @@ class Product {
     this.invoiceAmount = snapshot.data["invoiceAmount"];
     this.remarks = snapshot.data["remarks"];
     this.id = snapshot.documentID;
-
     this.product = snapshot.data["product"];
     this.productId = snapshot.data["productId"];
     this.category = snapshot.data["category"];
@@ -67,7 +65,7 @@ class Product {
   Map<String, dynamic> toMap() {
     var map = new Map<String, dynamic>();
     map["ourQty"] = ourQty;
-    map["usedQty"] = usedQty;
+    map["usedQty"] = deliveredQty;
     map["purchasedQty"] = purchasedQty;
     map["actualExcessQty"] = actualExcessQty;
     map["EODExcess"] = EODExcess;
@@ -89,8 +87,7 @@ class Product {
       "employee":employee,
       "categoryId":categoryId,
       "category":category,
-      "ourQty":ourQty,
-      "usedQty":usedQty,
+      "deliveredQty":deliveredQty,
       "actualExcessQty":actualExcessQty,
       "EODExcess":EODExcess,
       "returnQty":returnQty,

@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:chitragupta/extension/util.dart';
 import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/models/Order.dart';
+import 'package:chitragupta/models/Product.dart';
 import 'package:chitragupta/models/category.dart';
 import 'package:chitragupta/models/indent.dart';
 import 'package:chitragupta/models/product.dart';
@@ -23,7 +24,7 @@ class DisplayIndentBloc extends Bloc<DisplayIndentEvent, DisplayIndentState> {
   List<Category> categoryList=List();
   List<ProductModel> productsList=List();
   List<Member> teamList = new List();
-  List<Indent> indentList=List();
+  List<Product> indentList=List();
 
   @override
   Stream<DisplayIndentState> mapEventToState(DisplayIndentEvent event,) async* {
@@ -62,7 +63,7 @@ class DisplayIndentBloc extends Bloc<DisplayIndentEvent, DisplayIndentState> {
       var createdDate=DateTime.now().millisecondsSinceEpoch;
       for(int i=1;i<table.rows.length;i++){
         var data=table.rows[i];
-        var indent=Indent(orderId: order.orderId,createdDate: createdDate,purchaseOrderQty: 0,purchaseQty: 0);
+        var indent=Product(orderId: order.orderId,createdDate: createdDate,purchaseOrderQty: 0,purchaseQty: 0);
 
         if(data[0]!=null){
           indent.product=data[0];

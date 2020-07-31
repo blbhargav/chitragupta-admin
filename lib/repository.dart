@@ -682,7 +682,7 @@ class Repository {
   }
 
   //add indent
-  addIndentProduct(Indent indent)async{
+  addIndentProduct(Product indent)async{
     return await databaseReference
         .collection('Orders')
         .document(indent.orderId)
@@ -690,8 +690,8 @@ class Repository {
         .document()
         .setData(indent.toJson());
   }
-  Future<List<Indent>> getIndentProducts(String indentId) async{
-    List<Indent> indentList=List();
+  Future<List<Product>> getIndentProducts(String indentId) async{
+    List<Product> indentList=List();
     var snapshot=await databaseReference
         .collection('Orders')
         .document(indentId)
@@ -700,7 +700,7 @@ class Repository {
         .getDocuments();
     if (snapshot.documents.length > 0) {
       snapshot.documents.forEach((element) {
-        Indent order = Indent.fromSnapshot(snapshot: element);
+        Product order = Product.fromSnapshot(snapshot: element);
         indentList.add(order);
       });
     }
@@ -713,7 +713,7 @@ class Repository {
         .collection("products")
         .document(productId).delete();
   }
-  updateProductInOrder(String orderId, Indent data) {
+  updateProductInOrder(String orderId, Product data) {
     return databaseReference
         .collection('Orders')
         .document(orderId)

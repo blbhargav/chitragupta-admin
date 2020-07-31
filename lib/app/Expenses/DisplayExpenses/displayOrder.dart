@@ -11,6 +11,7 @@ import 'package:chitragupta/extension/util.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:chitragupta/models/ExtraData.dart';
@@ -54,7 +55,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   TextEditingController _descriptionController = new TextEditingController();
   TextEditingController _poQtyController = new TextEditingController();
   TextEditingController _ourQtyController = new TextEditingController();
-  TextEditingController _usedQtyController = new TextEditingController();
+  TextEditingController _deliveredQtyController = new TextEditingController();
   TextEditingController _purchasedQtyController = new TextEditingController();
   TextEditingController _actualExcessQtyController =
       new TextEditingController();
@@ -619,7 +620,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                             Expanded(
                               child: Container(
                                 child: Text(
-                                  "Our\nQty",textAlign: TextAlign.center,
+                                  "Expected\nPurchase Qty",textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontSize: 16,color: Colors.white,
                                       fontWeight: FontWeight.w600),
@@ -627,6 +628,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               ),
                               flex: 1,
                             ),
+                            Padding(padding: EdgeInsets.all(3),),
                             Expanded(
                               child: Container(
                                 child: Text(
@@ -663,7 +665,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                             Expanded(
                               child: Container(
                                 child: Text(
-                                  "Used\nQty",textAlign: TextAlign.center,
+                                  "Delivered\nQty",textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontSize: 16,color: Colors.white,
                                       fontWeight: FontWeight.w600),
@@ -754,135 +756,137 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                     ),
                                   )
                                 : Container(
-                                    child: ListView.separated(
-                                        shrinkWrap: true,
-                                        physics: NeverScrollableScrollPhysics(),
-                                        separatorBuilder:
-                                            (BuildContext context, int index) {
-                                          return Container(
-                                            padding: EdgeInsets.only(
-                                                top: 10, bottom: 10),
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            height: 1,
-                                            color: Colors.black12,
-                                          );
-                                        },
-                                        padding: EdgeInsets.all(5),
-                                        scrollDirection: Axis.vertical,
-                                        itemCount: productsList.length,
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
-                                          return Container(
-                                            padding: EdgeInsets.only(
-                                                top: 20, bottom: 20),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment
-                                                  .spaceEvenly,
-                                              children: <Widget>[
-                                                Expanded(
-                                                  child: Container(
-                                                    child: Text(
-                                                        "${productsList[index].product}"),
+                                    child: Scrollbar(
+                                      child: ListView.separated(
+                                          shrinkWrap: true,
+                                          physics: NeverScrollableScrollPhysics(),
+                                          separatorBuilder:
+                                              (BuildContext context, int index) {
+                                            return Container(
+                                              padding: EdgeInsets.only(
+                                                  top: 10, bottom: 10),
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              height: 1,
+                                              color: Colors.black12,
+                                            );
+                                          },
+                                          padding: EdgeInsets.all(5),
+                                          scrollDirection: Axis.vertical,
+                                          itemCount: productsList.length,
+                                          itemBuilder:
+                                              (BuildContext context, int index) {
+                                            return Container(
+                                              padding: EdgeInsets.only(
+                                                  top: 20, bottom: 20),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment
+                                                    .spaceEvenly,
+                                                children: <Widget>[
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                          "${productsList[index].product}"),
+                                                    ),
+                                                    flex: 2,
                                                   ),
-                                                  flex: 2,
-                                                ),
-                                                Expanded(
-                                                  child: Container(
-                                                    child: Text(
-                                                      "${productsList[index].purchaseOrderQty ??0}",textAlign: TextAlign.center,),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                        "${productsList[index].purchaseOrderQty ??0}",textAlign: TextAlign.center,),
+                                                    ),
+                                                    flex: 1,
                                                   ),
-                                                  flex: 1,
-                                                ),
-                                                Expanded(
-                                                  child: Container(
-                                                    child: Text(
-                                                      "${productsList[index].ourQty ?? 0}",textAlign: TextAlign.center,),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                        "${productsList[index].purchaseQty ?? 0}",textAlign: TextAlign.center,),
+                                                    ),
+                                                    flex: 1,
                                                   ),
-                                                  flex: 1,
-                                                ),
-                                                Expanded(
-                                                  child: Container(
-                                                    child: Text(
-                                                      "${productsList[index].employee ?? "-"}",textAlign: TextAlign.start,),
+                                                  Padding(padding: EdgeInsets.all(3),),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                        "${productsList[index].employee ?? "-"}",textAlign: TextAlign.start,),
+                                                    ),
+                                                    flex: 1,
                                                   ),
-                                                  flex: 1,
-                                                ),
-                                                Expanded(
-                                                  child: Container(
-                                                    child: Text(
-                                                      "${productsList[index].purchasedQty ?? 0}",textAlign: TextAlign.center,),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                        "${productsList[index].purchasedQty ?? 0}",textAlign: TextAlign.center,),
+                                                    ),
+                                                    flex: 1,
                                                   ),
-                                                  flex: 1,
-                                                ),
-                                                Expanded(
-                                                  child: Container(
-                                                    child: Text(
-                                                      "${productsList[index].amountSpent ??0}",textAlign: TextAlign.center,),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                        "${productsList[index].amountSpent ??0}",textAlign: TextAlign.center,),
+                                                    ),
+                                                    flex: 1,
                                                   ),
-                                                  flex: 1,
-                                                ),
-                                                Expanded(
-                                                  child: Container(
-                                                    child: Text(
-                                                      "${productsList[index].usedQty ??0}",textAlign: TextAlign.center,),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                        "${productsList[index].deliveredQty ??0}",textAlign: TextAlign.center,),
+                                                    ),
+                                                    flex: 1,
                                                   ),
-                                                  flex: 1,
-                                                ),
 
-                                                Expanded(
-                                                  child: Container(
-                                                    child: Text(
-                                                      "${productsList[index].actualExcessQty ?? 0}",textAlign: TextAlign.center,),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                        "${productsList[index].actualExcessQty ?? 0}",textAlign: TextAlign.center,),
+                                                    ),
+                                                    flex: 1,
                                                   ),
-                                                  flex: 1,
-                                                ),
-                                                Expanded(
-                                                  child: Container(
-                                                    child: Text(
-                                                      "${productsList[index].EODExcess ?? 0}",textAlign: TextAlign.center,),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                        "${productsList[index].EODExcess ?? 0}",textAlign: TextAlign.center,),
+                                                    ),
+                                                    flex: 1,
                                                   ),
-                                                  flex: 1,
-                                                ),
 
-                                                Expanded(
-                                                  child: Container(
-                                                    child: Text(
-                                                      "${productsList[index].returnQty ?? 0}",textAlign: TextAlign.center,),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                        "${productsList[index].returnQty ?? 0}",textAlign: TextAlign.center,),
+                                                    ),
+                                                    flex: 1,
                                                   ),
-                                                  flex: 1,
-                                                ),
-                                                Expanded(
-                                                  child: Container(
-                                                    child: Text(
-                                                      "${productsList[index].invoiceAmount ?? 0}",textAlign: TextAlign.center,),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                        "${productsList[index].invoiceAmount ?? 0}",textAlign: TextAlign.center,),
+                                                    ),
+                                                    flex: 1,
                                                   ),
-                                                  flex: 1,
-                                                ),
-                                                Expanded(
-                                                  child: Container(
-                                                    child: Text(
-                                                      "${productsList[index].remarks ?? "-"}",textAlign: TextAlign.center,),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                        "${productsList[index].remarks ?? "-"}",textAlign: TextAlign.center,),
+                                                    ),
+                                                    flex: 1,
                                                   ),
-                                                  flex: 1,
-                                                ),
-                                                Expanded(
-                                                  child: InkWellMouseRegion(
-                                                    child: Icon(Icons.edit,color: Colors.lightBlue[900],),
-                                                    onTap: (){
-                                                      showEditProductAlertDialog(
-                                                          context, productsList[index]);
-                                                    },
+                                                  Expanded(
+                                                    child: InkWellMouseRegion(
+                                                      child: Icon(Icons.edit,color: Colors.lightBlue[900],),
+                                                      onTap: (){
+                                                        showEditProductAlertDialog(context, productsList[index]);
+                                                      },
+                                                    ),
+                                                    flex: 1,
                                                   ),
-                                                  flex: 1,
-                                                ),
 
-                                              ],
-                                            ),
-                                          );
-                                        }),
+                                                ],
+                                              ),
+                                            );
+                                          }),
+                                    ),
                                   )
                           ],
                         ),
@@ -1294,264 +1298,266 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                 padding: EdgeInsets.all(10),
                 child: MediaQuery.removePadding(
                     context: contxt,
-                    child: ListView(
-                      reverse: false,
-                      shrinkWrap: true,
-                      padding: EdgeInsets.only(left: 5, right: 5),
-                      children: <Widget>[
-                        Padding(
-                          child: Center(
-                            child: Text(
-                              "Add Product",
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600,
-                                color: Utils.headingColor,
-                              ),
-                            ),
-                          ),
-                          padding: EdgeInsets.all(5),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          child: new TextField(
-                            controller: this._descriptionController,
-                            textCapitalization: TextCapitalization.sentences,
-                            decoration: InputDecoration(
-                              labelText: "Description",
-                              prefixIcon: Icon(Icons.description),
-                              errorText: _descriptionErrorTv,
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.cyan),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.indigo),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          child: new TextField(
-                            controller: this._poQtyController,
-                            textCapitalization: TextCapitalization.sentences,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              labelText: "Po Qty",
-                              errorText: _poQtyErrorTv,
-                              prefixIcon: Icon(Icons.description),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.cyan),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.indigo),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          child: new TextField(
-                            controller: this._ourQtyController,
-                            decoration: InputDecoration(
-                              labelText: "Our Qty",
-                              prefixIcon: Icon(Icons.star),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.cyan),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.indigo),
-                              ),
-                              //errorText: amountErrorTV
-                            ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          child: new TextField(
-                            controller: this._usedQtyController,
-                            decoration: InputDecoration(
-                              labelText: "Used Qty",
-                              prefixIcon: Icon(Icons.star),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.cyan),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.indigo),
-                              ),
-                              //errorText: amountErrorTV
-                            ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          child: new TextField(
-                            controller: this._purchasedQtyController,
-                            decoration: InputDecoration(
-                              labelText: "Purchased Qty",
-                              prefixIcon: Icon(Icons.shopping_basket),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.cyan),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.indigo),
-                              ),
-                              //errorText: amountErrorTV
-                            ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          child: new TextField(
-                            controller: this._actualExcessQtyController,
-                            decoration: InputDecoration(
-                              labelText: "Actual Excess Qty",
-                              prefixIcon: Icon(Icons.star),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.cyan),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.indigo),
-                              ),
-                              //errorText: amountErrorTV
-                            ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          child: new TextField(
-                            controller: this._EODExcessController,
-                            decoration: InputDecoration(
-                              labelText: "EOD Excess",
-                              prefixIcon: Icon(MdiIcons.stackOverflow),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.cyan),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.indigo),
-                              ),
-                              //errorText: amountErrorTV
-                            ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          child: new TextField(
-                            controller: this._amountSpentController,
-                            decoration: InputDecoration(
-                              labelText: "Amount Spent",
-                              prefixIcon: Icon(MdiIcons.currencyInr),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.cyan),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.indigo),
-                              ),
-                              //errorText: amountErrorTV
-                            ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          child: new TextField(
-                            controller: this._returnQtyController,
-                            decoration: InputDecoration(
-                              labelText: "Return Qty",
-                              prefixIcon: Icon(Icons.assignment_returned),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.cyan),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.indigo),
-                              ),
-                              //errorText: amountErrorTV
-                            ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          child: new TextField(
-                            controller: this._invoiceAmountController,
-                            decoration: InputDecoration(
-                              labelText: "Invoice Amount",
-                              prefixIcon: Icon(MdiIcons.currencyInr),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.cyan),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.indigo),
-                              ),
-                              //errorText: amountErrorTV
-                            ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          child: new TextField(
-                            controller: this._remarksController,
-                            textCapitalization: TextCapitalization.sentences,
-                            decoration: InputDecoration(
-                              labelText: "Remarks",
-                              prefixIcon: Icon(Icons.warning),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.cyan),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.indigo),
-                              ),
-                              //errorText: titleErrorTV
-                            ),
-                            maxLength: 50,
-                            maxLengthEnforced: true,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 10),
-                        ),
-                        GestureDetector(
-                          child: Center(
-                            child:
-                                roundedRectButton("Save", saveGradient, false),
-                          ),
-                          onTap: () {
-                            Navigator.pop(contxt);
-                            validateNewProduct();
-                          },
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 10),
-                        ),
-                        InkWell(
-                          child: Center(
-                            child: Container(
+                    child: Scrollbar(
+                      child: ListView(
+                        reverse: false,
+                        shrinkWrap: true,
+                        padding: EdgeInsets.only(left: 5, right: 5),
+                        children: <Widget>[
+                          Padding(
+                            child: Center(
                               child: Text(
-                                "Cancel",
-                                style: TextStyle(color: Colors.red),
+                                "Add Product",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w600,
+                                  color: Utils.headingColor,
+                                ),
                               ),
-                              padding: EdgeInsets.all(5),
+                            ),
+                            padding: EdgeInsets.all(5),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            child: new TextField(
+                              controller: this._descriptionController,
+                              textCapitalization: TextCapitalization.sentences,
+                              decoration: InputDecoration(
+                                labelText: "Description",
+                                prefixIcon: Icon(Icons.description),
+                                errorText: _descriptionErrorTv,
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.cyan),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.indigo),
+                                ),
+                              ),
                             ),
                           ),
-                          onTap: () {
-                            Navigator.pop(contxt);
-                          },
-                        )
-                      ],
+                          Padding(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            child: new TextField(
+                              controller: this._poQtyController,
+                              textCapitalization: TextCapitalization.sentences,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText: "Po Qty",
+                                errorText: _poQtyErrorTv,
+                                prefixIcon: Icon(Icons.description),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.cyan),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.indigo),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            child: new TextField(
+                              controller: this._ourQtyController,
+                              decoration: InputDecoration(
+                                labelText: "Our Qty",
+                                prefixIcon: Icon(Icons.star),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.cyan),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.indigo),
+                                ),
+                                //errorText: amountErrorTV
+                              ),
+                              keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            child: new TextField(
+                              controller: this._deliveredQtyController,
+                              decoration: InputDecoration(
+                                labelText: "Used Qty",
+                                prefixIcon: Icon(Icons.star),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.cyan),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.indigo),
+                                ),
+                                //errorText: amountErrorTV
+                              ),
+                              keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            child: new TextField(
+                              controller: this._purchasedQtyController,
+                              decoration: InputDecoration(
+                                labelText: "Purchased Qty",
+                                prefixIcon: Icon(Icons.shopping_basket),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.cyan),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.indigo),
+                                ),
+                                //errorText: amountErrorTV
+                              ),
+                              keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            child: new TextField(
+                              controller: this._actualExcessQtyController,
+                              decoration: InputDecoration(
+                                labelText: "Actual Excess Qty",
+                                prefixIcon: Icon(Icons.star),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.cyan),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.indigo),
+                                ),
+                                //errorText: amountErrorTV
+                              ),
+                              keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            child: new TextField(
+                              controller: this._EODExcessController,
+                              decoration: InputDecoration(
+                                labelText: "EOD Excess",
+                                prefixIcon: Icon(MdiIcons.stackOverflow),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.cyan),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.indigo),
+                                ),
+                                //errorText: amountErrorTV
+                              ),
+                              keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            child: new TextField(
+                              controller: this._amountSpentController,
+                              decoration: InputDecoration(
+                                labelText: "Amount Spent",
+                                prefixIcon: Icon(MdiIcons.currencyInr),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.cyan),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.indigo),
+                                ),
+                                //errorText: amountErrorTV
+                              ),
+                              keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            child: new TextField(
+                              controller: this._returnQtyController,
+                              decoration: InputDecoration(
+                                labelText: "Return Qty",
+                                prefixIcon: Icon(Icons.assignment_returned),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.cyan),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.indigo),
+                                ),
+                                //errorText: amountErrorTV
+                              ),
+                              keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            child: new TextField(
+                              controller: this._invoiceAmountController,
+                              decoration: InputDecoration(
+                                labelText: "Invoice Amount",
+                                prefixIcon: Icon(MdiIcons.currencyInr),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.cyan),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.indigo),
+                                ),
+                                //errorText: amountErrorTV
+                              ),
+                              keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            child: new TextField(
+                              controller: this._remarksController,
+                              textCapitalization: TextCapitalization.sentences,
+                              decoration: InputDecoration(
+                                labelText: "Remarks",
+                                prefixIcon: Icon(Icons.warning),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.cyan),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.indigo),
+                                ),
+                                //errorText: titleErrorTV
+                              ),
+                              maxLength: 50,
+                              maxLengthEnforced: true,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top: 10),
+                          ),
+                          GestureDetector(
+                            child: Center(
+                              child:
+                              roundedRectButton("Save", saveGradient, false),
+                            ),
+                            onTap: () {
+                              Navigator.pop(contxt);
+                              validateNewProduct();
+                            },
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top: 10),
+                          ),
+                          InkWell(
+                            child: Center(
+                              child: Container(
+                                child: Text(
+                                  "Cancel",
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                                padding: EdgeInsets.all(5),
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.pop(contxt);
+                            },
+                          )
+                        ],
+                      ),
                     )),
               ),
             ),
@@ -1588,10 +1594,10 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
       product.ourQty = 0;
     }
 
-    if (_usedQtyController.text.trim().length > 0) {
-      product.usedQty = int.parse(_usedQtyController.text);
+    if (_deliveredQtyController.text.trim().length > 0) {
+      product.deliveredQty = int.parse(_deliveredQtyController.text);
     } else {
-      product.usedQty = 0;
+      product.deliveredQty = 0;
     }
 
     if (_purchasedQtyController.text.trim().length > 0) {
@@ -1641,7 +1647,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
     _descriptionController.text = "";
     _poQtyController.text = "";
     _ourQtyController.text = "";
-    _usedQtyController.text = "";
+    _deliveredQtyController.text = "";
     _purchasedQtyController.text = "";
     _actualExcessQtyController.text = "";
     _EODExcessController.text = "";
@@ -1716,17 +1722,31 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   }
 
   showEditProductAlertDialog(BuildContext contxt, Product product) {
-    _descriptionController.text = product.product;
-    _poQtyController.text = product.purchaseOrderQty.toString();
-    _ourQtyController.text = product.ourQty.toString();
-    _usedQtyController.text = product.usedQty.toString();
-    _purchasedQtyController.text = product.purchasedQty.toString();
-    _actualExcessQtyController.text = product.actualExcessQty.toString();
-    _EODExcessController.text = product.EODExcess.toString();
-    _amountSpentController.text = product.amountSpent.toString();
+    _deliveredQtyController.text="";
+    _actualExcessQtyController.text="";
+    _EODExcessController.text="";
+    _returnQtyController.text="";
+    _invoiceAmountController.text="";
+    _remarksController.text="";
+
+    if(product.deliveredQty!=null)
+      _deliveredQtyController.text = product.deliveredQty.toString();
+    
+    if(product.actualExcessQty!=null)
+      _actualExcessQtyController.text = product.actualExcessQty.toString();
+    
+    if(product.EODExcess!=null)
+      _EODExcessController.text = product.EODExcess.toString();
+    
+    if(product.returnQty!=null)
     _returnQtyController.text = product.returnQty.toString();
-    _invoiceAmountController.text = product.invoiceAmount.toString();
-    _remarksController.text = product.remarks.toString();
+    
+    if(product.invoiceAmount !=null)
+      _invoiceAmountController.text = product.invoiceAmount.toString();
+
+    if(product.remarks!=null)
+      _remarksController.text = product.remarks;
+
     return showDialog(
         context: contxt,
         barrierDismissible: false,
@@ -1734,74 +1754,147 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
           return AlertDialog(
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(15.0))),
-            contentPadding: EdgeInsets.only(top: 10.0),
-            content: Center(
-              child: Container(
-                width: 500,
-                padding: EdgeInsets.all(10),
-                child: MediaQuery.removePadding(
-                    context: contxt,
+            content: Container(
+              width: 500,
+              padding: EdgeInsets.all(10),
+              child: MediaQuery.removePadding(
+                  context: contxt,
+                  child: Scrollbar(
                     child: ListView(
                       reverse: false,
                       shrinkWrap: true,
                       padding: EdgeInsets.only(left: 5, right: 5),
                       children: <Widget>[
-                        Padding(
-                          child: Center(
-                            child: Text(
-                              "Edit Product",
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600,
-                                color: Utils.headingColor,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Center(
+                                child: Text(
+                                  "Edit:- ${product.product}",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.lightBlue[900]),
+                                ),
                               ),
                             ),
-                          ),
-                          padding: EdgeInsets.all(5),
+                            HandCursor(
+                              child: GestureDetector(
+                                child: Icon(
+                                  Icons.cancel,
+                                  color: Colors.red,
+                                ),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            )
+                          ],
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          child: new TextField(
-                            controller: this._descriptionController,
-                            textCapitalization: TextCapitalization.sentences,
-                            decoration: InputDecoration(
-                              labelText: "Description",
-                              prefixIcon: Icon(Icons.description),
-                              errorText: _descriptionErrorTv,
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.cyan),
+                        Container(
+                          margin: EdgeInsets.only(top: 10),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Padding(
+                                      child: Text("Purchase Order Quantity",style: TextStyle(fontSize: 12,color: Colors.black54),),
+                                      padding: EdgeInsets.all(5),
+                                    ),
+                                    Padding(
+                                      child: Text("${product.purchaseOrderQty}",style: TextStyle(fontSize: 18,color: Colors.black),),
+                                      padding: EdgeInsets.all(5),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.indigo),
+                              Padding(padding: EdgeInsets.all(5),),
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Padding(
+                                      child: Text("Expected Purchase Quantity",style: TextStyle(fontSize: 12,color: Colors.black54),),
+                                      padding: EdgeInsets.all(5),
+                                    ),
+                                    Padding(
+                                      child: Text("${product.purchaseQty}",style: TextStyle(fontSize: 18,color: Colors.black),),
+                                      padding: EdgeInsets.all(5),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
+                            ],
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          child: new TextField(
-                            controller: this._poQtyController,
-                            textCapitalization: TextCapitalization.sentences,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              labelText: "Po Qty",
-                              errorText: _poQtyErrorTv,
-                              prefixIcon: Icon(Icons.description),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.cyan),
+                        Container(
+                          margin: EdgeInsets.only(top: 10),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Padding(
+                                      child: Text("Employee",style: TextStyle(fontSize: 12,color: Colors.black54),),
+                                      padding: EdgeInsets.all(5),
+                                    ),
+                                    Padding(
+                                      child: Text("${product.employee ?? "-"}",style: TextStyle(fontSize: 18,color: Colors.black),),
+                                      padding: EdgeInsets.all(5),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.indigo),
+                              Padding(padding: EdgeInsets.all(5),),
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Padding(
+                                      child: Text("Purchased Quantity",style: TextStyle(fontSize: 12,color: Colors.black54),),
+                                      padding: EdgeInsets.all(5),
+                                    ),
+                                    Padding(
+                                      child: Text("${product.purchaseQty ?? 0}",style: TextStyle(fontSize: 18,color: Colors.black),),
+                                      padding: EdgeInsets.all(5),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
+                              Padding(padding: EdgeInsets.all(5),),
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Padding(
+                                      child: Text("Amount Spent",style: TextStyle(fontSize: 12,color: Colors.black54),),
+                                      padding: EdgeInsets.all(5),
+                                    ),
+                                    Padding(
+                                      child: Text("₹ ${product.amountSpent ?? 0}",style: TextStyle(fontSize: 18,color: Colors.black),),
+                                      padding: EdgeInsets.all(5),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                        Padding(padding: EdgeInsets.all(5),),
                         Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
+                          padding: EdgeInsets.only(left: 10, right: 10,top: 5),
                           child: new TextField(
-                            controller: this._ourQtyController,
+                            controller: this._deliveredQtyController,
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: <TextInputFormatter>[
+                              WhitelistingTextInputFormatter.digitsOnly
+                            ],
                             decoration: InputDecoration(
-                              labelText: "Our Qty",
+                              labelText: "Delivered Quantity",
                               prefixIcon: Icon(Icons.star),
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.cyan),
@@ -1811,46 +1904,6 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               ),
                               //errorText: amountErrorTV
                             ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          child: new TextField(
-                            controller: this._usedQtyController,
-                            decoration: InputDecoration(
-                              labelText: "Used Qty",
-                              prefixIcon: Icon(Icons.star),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.cyan),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.indigo),
-                              ),
-                              //errorText: amountErrorTV
-                            ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          child: new TextField(
-                            controller: this._purchasedQtyController,
-                            decoration: InputDecoration(
-                              labelText: "Purchased Qty",
-                              prefixIcon: Icon(Icons.shopping_basket),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.cyan),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.indigo),
-                              ),
-                              //errorText: amountErrorTV
-                            ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
                         Padding(
@@ -1858,7 +1911,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                           child: new TextField(
                             controller: this._actualExcessQtyController,
                             decoration: InputDecoration(
-                              labelText: "Actual Excess Qty",
+                              labelText: "Actual Excess Quantity",
                               prefixIcon: Icon(Icons.star),
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.cyan),
@@ -1868,8 +1921,10 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               ),
                               //errorText: amountErrorTV
                             ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: <TextInputFormatter>[
+                              WhitelistingTextInputFormatter.digitsOnly
+                            ],
                           ),
                         ),
                         Padding(
@@ -1877,7 +1932,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                           child: new TextField(
                             controller: this._EODExcessController,
                             decoration: InputDecoration(
-                              labelText: "EOD Excess",
+                              labelText: "EOD Excess Quantity",
                               prefixIcon: Icon(MdiIcons.stackOverflow),
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.cyan),
@@ -1887,27 +1942,10 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               ),
                               //errorText: amountErrorTV
                             ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          child: new TextField(
-                            controller: this._amountSpentController,
-                            decoration: InputDecoration(
-                              labelText: "Amount Spent",
-                              prefixIcon: Icon(MdiIcons.currencyInr),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.cyan),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.indigo),
-                              ),
-                              //errorText: amountErrorTV
-                            ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: <TextInputFormatter>[
+                              WhitelistingTextInputFormatter.digitsOnly
+                            ],
                           ),
                         ),
                         Padding(
@@ -1915,7 +1953,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                           child: new TextField(
                             controller: this._returnQtyController,
                             decoration: InputDecoration(
-                              labelText: "Return Qty",
+                              labelText: "Return Quantity",
                               prefixIcon: Icon(Icons.assignment_returned),
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.cyan),
@@ -1925,8 +1963,10 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               ),
                               //errorText: amountErrorTV
                             ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: <TextInputFormatter>[
+                              WhitelistingTextInputFormatter.digitsOnly
+                            ],
                           ),
                         ),
                         Padding(
@@ -1944,8 +1984,10 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               ),
                               //errorText: amountErrorTV
                             ),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: <TextInputFormatter>[
+                              WhitelistingTextInputFormatter.digitsOnly
+                            ],
                           ),
                         ),
                         Padding(
@@ -1971,10 +2013,10 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                         Padding(
                           padding: EdgeInsets.only(top: 10),
                         ),
-                        GestureDetector(
+                        InkWellMouseRegion(
                           child: Center(
                             child:
-                                roundedRectButton("Save", saveGradient, false),
+                            roundedRectButton("Save", saveGradient, false),
                           ),
                           onTap: () {
                             Navigator.pop(contxt);
@@ -1984,65 +2026,24 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                         Padding(
                           padding: EdgeInsets.only(top: 10),
                         ),
-                        InkWell(
-                          child: Center(
-                            child: Container(
-                              child: Text(
-                                "Cancel",
-                                style: TextStyle(color: Colors.red),
-                              ),
-                              padding: EdgeInsets.all(5),
-                            ),
-                          ),
-                          onTap: () {
-                            Navigator.pop(contxt);
-                          },
-                        )
                       ],
-                    )),
-              ),
+                    ),
+                  )),
             ),
           );
         });
   }
 
   void validateEditProduct(Product product) async {
-    _descriptionErrorTv = null;
-    _poQtyErrorTv = null;
-    if (_descriptionController.text.trim().length == 0) {
-      _descriptionErrorTv = "Enter description";
-      showAddProductAlertDialog(context);
-      return;
-    }
-
-    if (_poQtyController.text.trim().length == 0) {
-      _poQtyErrorTv = "Enter PO Quantity";
-      showAddProductAlertDialog(context);
-      return;
-    }
 
     setState(() {
       _loading = true;
     });
-    product.product = _descriptionController.text;
-    product.purchaseOrderQty = int.parse(_poQtyController.text);
 
-    if (_ourQtyController.text.trim().length > 0) {
-      product.ourQty = int.parse(_ourQtyController.text);
+    if (_deliveredQtyController.text.trim().length > 0) {
+      product.deliveredQty = int.parse(_deliveredQtyController.text);
     } else {
-      product.ourQty = 0;
-    }
-
-    if (_usedQtyController.text.trim().length > 0) {
-      product.usedQty = int.parse(_usedQtyController.text);
-    } else {
-      product.usedQty = 0;
-    }
-
-    if (_purchasedQtyController.text.trim().length > 0) {
-      product.purchasedQty = int.parse(_purchasedQtyController.text);
-    } else {
-      product.purchasedQty = 0;
+      product.deliveredQty = 0;
     }
 
     if (_actualExcessQtyController.text.trim().length > 0) {
@@ -2055,12 +2056,6 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
       product.EODExcess = int.parse(_EODExcessController.text);
     } else {
       product.EODExcess = 0;
-    }
-
-    if (_amountSpentController.text.trim().length > 0) {
-      product.amountSpent = int.parse(_amountSpentController.text);
-    } else {
-      product.amountSpent = 0;
     }
 
     if (_returnQtyController.text.trim().length > 0) {
@@ -2078,7 +2073,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
     if (_remarksController.text.trim().length > 0) {
       product.remarks = _remarksController.text;
     }
-
+    print("BLB ${product.toJson()}");
     //await repository.updateProductInOrder(widget.orderId, product);
     setState(() {
       _loading = false;
@@ -2086,7 +2081,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
     _descriptionController.text = "";
     _poQtyController.text = "";
     _ourQtyController.text = "";
-    _usedQtyController.text = "";
+    _deliveredQtyController.text = "";
     _purchasedQtyController.text = "";
     _actualExcessQtyController.text = "";
     _EODExcessController.text = "";

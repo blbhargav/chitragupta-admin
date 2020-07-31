@@ -7,6 +7,7 @@ import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/models/Order.dart';
+import 'package:chitragupta/models/Product.dart';
 import 'package:chitragupta/models/category.dart';
 import 'package:chitragupta/models/indent.dart';
 import 'package:chitragupta/models/product.dart';
@@ -54,7 +55,7 @@ class _DisplayIndentState extends State<DisplayIndent>{
   GlobalKey employeeKey = new GlobalKey<AutoCompleteTextFieldState<Member>>();
   GlobalKey categoryKey = new GlobalKey<AutoCompleteTextFieldState<Category>>();
 
-  List<Indent> indentList=List();
+  List<Product> indentList=List();
 
   List<int> _selectedFile;
   Uint8List _bytesData;
@@ -206,7 +207,7 @@ class _DisplayIndentState extends State<DisplayIndent>{
                             },
                             itemCount: indentList.length,
                             itemBuilder: (BuildContext context, int index) {
-                              Indent indentProduct=indentList[index];
+                              Product indentProduct=indentList[index];
                               var format = DateFormat('dd-MMM-yyy hh:mm a');
 //                              var createdDate=format.format(order.createdDate);
 //                              var orderDate=format.format(order.date);
@@ -331,7 +332,7 @@ class _DisplayIndentState extends State<DisplayIndent>{
     _commonError="";
   }
 
-  showEditIndentAlertDialog(BuildContext contxt, Indent indent) {
+  showEditIndentAlertDialog(BuildContext contxt, Product indent) {
 
 
     if(indent.employee!=null){
@@ -522,7 +523,7 @@ class _DisplayIndentState extends State<DisplayIndent>{
       return;
     }
 
-    Indent indent=Indent();
+    Product indent=Product();
     indent.orderId=widget.order.orderId;
     indent.category=selectedProduct.category;
     indent.categoryId=selectedProduct.categoryId;
@@ -814,7 +815,7 @@ class _DisplayIndentState extends State<DisplayIndent>{
         });
   }
 
-  showDeleteProductDialog(BuildContext contxt, Indent indent) {
+  showDeleteProductDialog(BuildContext contxt, Product indent) {
     return showDialog(
         context: contxt,
         barrierDismissible: false,
