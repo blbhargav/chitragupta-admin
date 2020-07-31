@@ -802,151 +802,145 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                         ),
                       ),
                       Expanded(
-                        child: ListView(
-                          shrinkWrap: true,
-                          children: <Widget>[
+                        child:  displayProductsList.length == 0
+                            ? Center(
+                          child: Text("No data found"),
+                        )
+                            : Container(
+                          child: Scrollbar(
+                            isAlwaysShown: true,
+                            controller: _scrollController,
+                            child: ListView.separated(
+                                controller: _scrollController,
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                separatorBuilder:
+                                    (BuildContext context, int index) {
+                                  return Container(
+                                    padding: EdgeInsets.only(
+                                        top: 10, bottom: 10),
+                                    width: MediaQuery.of(context)
+                                        .size
+                                        .width,
+                                    height: 1,
+                                    color: Colors.black12,
+                                  );
+                                },
+                                padding: EdgeInsets.all(5),
+                                scrollDirection: Axis.vertical,
+                                itemCount: displayProductsList.length,
+                                itemBuilder:
+                                    (BuildContext context, int index) {
+                                  return Container(
+                                    padding: EdgeInsets.only(
+                                        top: 20, bottom: 20),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment
+                                          .spaceEvenly,
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: Container(
+                                            child: Text(
+                                                "${displayProductsList[index].product}"),
+                                          ),
+                                          flex: 2,
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            child: Text(
+                                              "${displayProductsList[index].purchaseOrderQty ??0}",textAlign: TextAlign.center,),
+                                          ),
+                                          flex: 1,
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            child: Text(
+                                              "${displayProductsList[index].purchaseQty ?? 0}",textAlign: TextAlign.center,),
+                                          ),
+                                          flex: 1,
+                                        ),
+                                        Padding(padding: EdgeInsets.all(3),),
+                                        Expanded(
+                                          child: Container(
+                                            child: Text(
+                                              "${displayProductsList[index].employee ?? "-"}",textAlign: TextAlign.start,),
+                                          ),
+                                          flex: 1,
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            child: Text(
+                                              "${displayProductsList[index].purchasedQty ?? 0}",textAlign: TextAlign.center,),
+                                          ),
+                                          flex: 1,
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            child: Text(
+                                              "${displayProductsList[index].amountSpent ??0}",textAlign: TextAlign.center,),
+                                          ),
+                                          flex: 1,
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            child: Text(
+                                              "${displayProductsList[index].deliveredQty ??0}",textAlign: TextAlign.center,),
+                                          ),
+                                          flex: 1,
+                                        ),
 
-                            displayProductsList.length == 0
-                                ? Center(
-                                  child: Text("No data found"),
-                                )
-                                : Container(
-                                    child: Scrollbar(
-                                      isAlwaysShown: true,
-                                      controller: _scrollController,
-                                      child: ListView.separated(
-                                          controller: _scrollController,
-                                          shrinkWrap: true,
-                                          physics: NeverScrollableScrollPhysics(),
-                                          separatorBuilder:
-                                              (BuildContext context, int index) {
-                                            return Container(
-                                              padding: EdgeInsets.only(
-                                                  top: 10, bottom: 10),
-                                              width: MediaQuery.of(context)
-                                                  .size
-                                                  .width,
-                                              height: 1,
-                                              color: Colors.black12,
-                                            );
-                                          },
-                                          padding: EdgeInsets.all(5),
-                                          scrollDirection: Axis.vertical,
-                                          itemCount: displayProductsList.length,
-                                          itemBuilder:
-                                              (BuildContext context, int index) {
-                                            return Container(
-                                              padding: EdgeInsets.only(
-                                                  top: 20, bottom: 20),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                MainAxisAlignment
-                                                    .spaceEvenly,
-                                                children: <Widget>[
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                          "${displayProductsList[index].product}"),
-                                                    ),
-                                                    flex: 2,
-                                                  ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                        "${displayProductsList[index].purchaseOrderQty ??0}",textAlign: TextAlign.center,),
-                                                    ),
-                                                    flex: 1,
-                                                  ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                        "${displayProductsList[index].purchaseQty ?? 0}",textAlign: TextAlign.center,),
-                                                    ),
-                                                    flex: 1,
-                                                  ),
-                                                  Padding(padding: EdgeInsets.all(3),),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                        "${displayProductsList[index].employee ?? "-"}",textAlign: TextAlign.start,),
-                                                    ),
-                                                    flex: 1,
-                                                  ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                        "${displayProductsList[index].purchasedQty ?? 0}",textAlign: TextAlign.center,),
-                                                    ),
-                                                    flex: 1,
-                                                  ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                        "${displayProductsList[index].amountSpent ??0}",textAlign: TextAlign.center,),
-                                                    ),
-                                                    flex: 1,
-                                                  ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                        "${displayProductsList[index].deliveredQty ??0}",textAlign: TextAlign.center,),
-                                                    ),
-                                                    flex: 1,
-                                                  ),
+                                        Expanded(
+                                          child: Container(
+                                            child: Text(
+                                              "${displayProductsList[index].actualExcessQty ?? 0}",textAlign: TextAlign.center,),
+                                          ),
+                                          flex: 1,
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            child: Text(
+                                              "${displayProductsList[index].EODExcess ?? 0}",textAlign: TextAlign.center,),
+                                          ),
+                                          flex: 1,
+                                        ),
 
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                        "${displayProductsList[index].actualExcessQty ?? 0}",textAlign: TextAlign.center,),
-                                                    ),
-                                                    flex: 1,
-                                                  ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                        "${displayProductsList[index].EODExcess ?? 0}",textAlign: TextAlign.center,),
-                                                    ),
-                                                    flex: 1,
-                                                  ),
+                                        Expanded(
+                                          child: Container(
+                                            child: Text(
+                                              "${displayProductsList[index].returnQty ?? 0}",textAlign: TextAlign.center,),
+                                          ),
+                                          flex: 1,
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            child: Text(
+                                              "${displayProductsList[index].invoiceAmount ?? 0}",textAlign: TextAlign.center,),
+                                          ),
+                                          flex: 1,
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            child: Text(
+                                              "${displayProductsList[index].remarks ?? "-"}",textAlign: TextAlign.center,),
+                                          ),
+                                          flex: 1,
+                                        ),
+                                        Expanded(
+                                          child: InkWellMouseRegion(
+                                            child: Icon(Icons.edit,color: Colors.lightBlue[900],),
+                                            onTap: (){
+                                              showEditProductAlertDialog(context, displayProductsList[index]);
+                                            },
+                                          ),
+                                          flex: 1,
+                                        ),
 
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                        "${displayProductsList[index].returnQty ?? 0}",textAlign: TextAlign.center,),
-                                                    ),
-                                                    flex: 1,
-                                                  ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                        "${displayProductsList[index].invoiceAmount ?? 0}",textAlign: TextAlign.center,),
-                                                    ),
-                                                    flex: 1,
-                                                  ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                        "${displayProductsList[index].remarks ?? "-"}",textAlign: TextAlign.center,),
-                                                    ),
-                                                    flex: 1,
-                                                  ),
-                                                  Expanded(
-                                                    child: InkWellMouseRegion(
-                                                      child: Icon(Icons.edit,color: Colors.lightBlue[900],),
-                                                      onTap: (){
-                                                        showEditProductAlertDialog(context, displayProductsList[index]);
-                                                      },
-                                                    ),
-                                                    flex: 1,
-                                                  ),
-
-                                                ],
-                                              ),
-                                            );
-                                          }),
+                                      ],
                                     ),
-                                  )
-                          ],
+                                  );
+                                }),
+                          ),
                         ),
                       ),
                     ],
