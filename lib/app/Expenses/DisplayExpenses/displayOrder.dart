@@ -48,6 +48,8 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   final _extraEarnedKeyController = TextEditingController();
   final _extraEarnedValueController = TextEditingController();
 
+  final ScrollController _scrollController=ScrollController();
+
   String _extraDataKeyErrorTV = null, _extraDataValueErrorTV = null;
   String _extraSpentKeyErrorTV = null, _extraSpentValueErrorTV = null;
   String _extraEarnedKeyErrorTV = null, _extraEarnedValueErrorTV = null;
@@ -152,16 +154,9 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
       });
     });
 
-    repository.getTeamMembersOnce().then((value) {
-      List<Member> tempMembersList = new List();
-      if (value.documents.length > 0) {
-        var i=0;
-        value.documents.forEach((element) {
-          tempMembersList.add(Member.fromSnapshot(snapshot: element));
-        });
-      }
+    repository.getEmployeesOnceByCity(widget.order.cityID).then((value) {
       setState(() {
-        membersList = tempMembersList;
+        membersList = value;
       });
     });
   }
@@ -209,7 +204,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                               fontWeight: FontWeight.w700),
                                         ),
                                         Padding(
-                                          padding: EdgeInsets.all(3),
+                                          padding: EdgeInsets.all(5),
                                         ),
                                         Text(
                                             "Created @ ${DateFormat("dd-MMM-yyyy hh:mm a").format(order.createdDate)}",
@@ -217,6 +212,10 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                                 fontSize: 14,
                                                 color: Colors.black45,
                                                 fontWeight: FontWeight.w500)),
+                                        Padding(
+                                          padding: EdgeInsets.all(5),
+                                        ),
+                                        getOrderStatus()
                                       ],
                                     ),
                                   ],
@@ -757,6 +756,8 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                   )
                                 : Container(
                                     child: Scrollbar(
+                                      isAlwaysShown: true,
+                                      controller: _scrollController,
                                       child: ListView.separated(
                                           shrinkWrap: true,
                                           physics: NeverScrollableScrollPhysics(),
@@ -1299,6 +1300,8 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                 child: MediaQuery.removePadding(
                     context: contxt,
                     child: Scrollbar(
+                      isAlwaysShown: true,
+                      controller: _scrollController,
                       child: ListView(
                         reverse: false,
                         shrinkWrap: true,
@@ -1760,6 +1763,8 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
               child: MediaQuery.removePadding(
                   context: contxt,
                   child: Scrollbar(
+                    isAlwaysShown: true,
+                    controller: _scrollController,
                     child: ListView(
                       reverse: false,
                       shrinkWrap: true,
@@ -1793,7 +1798,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                           ],
                         ),
                         Container(
-                          margin: EdgeInsets.only(top: 10),
+                          margin: EdgeInsets.only(top: 15),
                           child: Row(
                             children: [
                               Expanded(
@@ -2073,8 +2078,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
     if (_remarksController.text.trim().length > 0) {
       product.remarks = _remarksController.text;
     }
-    print("BLB ${product.toJson()}");
-    //await repository.updateProductInOrder(widget.orderId, product);
+    await repository.updateProductInOrder(widget.order.orderId, product);
     setState(() {
       _loading = false;
     });
@@ -2149,5 +2153,57 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
         ),
       ],
     );
+  }
+
+  getOrderStatus() {
+    if(widget.order.status==1){
+      return Row(
+        children: [
+          Container(
+            height: 12,
+            width: 12,
+            decoration: BoxDecoration(
+                color: Colors.blue,
+                shape: BoxShape.circle
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(left: 10),
+            child: Text("Active"),)
+        ],
+      );
+    }else if(widget.order.status==0){
+      return Row(
+        children: [
+          Container(
+            height: 12,
+            width: 12,
+            decoration: BoxDecoration(
+                color: Colors.green,
+                shape: BoxShape.circle
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(left: 10),
+            child: Text("Completed"),)
+        ],
+      );
+    }else {
+      return Row(
+        children: [
+          Container(
+            height: 12,
+            width: 12,
+            decoration: BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(left: 10),
+            child: Text("Cancelled"),)
+        ],
+      );
+    }
   }
 }

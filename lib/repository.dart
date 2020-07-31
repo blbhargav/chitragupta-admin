@@ -240,6 +240,7 @@ class Repository {
         .collection("Orders")
         .document(orderId)
         .collection("products")
+        .orderBy("product",descending: false)
         .snapshots();
 
     return reference;
@@ -696,7 +697,7 @@ class Repository {
         .collection('Orders')
         .document(indentId)
         .collection("products")
-        .orderBy("product",descending: true)
+        .orderBy("product",descending: false)
         .getDocuments();
     if (snapshot.documents.length > 0) {
       snapshot.documents.forEach((element) {
@@ -719,6 +720,6 @@ class Repository {
         .document(orderId)
         .collection("products")
         .document(data.id)
-        .updateData(data.toJson());
+        .setData(data.toJson());
   }
 }
