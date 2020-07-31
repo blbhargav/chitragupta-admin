@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/models/Order.dart';
 import 'package:chitragupta/models/Product.dart';
 import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:chitragupta/extension/util.dart';
+import 'package:expandable/expandable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -154,24 +156,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
       if (value.documents.length > 0) {
         var i=0;
         value.documents.forEach((element) {
-          Member member=Member.fromSnapshot(snapshot: element);
-          tempMembersList.add(member);
-          setState(() {
-            if(i==0){
-              member1Name=member.name;
-              member1Amount= event.data[member.uid];
-            }else if(i==1){
-              member2Name=member.name;
-              member2Amount= event.data[member.uid];
-            }else if(i==2){
-              member3Name=member.name;
-              member3Amount= event.data[member.uid];
-            }else if(i==3){
-              member4Name=member.name;
-              member4Amount= event.data[member.uid];
-            }
-          });
-          i++;
+          tempMembersList.add(Member.fromSnapshot(snapshot: element));
         });
       }
       setState(() {
@@ -195,453 +180,133 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
-                      Card(
-                        elevation: 2,
-                        child: Container(
-                          padding: EdgeInsets.all(12),
+                      ExpandablePanel(
+                        header: Container(
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Image.asset(
-                                    "assets/logo.png",
-                                    width: 70,
-                                    height: 70,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(2),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        "${order.name}",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w700),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(3),
-                                      ),
-                                      Text(
-                                          "@ ${DateFormat("dd-MMM-yyyy hh:mm a").format(order.createdDate)}",
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Image.asset(
+                                      "assets/logo.png",
+                                      width: 60,
+                                      height: 60,
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(2),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text(
+                                          "${order.name}",
                                           style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.black45,
-                                              fontWeight: FontWeight.w500)),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Row(
-                                    children: <Widget>[
-                                      Icon(
-                                        Icons.calendar_today,
-                                        color: Colors.cyan,
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(2),
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Text(
-                                            "Order Date",
-                                            style: TextStyle(
-                                                fontSize: 17,
-                                                color: Utils.headingColor,
-                                                fontWeight: FontWeight.w700),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(6),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Color(0XFFF5F5F5),
-                                      borderRadius: BorderRadius.circular(10),
-                                      //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
-                                    ),
-                                    child: Column(
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: EdgeInsets.all(7),
-                                          child: Row(
-                                            children: <Widget>[
-                                              Text(
-                                                  "${DateFormat("dd-MMM-yyyy").format(order.date)}",
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.black)),
-                                            ],
-                                          ),
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w700),
                                         ),
+                                        Padding(
+                                          padding: EdgeInsets.all(3),
+                                        ),
+                                        Text(
+                                            "Created @ ${DateFormat("dd-MMM-yyyy hh:mm a").format(order.createdDate)}",
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.black45,
+                                                fontWeight: FontWeight.w500)),
                                       ],
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
+                                flex: 2,
                               ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Row(
-                                    children: <Widget>[
-                                      Icon(
-                                        Icons.bubble_chart,
-                                        color: Colors.blueAccent,
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(2),
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Text(
-                                            "Total Items",
-                                            style: TextStyle(
-                                                fontSize: 17,
-                                                color: Utils.headingColor,
-                                                fontWeight: FontWeight.w700),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(6),
-                                  ),
-                                  Center(
-                                    child: Container(
-                                      padding: EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: Color(0XFFF5F5F5),
-                                        borderRadius: BorderRadius.circular(10),
-                                        //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
-                                      ),
-                                      child: Column(
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: EdgeInsets.all(7),
-                                            child: Row(
-                                              children: <Widget>[
-                                                Text("${order.totalItems ?? 0}",
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.black)),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              Padding(padding: EdgeInsets.all(5),),
+                              Expanded(
+                                child: getHeaderWidget("Order Date","${DateFormat("dd-MMM-yyyy").format(order.date)}",Icons.calendar_today,Colors.blue ),
+                                flex: 1,
                               ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Row(
-                                    children: <Widget>[
-                                      Icon(
-                                        Icons.timelapse,
-                                        color: Colors.deepOrangeAccent,
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(2),
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Text(
-                                            "Procured Items",
-                                            style: TextStyle(
-                                                fontSize: 17,
-                                                color: Utils.headingColor,
-                                                fontWeight: FontWeight.w700),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(6),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Color(0XFFF5F5F5),
-                                      borderRadius: BorderRadius.circular(10),
-                                      //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
-                                    ),
-                                    child: Column(
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: EdgeInsets.all(7),
-                                          child: Row(
-                                            children: <Widget>[
-                                              Text(
-                                                  "${order.procuredItems ?? 0}",
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.black)),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
+                              Padding(padding: EdgeInsets.all(5),),
+                              Expanded(
+                                child: getHeaderWidget("Total Items", "${productsList.length ?? 0}", Icons.bubble_chart, Colors.blueAccent),
+                                flex: 1,
                               ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Row(
-                                    children: <Widget>[
-                                      Icon(
-                                        MdiIcons.currencyInr,
-                                        color: Colors.red,
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(2),
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Text(
-                                            "Spent",
-                                            style: TextStyle(
-                                                fontSize: 17,
-                                                color: Utils.headingColor,
-                                                fontWeight: FontWeight.w700),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(6),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Color(0XFFF5F5F5),
-                                      borderRadius: BorderRadius.circular(10),
-                                      //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
-                                    ),
-                                    child: Column(
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: EdgeInsets.all(7),
-                                          child: Row(
-                                            children: <Widget>[
-                                              Text("${order.amountSpent ?? 0}",
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.black)),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
+                              Padding(padding: EdgeInsets.all(5),),
+                              Expanded(
+                                child: getHeaderWidget("Procured Items", "${order.procuredItems ?? 0}", Icons.timelapse, Colors.deepOrangeAccent),
+                                flex: 1,
                               ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Row(
-                                    children: <Widget>[
-                                      Icon(
-                                        MdiIcons.currencyInr,
-                                        color: Colors.green,
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(2),
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Text(
-                                            "Earned",
-                                            style: TextStyle(
-                                                fontSize: 17,
-                                                color: Utils.headingColor,
-                                                fontWeight: FontWeight.w700),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(6),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Color(0XFFF5F5F5),
-                                      borderRadius: BorderRadius.circular(10),
-                                      //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
-                                    ),
-                                    child: Column(
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: EdgeInsets.all(7),
-                                          child: Row(
-                                            children: <Widget>[
-                                              Text("${order.amountEarned ?? 0}",
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.black)),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
+                              Padding(padding: EdgeInsets.all(5),),
+                              Expanded(
+                                child: getHeaderWidget("Spent", "${order.amountSpent ?? 0}", MdiIcons.currencyInr, Colors.red),
+                                flex: 1,
                               ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Row(
-                                    children: <Widget>[
-                                      Icon(
-                                        MdiIcons.currencyInr,
-                                        color: Colors.green,
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(2),
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Text(
-                                            "Total",
-                                            style: TextStyle(
-                                                fontSize: 17,
-                                                color: Utils.headingColor,
-                                                fontWeight: FontWeight.w700),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(6),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Color(0XFFF5F5F5),
-                                      borderRadius: BorderRadius.circular(10),
-                                      //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
-                                    ),
-                                    child: Column(
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: EdgeInsets.all(7),
-                                          child: Row(
-                                            children: <Widget>[
-                                              Text(
-                                                  "${(order.amountEarned ?? 0) - (order.amountSpent ?? 0)}",
-                                                  style: TextStyle(
-                                                      fontSize: 18,
-                                                      color: Colors.black)),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
+                              Padding(padding: EdgeInsets.all(5),),
+                              Expanded(
+                                child: getHeaderWidget("Earned", "${order.amountEarned ?? 0}", MdiIcons.currencyInr, Colors.green),
+                                flex: 1,
+                              ),
+                              Padding(padding: EdgeInsets.all(5),),
+                              Expanded(
+                                child: getHeaderWidget("Total","${(order.amountEarned ?? 0) - (order.amountSpent ?? 0)}", MdiIcons.currencyInr, Colors.green),
+                                flex: 1,
                               ),
                             ],
                           ),
+                          padding: EdgeInsets.all(5),
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 10),
-                      ),
-                      Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
-                        elevation: 2,
-                        child: Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Text(member1Name,style:TextStyle(fontSize: 18,fontWeight: FontWeight.w700),),
-                                  Padding(padding: EdgeInsets.all(2),),
-                                  Text("₹ ${member1Amount}",style: TextStyle(color: Colors.blue[900]),)
-                                ],
+                        expanded: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
                               ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Text(member2Name,style:TextStyle(fontSize: 18,fontWeight: FontWeight.w700),),
-                                  Padding(padding: EdgeInsets.all(2),),
-                                  Text("₹ ${member2Amount}",style: TextStyle(color: Colors.blue[900]),)
-                                ],
+                              elevation: 0,
+                              child: Container(
+                                height: 120,
+                                width: double.maxFinite,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Padding(
+                                      child: Text("Employees Expenses",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 20,color: Colors.lightBlue[900]),),
+                                      padding: EdgeInsets.only(top: 5,bottom: 5),
+                                    ),
+                                    Expanded(
+                                      child: ListView.builder(
+                                          itemCount: membersList.length,
+                                          scrollDirection: Axis.horizontal,
+                                          itemBuilder: (BuildContext context,int index){
+                                            return Container(
+                                              width: 120,
+                                              padding: EdgeInsets.all(5),
+                                              margin: EdgeInsets.only(left:5,right: 5),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Padding(
+                                                    padding:EdgeInsets.all(5),
+                                                    child: Text("${membersList[index].name}",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 18),),
+                                                  ),
+                                                  Padding(
+                                                    padding:EdgeInsets.all(5),
+                                                    child: Text("₹ ${event.data[membersList[index].uid] ?? 0}",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 22),),
+                                                  )
+                                                ],
+                                              ),
+                                            );
+                                          }
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Text(member3Name,style:TextStyle(fontSize: 18,fontWeight: FontWeight.w700),),
-                                  Padding(padding: EdgeInsets.all(2),),
-                                  Text("₹ ${member3Amount}",style: TextStyle(color: Colors.blue[900]),)
-                                ],
-                              ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Text(member4Name,style:TextStyle(fontSize: 18,fontWeight: FontWeight.w700),),
-                                  Padding(padding: EdgeInsets.all(2),),
-                                  Text("₹ ${member4Amount}",style: TextStyle(color: Colors.blue[900]),)
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 10),
-                      ),
-                      Expanded(
-                        child: ListView(
-                          shrinkWrap: true,
-                          children: <Widget>[
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 10),
+                            ),
                             Row(
                               mainAxisSize: MainAxisSize.max,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -658,14 +323,14 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(
                                               15.0) //         <--- border radius here
-                                          ),
+                                      ),
                                     ),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
                                         Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                           children: <Widget>[
                                             Text(
                                               "Extra Data",
@@ -686,48 +351,48 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                         ),
                                         extraData.length == 0
                                             ? Container(
-                                                height: 50,
-                                                child: Center(
-                                                  child: Text("No data"),
-                                                ),
-                                              )
+                                          height: 50,
+                                          child: Center(
+                                            child: Text("No data"),
+                                          ),
+                                        )
                                             : Container(
-                                                child: ListView.builder(
-                                                    shrinkWrap: true,
-                                                    padding: EdgeInsets.only(
-                                                        top: 10),
-                                                    physics:
-                                                        BouncingScrollPhysics(),
-                                                    itemCount: extraData.length,
-                                                    itemBuilder:
-                                                        (BuildContext context,
-                                                            int index) {
-                                                      return Container(
-                                                        child: Row(
-                                                          children: <Widget>[
-                                                            Flexible(
-                                                                child: Text(
-                                                              extraData[index]
-                                                                  .name,
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .black54),
-                                                            )),
-                                                            Text(" : "),
-                                                            Text(
-                                                              "₹ ${extraData[index].amount}",
-                                                              style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700),
-                                                            )
-                                                          ],
-                                                        ),
-                                                        padding:
-                                                            EdgeInsets.all(5),
-                                                      );
-                                                    }),
-                                              ),
+                                          child: ListView.builder(
+                                              shrinkWrap: true,
+                                              padding: EdgeInsets.only(
+                                                  top: 10),
+                                              physics:
+                                              BouncingScrollPhysics(),
+                                              itemCount: extraData.length,
+                                              itemBuilder:
+                                                  (BuildContext context,
+                                                  int index) {
+                                                return Container(
+                                                  child: Row(
+                                                    children: <Widget>[
+                                                      Flexible(
+                                                          child: Text(
+                                                            extraData[index]
+                                                                .name,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black54),
+                                                          )),
+                                                      Text(" : "),
+                                                      Text(
+                                                        "₹ ${extraData[index].amount}",
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                            FontWeight
+                                                                .w700),
+                                                      )
+                                                    ],
+                                                  ),
+                                                  padding:
+                                                  EdgeInsets.all(5),
+                                                );
+                                              }),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -748,14 +413,14 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(
                                               15.0) //         <--- border radius here
-                                          ),
+                                      ),
                                     ),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
                                         Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                           children: <Widget>[
                                             Text(
                                               "Extra Amount Spent",
@@ -776,49 +441,49 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                         ),
                                         extraSpent.length == 0
                                             ? Container(
-                                                height: 50,
-                                                child: Center(
-                                                  child: Text("No data"),
-                                                ),
-                                              )
+                                          height: 50,
+                                          child: Center(
+                                            child: Text("No data"),
+                                          ),
+                                        )
                                             : Container(
-                                                child: ListView.builder(
-                                                    shrinkWrap: true,
-                                                    padding: EdgeInsets.only(
-                                                        top: 10),
-                                                    physics:
-                                                        BouncingScrollPhysics(),
-                                                    itemCount:
-                                                        extraSpent.length,
-                                                    itemBuilder:
-                                                        (BuildContext context,
-                                                            int index) {
-                                                      return Container(
-                                                        child: Row(
-                                                          children: <Widget>[
-                                                            Flexible(
-                                                                child: Text(
-                                                              extraSpent[index]
-                                                                  .name,
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .black54),
-                                                            )),
-                                                            Text(" : "),
-                                                            Text(
-                                                              "₹ ${extraSpent[index].amount}",
-                                                              style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700),
-                                                            )
-                                                          ],
-                                                        ),
-                                                        padding:
-                                                            EdgeInsets.all(5),
-                                                      );
-                                                    }),
-                                              ),
+                                          child: ListView.builder(
+                                              shrinkWrap: true,
+                                              padding: EdgeInsets.only(
+                                                  top: 10),
+                                              physics:
+                                              BouncingScrollPhysics(),
+                                              itemCount:
+                                              extraSpent.length,
+                                              itemBuilder:
+                                                  (BuildContext context,
+                                                  int index) {
+                                                return Container(
+                                                  child: Row(
+                                                    children: <Widget>[
+                                                      Flexible(
+                                                          child: Text(
+                                                            extraSpent[index]
+                                                                .name,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black54),
+                                                          )),
+                                                      Text(" : "),
+                                                      Text(
+                                                        "₹ ${extraSpent[index].amount}",
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                            FontWeight
+                                                                .w700),
+                                                      )
+                                                    ],
+                                                  ),
+                                                  padding:
+                                                  EdgeInsets.all(5),
+                                                );
+                                              }),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -839,14 +504,14 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(
                                               15.0) //         <--- border radius here
-                                          ),
+                                      ),
                                     ),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
                                         Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                           children: <Widget>[
                                             Text(
                                               "Extra Amount Earned",
@@ -867,221 +532,223 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                         ),
                                         extraEarned.length == 0
                                             ? Container(
-                                                height: 50,
-                                                child: Center(
-                                                  child: Text("No data"),
-                                                ),
-                                              )
+                                          height: 50,
+                                          child: Center(
+                                            child: Text("No data"),
+                                          ),
+                                        )
                                             : Container(
-                                                child: ListView.builder(
-                                                    shrinkWrap: true,
-                                                    padding: EdgeInsets.only(
-                                                        top: 10),
-                                                    physics:
-                                                        BouncingScrollPhysics(),
-                                                    itemCount:
-                                                        extraEarned.length,
-                                                    itemBuilder:
-                                                        (BuildContext context,
-                                                            int index) {
-                                                      return Container(
-                                                        child: Row(
-                                                          children: <Widget>[
-                                                            Flexible(
-                                                                child: Text(
-                                                              extraEarned[index]
-                                                                  .name,
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .black54),
-                                                            )),
-                                                            Text(" : "),
-                                                            Text(
-                                                              "₹ ${extraEarned[index].amount}",
-                                                              style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700),
-                                                            )
-                                                          ],
-                                                        ),
-                                                        padding:
-                                                            EdgeInsets.all(5),
-                                                      );
-                                                    }),
-                                              ),
+                                          child: ListView.builder(
+                                              shrinkWrap: true,
+                                              padding: EdgeInsets.only(
+                                                  top: 10),
+                                              physics:
+                                              BouncingScrollPhysics(),
+                                              itemCount:
+                                              extraEarned.length,
+                                              itemBuilder:
+                                                  (BuildContext context,
+                                                  int index) {
+                                                return Container(
+                                                  child: Row(
+                                                    children: <Widget>[
+                                                      Flexible(
+                                                          child: Text(
+                                                            extraEarned[index]
+                                                                .name,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black54),
+                                                          )),
+                                                      Text(" : "),
+                                                      Text(
+                                                        "₹ ${extraEarned[index].amount}",
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                            FontWeight
+                                                                .w700),
+                                                      )
+                                                    ],
+                                                  ),
+                                                  padding:
+                                                  EdgeInsets.all(5),
+                                                );
+                                              }),
+                                        ),
                                       ],
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-                            //End of Extra data
-                            Padding(
-                              padding: EdgeInsets.only(top: 20),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text(
-                                  "Products (${productsList.length})",
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 20),
+                      ),
+                      Container(
+                        color: Colors.black,
+                        padding: EdgeInsets.all(5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            Expanded(
+                              child: Container(
+                                padding: EdgeInsets.all(5),
+                                child: Text(
+                                  "Product",
                                   style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 25,
-                                    color: Utils.headingColor,
-                                  ),
+                                      fontSize: 16,color: Colors.white,
+                                      fontWeight: FontWeight.w600),
                                 ),
-                                RaisedButton(child: Text("Import xlsx"),hoverColor: Colors.orange,onPressed: (){
-                                  html.InputElement uploadInput = html.FileUploadInputElement();
-                                  uploadInput.multiple = false;
-                                  uploadInput.draggable = true;
-                                  uploadInput.accept = '.xlsx';
-                                  uploadInput.click();
-                                  uploadInput.onChange.listen((e) {
-                                    final files = uploadInput.files;
-                                    final file = files[0];
-                                    final reader = new html.FileReader();
+                              ),
+                              flex: 2,
+                            ),
+                            Expanded(
+                              child: Container(
+                                child: Text(
+                                  "Purchase\nOrder Qty",textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 16,color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              flex: 1,
+                            ),
+                            Expanded(
+                              child: Container(
+                                child: Text(
+                                  "Our\nQty",textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 16,color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              flex: 1,
+                            ),
+                            Expanded(
+                              child: Container(
+                                child: Text(
+                                  "Employee",
+                                  style: TextStyle(
+                                      fontSize: 16,color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              flex: 1,
+                            ),
+                            Expanded(
+                              child: Container(
+                                child: Text(
+                                  "Purchased",textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 16,color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              flex: 1,
+                            ),
+                            Expanded(
+                              child: Container(
+                                child: Text(
+                                  "Amount\nSpent",textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 16,color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              flex: 1,
+                            ),
+                            Expanded(
+                              child: Container(
+                                child: Text(
+                                  "Used\nQty",textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 16,color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              flex: 1,
+                            ),
 
-                                    reader.onLoadEnd.listen((e) {
-                                      _handleResult(reader.result);
-                                    });
-                                    reader.readAsDataUrl(file);
-                                    print("BLB file ${_selectedFile.length}");
-                                  });
-                                },),
-                              ],
+                            Expanded(
+                              child: Container(
+                                child: Text(
+                                  "Actual\nExcess Qty",textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 16,color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              flex: 1,
                             ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 10),
+                            Expanded(
+                              child: Container(
+                                child: Text(
+                                  "Eod\nExcess",textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 16,color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              flex: 1,
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                Expanded(
-                                  child: Container(
-                                    child: Text(
-                                      "Description",
-                                      style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
+
+                            Expanded(
+                              child: Container(
+                                child: Text(
+                                  "Return\nQty",textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 16,color: Colors.white,
+                                      fontWeight: FontWeight.w600),
                                 ),
-                                Expanded(
-                                  child: Container(
-                                    child: Text(
-                                      "PO Qty",
-                                      style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    child: Text(
-                                      "Our Qty",
-                                      style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    child: Text(
-                                      "Used\nQty",
-                                      style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    child: Text(
-                                      "Purchased",
-                                      style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    child: Text(
-                                      "Actual\nExcess\nQty",
-                                      style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    child: Text(
-                                      "Eod\nExcess",
-                                      style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    child: Text(
-                                      "Amount\nSpent",
-                                      style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    child: Text(
-                                      "Return\nQty",
-                                      style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    child: Text(
-                                      "Invoice\nAmount",
-                                      style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    child: Text(
-                                      "Remarks",
-                                      style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    child: Text(
-                                      "Payer",
-                                      style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
+                              flex: 1,
                             ),
+                            Expanded(
+                              child: Container(
+                                child: Text(
+                                  "Invoice\nAmount",textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 16,color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              flex: 1,
+                            ),
+                            Expanded(
+                              child: Container(
+                                child: Text(
+                                  "Remarks",textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 16,color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              flex: 1,
+                            ),
+                            Expanded(
+                              child: Container(
+                                child: Text(
+                                  "Action",textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 16,color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              flex: 1,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView(
+                          shrinkWrap: true,
+                          children: <Widget>[
+
                             productsList.length == 0
-                                ? Container(
-                                    height: 200,
+                                ? Expanded(
                                     child: Center(
                                       child: Text("No data found"),
                                     ),
@@ -1099,7 +766,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                                 .size
                                                 .width,
                                             height: 1,
-                                            color: Colors.grey,
+                                            color: Colors.black12,
                                           );
                                         },
                                         padding: EdgeInsets.all(5),
@@ -1107,98 +774,113 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                         itemCount: productsList.length,
                                         itemBuilder:
                                             (BuildContext context, int index) {
-                                          return GestureDetector(
-                                            child: Container(
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                                children: <Widget>[
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                          "${productsList[index].product}"),
-                                                    ),
+                                          return Container(
+                                            padding: EdgeInsets.only(
+                                                top: 20, bottom: 20),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment
+                                                  .spaceEvenly,
+                                              children: <Widget>[
+                                                Expanded(
+                                                  child: Container(
+                                                    child: Text(
+                                                        "${productsList[index].product}"),
                                                   ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                          "${productsList[index].purchaseOrderQty}"),
-                                                    ),
+                                                  flex: 2,
+                                                ),
+                                                Expanded(
+                                                  child: Container(
+                                                    child: Text(
+                                                      "${productsList[index].purchaseOrderQty ??0}",textAlign: TextAlign.center,),
                                                   ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                          "${productsList[index].ourQty}"),
-                                                    ),
+                                                  flex: 1,
+                                                ),
+                                                Expanded(
+                                                  child: Container(
+                                                    child: Text(
+                                                      "${productsList[index].ourQty ?? 0}",textAlign: TextAlign.center,),
                                                   ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                          "${productsList[index].usedQty}"),
-                                                    ),
+                                                  flex: 1,
+                                                ),
+                                                Expanded(
+                                                  child: Container(
+                                                    child: Text(
+                                                      "${productsList[index].employee ?? "-"}",textAlign: TextAlign.start,),
                                                   ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                          "${productsList[index].purchasedQty}"),
-                                                    ),
+                                                  flex: 1,
+                                                ),
+                                                Expanded(
+                                                  child: Container(
+                                                    child: Text(
+                                                      "${productsList[index].purchasedQty ?? 0}",textAlign: TextAlign.center,),
                                                   ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                          "${productsList[index].actualExcessQty}"),
-                                                    ),
+                                                  flex: 1,
+                                                ),
+                                                Expanded(
+                                                  child: Container(
+                                                    child: Text(
+                                                      "${productsList[index].amountSpent ??0}",textAlign: TextAlign.center,),
                                                   ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                          "${productsList[index].EODExcess}"),
-                                                    ),
+                                                  flex: 1,
+                                                ),
+                                                Expanded(
+                                                  child: Container(
+                                                    child: Text(
+                                                      "${productsList[index].usedQty ??0}",textAlign: TextAlign.center,),
                                                   ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                          "${productsList[index].amountSpent}"),
-                                                    ),
+                                                  flex: 1,
+                                                ),
+
+                                                Expanded(
+                                                  child: Container(
+                                                    child: Text(
+                                                      "${productsList[index].actualExcessQty ?? 0}",textAlign: TextAlign.center,),
                                                   ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                          "${productsList[index].returnQty}"),
-                                                    ),
+                                                  flex: 1,
+                                                ),
+                                                Expanded(
+                                                  child: Container(
+                                                    child: Text(
+                                                      "${productsList[index].EODExcess ?? 0}",textAlign: TextAlign.center,),
                                                   ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                          "${productsList[index].invoiceAmount}"),
-                                                    ),
+                                                  flex: 1,
+                                                ),
+
+                                                Expanded(
+                                                  child: Container(
+                                                    child: Text(
+                                                      "${productsList[index].returnQty ?? 0}",textAlign: TextAlign.center,),
                                                   ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                          "${productsList[index].remarks ?? "-"}"),
-                                                    ),
+                                                  flex: 1,
+                                                ),
+                                                Expanded(
+                                                  child: Container(
+                                                    child: Text(
+                                                      "${productsList[index].invoiceAmount ?? 0}",textAlign: TextAlign.center,),
                                                   ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                          "${productsList[index].employee ?? "-"}"),
-                                                    ),
+                                                  flex: 1,
+                                                ),
+                                                Expanded(
+                                                  child: Container(
+                                                    child: Text(
+                                                      "${productsList[index].remarks ?? "-"}",textAlign: TextAlign.center,),
                                                   ),
-                                                ],
-                                              ),
-                                              padding: EdgeInsets.only(
-                                                  bottom: 10, top: 10),
+                                                  flex: 1,
+                                                ),
+                                                Expanded(
+                                                  child: InkWellMouseRegion(
+                                                    child: Icon(Icons.edit,color: Colors.lightBlue[900],),
+                                                    onTap: (){
+                                                      showEditProductAlertDialog(
+                                                          context, productsList[index]);
+                                                    },
+                                                  ),
+                                                  flex: 1,
+                                                ),
+
+                                              ],
                                             ),
-                                            onTap: () {
-                                              showEditProductAlertDialog(
-                                                  context, productsList[index]);
-                                            },
-                                            onLongPress: () {
-                                              showDeleteproductAlert(
-                                                  context, productsList[index]);
-                                            },
                                           );
                                         }),
                                   )
@@ -1207,16 +889,6 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                       ),
                     ],
                   )),
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: Image.asset(
-            'assets/feather.png',
-            height: 35,
-            width: 35,
-          ),
-          onPressed: () {
-            showAddProductAlertDialog(context);
-          },
         ),
       ),
       opacity: 0.4,
@@ -2422,5 +2094,65 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
     _returnQtyController.text = "";
     _invoiceAmountController.text = "";
     _remarksController.text = "";
+  }
+
+  getHeaderWidget(String title, String data, var icon, var color) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(
+                icon,
+                color: color,
+              ),
+              Padding(
+                padding: EdgeInsets.all(2),
+              ),
+              Column(
+                crossAxisAlignment:
+                CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "$title",
+                    style: TextStyle(
+                        fontSize: 17,
+                        color: Utils.headingColor,
+                        fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(6),
+        ),
+        Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Color(0XFFF5F5F5),
+            borderRadius: BorderRadius.circular(10),
+            //boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+          ),
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.all(5),
+              child: Text(
+                  "${data}",
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black)),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
