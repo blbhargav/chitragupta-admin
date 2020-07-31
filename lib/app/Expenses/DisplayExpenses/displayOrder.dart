@@ -14,14 +14,14 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:chitragupta/models/ExtraData.dart';
 import 'dart:html' as html;
 
-import '../login.dart';
+import '../../../login.dart';
 
 class DisplayOrderScreen extends StatefulWidget {
   Repository repository;
-  String orderId;
-  DisplayOrderScreen(Repository repository, String orderId)
+  final Order order;
+  DisplayOrderScreen(Repository repository, Order order)
       : repository = repository ?? Repository(),
-        orderId = orderId;
+        order=order;
   @override
   _DisplayOrderScreenState createState() =>
       _DisplayOrderScreenState(repository: repository);
@@ -95,7 +95,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   }
 
   void initScreen() {
-    repository.getOrder(widget.orderId).listen((_event) {
+    repository.getOrder(widget.order.orderId).listen((_event) {
       setState(() {
         _loading = false;
         event=_event;
@@ -103,7 +103,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
       });
     });
 
-    repository.getOrderExtraData(widget.orderId).listen((event) {
+    repository.getOrderExtraData(widget.order.orderId).listen((event) {
       List<ExtraData> extraList = new List();
       if (event.documents.length > 0) {
         event.documents.forEach((element) {
@@ -114,7 +114,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
         extraData = extraList;
       });
     });
-    repository.getOrderExtraSpent(widget.orderId).listen((event) {
+    repository.getOrderExtraSpent(widget.order.orderId).listen((event) {
       List<ExtraData> extraList = new List();
       if (event.documents.length > 0) {
         event.documents.forEach((element) {
@@ -125,7 +125,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
         extraSpent = extraList;
       });
     });
-    repository.getOrderExtraEarned(widget.orderId).listen((event) {
+    repository.getOrderExtraEarned(widget.order.orderId).listen((event) {
       List<ExtraData> extraList = new List();
       if (event.documents.length > 0) {
         event.documents.forEach((element) {
@@ -137,7 +137,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
       });
     });
 
-    repository.getOrderProducts(widget.orderId).listen((event) {
+    repository.getOrderProducts(widget.order.orderId).listen((event) {
       List<Product> productS = new List();
       if (event.documents.length > 0) {
         event.documents.forEach((element) {
@@ -184,11 +184,6 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   Widget build(BuildContext context) {
     return ProgressHUD(
       child: Scaffold(
-        appBar: AppBar(
-          title: Text("#${widget.orderId}"),
-          centerTitle: true,
-          backgroundColor: Colors.lightBlue[900],
-        ),
         body: MediaQuery.removePadding(
           context: context,
           child: order == null
@@ -1122,13 +1117,13 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                                   Expanded(
                                                     child: Container(
                                                       child: Text(
-                                                          "${productsList[index].description}"),
+                                                          "${productsList[index].product}"),
                                                     ),
                                                   ),
                                                   Expanded(
                                                     child: Container(
                                                       child: Text(
-                                                          "${productsList[index].POQty}"),
+                                                          "${productsList[index].purchaseOrderQty}"),
                                                     ),
                                                   ),
                                                   Expanded(
@@ -1188,7 +1183,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                                   Expanded(
                                                     child: Container(
                                                       child: Text(
-                                                          "${productsList[index].payer ?? "-"}"),
+                                                          "${productsList[index].employee ?? "-"}"),
                                                     ),
                                                   ),
                                                 ],
@@ -1912,8 +1907,8 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
     });
 
     var product = Product();
-    product.description = _descriptionController.text;
-    product.POQty = int.parse(_poQtyController.text);
+    product.product = _descriptionController.text;
+    product.purchaseOrderQty = int.parse(_poQtyController.text);
 
     if (_ourQtyController.text.trim().length > 0) {
       product.ourQty = int.parse(_ourQtyController.text);
@@ -1967,7 +1962,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
       product.remarks = _remarksController.text;
     }
 
-    await repository.addProductToOrder(widget.orderId, product);
+    await repository.addProductToOrder(widget.order.orderId, product);
     setState(() {
       _loading = false;
     });
@@ -2002,7 +1997,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Text(
-                    "Delete ${product.description} ?",
+                    "Delete ${product.product} ?",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                   ),
                   Padding(
@@ -2042,15 +2037,15 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
     setState(() {
       _loading = true;
     });
-    await repository.removeProductFromOrder(widget.orderId, id);
+    await repository.removeProductFromOrder(widget.order.orderId, id);
     setState(() {
       _loading = false;
     });
   }
 
   showEditProductAlertDialog(BuildContext contxt, Product product) {
-    _descriptionController.text = product.description;
-    _poQtyController.text = product.POQty.toString();
+    _descriptionController.text = product.product;
+    _poQtyController.text = product.purchaseOrderQty.toString();
     _ourQtyController.text = product.ourQty.toString();
     _usedQtyController.text = product.usedQty.toString();
     _purchasedQtyController.text = product.purchasedQty.toString();
@@ -2357,8 +2352,8 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
     setState(() {
       _loading = true;
     });
-    product.description = _descriptionController.text;
-    product.POQty = int.parse(_poQtyController.text);
+    product.product = _descriptionController.text;
+    product.purchaseOrderQty = int.parse(_poQtyController.text);
 
     if (_ourQtyController.text.trim().length > 0) {
       product.ourQty = int.parse(_ourQtyController.text);

@@ -14,8 +14,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 /// id : ""
 
 class Product {
-  String description;
-  int POQty;
   int ourQty;
   int usedQty;
   int purchasedQty;
@@ -25,13 +23,24 @@ class Product {
   int returnQty;
   int invoiceAmount;
   int paid;
-  String id,payer,remarks;
+  String remarks;
 
-  Product({this.description, this.POQty, this.ourQty, this.usedQty, this.purchasedQty, this.actualExcessQty, this.EODExcess, this.amountSpent, this.returnQty, this.invoiceAmount, this.remarks, this.id});
+  String id;
+  String product;
+  String productId;
+  String category;
+  int categoryId;
+  String orderId;
+  int createdDate;
+  String employee;
+  String employeeId;
+  int purchaseOrderQty;
+  int purchaseQty;
+
+  Product({this.ourQty, this.usedQty, this.purchasedQty, this.actualExcessQty, this.EODExcess, this.amountSpent,
+    this.returnQty, this.invoiceAmount, this.remarks, this.id});
 
   Product.fromSnapshot({DocumentSnapshot snapshot}) {
-    this.description = snapshot.data["description"];
-    this.POQty = snapshot.data["POQty"];
     this.ourQty = snapshot.data["ourQty"];
     this.usedQty = snapshot.data["usedQty"];
     this.purchasedQty = snapshot.data["purchasedQty"];
@@ -42,13 +51,21 @@ class Product {
     this.invoiceAmount = snapshot.data["invoiceAmount"];
     this.remarks = snapshot.data["remarks"];
     this.id = snapshot.documentID;
-    this.payer=snapshot.data["payer"];
+
+    this.product = snapshot.data["product"];
+    this.productId = snapshot.data["productId"];
+    this.category = snapshot.data["category"];
+    this.categoryId = snapshot.data["categoryId"];
+    this.orderId = snapshot.data["orderId"];
+    this.employee = snapshot.data["employee"];
+    this.employeeId = snapshot.data["employeeId"];
+    this.purchaseOrderQty = snapshot.data["purchaseOrderQty"];
+    this.purchaseQty = snapshot.data["purchaseQty"];
+    this.createdDate=snapshot.data["createdDate"];
   }
 
   Map<String, dynamic> toMap() {
     var map = new Map<String, dynamic>();
-    map["description"] = description;
-    map["POQty"] = POQty;
     map["ourQty"] = ourQty;
     map["usedQty"] = usedQty;
     map["purchasedQty"] = purchasedQty;
@@ -64,17 +81,22 @@ class Product {
 
   toJson(){
     return {
-      "description":description,
-      "POQty":POQty,
+      "product":product,
+      "productId":productId,
+      "purchaseQty":purchaseQty,
+      "purchaseOrderQty":purchaseOrderQty,
+      "employeeId":employeeId,
+      "employee":employee,
+      "categoryId":categoryId,
+      "category":category,
       "ourQty":ourQty,
       "usedQty":usedQty,
-      "purchasedQty":purchasedQty,
       "actualExcessQty":actualExcessQty,
       "EODExcess":EODExcess,
-      "amountSpent":amountSpent,
       "returnQty":returnQty,
       "invoiceAmount":invoiceAmount,
       "remarks":remarks,
+      "createdDate":createdDate,
       "id":id
     };
   }

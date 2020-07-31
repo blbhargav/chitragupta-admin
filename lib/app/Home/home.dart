@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chitragupta/app/Expenses/DisplayExpenses/displayOrder.dart';
 import 'package:chitragupta/app/Expenses/expenses_page.dart';
 import 'package:chitragupta/app/Home/home_bloc.dart';
 import 'package:chitragupta/app/Indent/DisplayIndent/display_indent.dart';
@@ -74,7 +75,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
     _homeBloc.add(DisplayIndentClickedEvent(order));
   }
   expenseCallback(Order order) {
-    _homeBloc.add(DisplayIndentClickedEvent(order));
+    _homeBloc.add(DisplayExpenseClickedEvent(order));
   }
 
   @override
@@ -104,6 +105,11 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                 resetColors();
                 pageName="Expenses";
                 _container=ExpensesScreen(widget.repository,callback: expenseCallback,);
+                expensesItemColor=Colors.black;
+              }else if(state is DisplayExpenseState){
+                resetColors();
+                pageName="Expense : ${state.order.orderId}";
+                _container=DisplayOrderScreen(widget.repository,state.order);
                 expensesItemColor=Colors.black;
               }else if(state is ShowAnalyticsState){
                 resetColors();
