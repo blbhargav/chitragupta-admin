@@ -21,7 +21,7 @@ import '../../../login.dart';
 
 class DisplayOrderScreen extends StatefulWidget {
   Repository repository;
-  final Order order;
+  Order order;
   DisplayOrderScreen(Repository repository, Order order)
       : repository = repository ?? Repository(),
         order=order;
@@ -36,7 +36,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   _DisplayOrderScreenState({Repository repository})
       : repository = repository ?? Repository();
 
-  bool _loading = false;
+  bool _loading = false,_showSearchClearIcon=false;
   Order order;
 
   final _extraDataKeyController = TextEditingController();
@@ -49,6 +49,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   final _extraEarnedValueController = TextEditingController();
 
   final ScrollController _scrollController=ScrollController();
+  TextEditingController _spareSearchControllers = TextEditingController();
 
   String _extraDataKeyErrorTV = null, _extraDataValueErrorTV = null;
   String _extraSpentKeyErrorTV = null, _extraSpentValueErrorTV = null;
@@ -59,8 +60,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   TextEditingController _ourQtyController = new TextEditingController();
   TextEditingController _deliveredQtyController = new TextEditingController();
   TextEditingController _purchasedQtyController = new TextEditingController();
-  TextEditingController _actualExcessQtyController =
-      new TextEditingController();
+  TextEditingController _actualExcessQtyController = new TextEditingController();
   TextEditingController _EODExcessController = new TextEditingController();
   TextEditingController _amountSpentController = new TextEditingController();
   TextEditingController _returnQtyController = new TextEditingController();
@@ -85,7 +85,8 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   List<ExtraData> extraSpent = new List();
   List<ExtraData> extraEarned = new List();
 
-  List<Product> productsList = new List();
+  final List<Product> productsList = new List();
+  List<Product> displayProductsList = new List();
   List<Member> membersList = new List();
   String member1Name="-",member2Name="-",member3Name="-",member4Name="-";
   int member1Amount=0,member2Amount=0,member3Amount=0,member4Amount=0;
@@ -105,6 +106,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
         _loading = false;
         event=_event;
         order = Order.fromSnapshot(snapshot: _event);
+        widget.order=order;
       });
     });
 
@@ -143,14 +145,15 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
     });
 
     repository.getOrderProducts(widget.order.orderId).listen((event) {
-      List<Product> productS = new List();
+      List<Product> products = new List();
       if (event.documents.length > 0) {
         event.documents.forEach((element) {
-          productS.add(Product.fromSnapshot(snapshot: element));
+          products.add(Product.fromSnapshot(snapshot: element));
         });
       }
       setState(() {
-        productsList = productS;
+        productsList.addAll(products);
+        displayProductsList=products;
       });
     });
 
@@ -584,8 +587,63 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                           ],
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 20),
+                      Container(
+                        padding: EdgeInsets.only(top: 10,bottom: 10),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 400,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  width: 1, //
+                                  color: Colors.grey,
+                                ),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(
+                                        15.0) //         <--- border radius here
+                                ),
+                              ),
+                              child: ListTile(
+                                leading: Icon(Icons.search),
+                                title: TextField(
+                                  controller: _spareSearchControllers,
+                                  decoration: InputDecoration(
+                                      hintText: 'Search Product', border: InputBorder.none),
+                                  onChanged: onSearchTextChanged,
+                                ),
+                                trailing: _showSearchClearIcon? IconButton(icon:  Icon(Icons.cancel), onPressed: () {
+                                  _spareSearchControllers.clear();
+                                  onSearchTextChanged('');
+                                },):null,
+                              ),
+                            ),
+                            Spacer(),
+                            RaisedButton(
+                              child: Text("Cancel",style: TextStyle(color: Colors.white),),
+                              color: Colors.red[500],
+                              onPressed: (){
+                                showCancelOrderAlert(context);
+                              },
+                            ),
+                            Padding(padding: EdgeInsets.all(10),),
+                            RaisedButton(
+                              child: Text("Complete",style: TextStyle(color: Colors.white),),
+                              color: Colors.green[500],
+                              onPressed: (){
+                                showCompleteOrderAlert(context);
+                              },
+                            ),
+                            Padding(padding: EdgeInsets.all(10),),
+                            
+                            RaisedButton(
+                              child: Text("Invoice"),
+                              onPressed: (){
+
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                       Container(
                         color: Colors.black,
@@ -748,17 +806,16 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                           shrinkWrap: true,
                           children: <Widget>[
 
-                            productsList.length == 0
-                                ? Expanded(
-                                    child: Center(
-                                      child: Text("No data found"),
-                                    ),
-                                  )
+                            displayProductsList.length == 0
+                                ? Center(
+                                  child: Text("No data found"),
+                                )
                                 : Container(
                                     child: Scrollbar(
                                       isAlwaysShown: true,
                                       controller: _scrollController,
                                       child: ListView.separated(
+                                          controller: _scrollController,
                                           shrinkWrap: true,
                                           physics: NeverScrollableScrollPhysics(),
                                           separatorBuilder:
@@ -775,7 +832,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                           },
                                           padding: EdgeInsets.all(5),
                                           scrollDirection: Axis.vertical,
-                                          itemCount: productsList.length,
+                                          itemCount: displayProductsList.length,
                                           itemBuilder:
                                               (BuildContext context, int index) {
                                             return Container(
@@ -789,21 +846,21 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                                   Expanded(
                                                     child: Container(
                                                       child: Text(
-                                                          "${productsList[index].product}"),
+                                                          "${displayProductsList[index].product}"),
                                                     ),
                                                     flex: 2,
                                                   ),
                                                   Expanded(
                                                     child: Container(
                                                       child: Text(
-                                                        "${productsList[index].purchaseOrderQty ??0}",textAlign: TextAlign.center,),
+                                                        "${displayProductsList[index].purchaseOrderQty ??0}",textAlign: TextAlign.center,),
                                                     ),
                                                     flex: 1,
                                                   ),
                                                   Expanded(
                                                     child: Container(
                                                       child: Text(
-                                                        "${productsList[index].purchaseQty ?? 0}",textAlign: TextAlign.center,),
+                                                        "${displayProductsList[index].purchaseQty ?? 0}",textAlign: TextAlign.center,),
                                                     ),
                                                     flex: 1,
                                                   ),
@@ -811,43 +868,28 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                                   Expanded(
                                                     child: Container(
                                                       child: Text(
-                                                        "${productsList[index].employee ?? "-"}",textAlign: TextAlign.start,),
+                                                        "${displayProductsList[index].employee ?? "-"}",textAlign: TextAlign.start,),
                                                     ),
                                                     flex: 1,
                                                   ),
                                                   Expanded(
                                                     child: Container(
                                                       child: Text(
-                                                        "${productsList[index].purchasedQty ?? 0}",textAlign: TextAlign.center,),
+                                                        "${displayProductsList[index].purchasedQty ?? 0}",textAlign: TextAlign.center,),
                                                     ),
                                                     flex: 1,
                                                   ),
                                                   Expanded(
                                                     child: Container(
                                                       child: Text(
-                                                        "${productsList[index].amountSpent ??0}",textAlign: TextAlign.center,),
+                                                        "${displayProductsList[index].amountSpent ??0}",textAlign: TextAlign.center,),
                                                     ),
                                                     flex: 1,
                                                   ),
                                                   Expanded(
                                                     child: Container(
                                                       child: Text(
-                                                        "${productsList[index].deliveredQty ??0}",textAlign: TextAlign.center,),
-                                                    ),
-                                                    flex: 1,
-                                                  ),
-
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                        "${productsList[index].actualExcessQty ?? 0}",textAlign: TextAlign.center,),
-                                                    ),
-                                                    flex: 1,
-                                                  ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: Text(
-                                                        "${productsList[index].EODExcess ?? 0}",textAlign: TextAlign.center,),
+                                                        "${displayProductsList[index].deliveredQty ??0}",textAlign: TextAlign.center,),
                                                     ),
                                                     flex: 1,
                                                   ),
@@ -855,21 +897,36 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                                   Expanded(
                                                     child: Container(
                                                       child: Text(
-                                                        "${productsList[index].returnQty ?? 0}",textAlign: TextAlign.center,),
+                                                        "${displayProductsList[index].actualExcessQty ?? 0}",textAlign: TextAlign.center,),
                                                     ),
                                                     flex: 1,
                                                   ),
                                                   Expanded(
                                                     child: Container(
                                                       child: Text(
-                                                        "${productsList[index].invoiceAmount ?? 0}",textAlign: TextAlign.center,),
+                                                        "${displayProductsList[index].EODExcess ?? 0}",textAlign: TextAlign.center,),
+                                                    ),
+                                                    flex: 1,
+                                                  ),
+
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                        "${displayProductsList[index].returnQty ?? 0}",textAlign: TextAlign.center,),
                                                     ),
                                                     flex: 1,
                                                   ),
                                                   Expanded(
                                                     child: Container(
                                                       child: Text(
-                                                        "${productsList[index].remarks ?? "-"}",textAlign: TextAlign.center,),
+                                                        "${displayProductsList[index].invoiceAmount ?? 0}",textAlign: TextAlign.center,),
+                                                    ),
+                                                    flex: 1,
+                                                  ),
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: Text(
+                                                        "${displayProductsList[index].remarks ?? "-"}",textAlign: TextAlign.center,),
                                                     ),
                                                     flex: 1,
                                                   ),
@@ -877,7 +934,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                                     child: InkWellMouseRegion(
                                                       child: Icon(Icons.edit,color: Colors.lightBlue[900],),
                                                       onTap: (){
-                                                        showEditProductAlertDialog(context, productsList[index]);
+                                                        showEditProductAlertDialog(context, displayProductsList[index]);
                                                       },
                                                     ),
                                                     flex: 1,
@@ -1303,6 +1360,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                       isAlwaysShown: true,
                       controller: _scrollController,
                       child: ListView(
+                        controller: _scrollController,
                         reverse: false,
                         shrinkWrap: true,
                         padding: EdgeInsets.only(left: 5, right: 5),
@@ -1660,7 +1718,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
     _remarksController.text = "";
   }
 
-  showDeleteproductAlert(BuildContext contxt, Product product) {
+  showCancelOrderAlert(BuildContext contxt) {
     return showDialog(
         context: contxt,
         builder: (BuildContext context) {
@@ -1677,9 +1735,27 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Text(
-                    "Delete ${product.product} ?",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            "Cancel ${widget.order.name} ?",
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700,color: Colors.lightBlue[900]),
+                          ),
+                        ),
+                      ),
+                      HandCursor(
+                        child: GestureDetector(
+                          child: Icon(Icons.cancel,color: Colors.red,),
+                          onTap: () async {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      )
+
+                    ],
                   ),
                   Padding(
                     padding: EdgeInsets.all(20),
@@ -1689,7 +1765,79 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                     // height: double.infinity,
                     child: RaisedButton(
                       child: Text(
-                        "Delete",
+                        "Cancel",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w700),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(5.0),
+                      ),
+                      color: Colors.blue[900],
+                      padding: EdgeInsets.only(top: 15, bottom: 15),
+                      onPressed: () async {
+                        Navigator.pop(contxt);
+                        await widget.repository.cancelOrder(widget.order);
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+  showCompleteOrderAlert(BuildContext contxt) {
+    return showDialog(
+        context: contxt,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            contentPadding: EdgeInsets.only(top: 10.0),
+            content: Container(
+              width: 500.0,
+              padding:
+              EdgeInsets.only(top: 10, right: 15, bottom: 10, left: 15),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            "Complete ${widget.order.name} ?",
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700,color: Colors.lightBlue[900]),
+                          ),
+                        ),
+                      ),
+                      HandCursor(
+                        child: GestureDetector(
+                          child: Icon(Icons.cancel,color: Colors.red,),
+                          onTap: () async {
+                            Navigator.pop(context);
+                            await widget.repository.completeOrder(widget.order);
+                          },
+                        ),
+                      )
+
+                    ],
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    // height: double.infinity,
+                    child: RaisedButton(
+                      child: Text(
+                        "Completed",
                         style: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.w700),
                       ),
@@ -1700,7 +1848,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                       padding: EdgeInsets.only(top: 15, bottom: 15),
                       onPressed: () {
                         Navigator.pop(contxt);
-                        deleteProduct(product.id);
+                        widget.repository.completeOrder(widget.order);
                       },
                     ),
                   ),
@@ -1767,6 +1915,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                     controller: _scrollController,
                     child: ListView(
                       reverse: false,
+                      controller: _scrollController,
                       shrinkWrap: true,
                       padding: EdgeInsets.only(left: 5, right: 5),
                       children: <Widget>[
@@ -2205,5 +2354,26 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
         ],
       );
     }
+  }
+
+  void onSearchTextChanged(String text) {
+    List<Product> tempProductsData=List();
+    displayProductsList.clear();
+    if (text.isEmpty) {
+      tempProductsData.addAll(productsList);
+    }else{
+      print("BLB temp ${text} in products ${productsList.length}");
+      productsList.forEach((product) {
+        print("BLB ${product.product.toLowerCase()} ${text.toLowerCase()}");
+        if (product.product.toLowerCase().contains(text.toLowerCase())){
+          tempProductsData.add(product);
+        }
+      });
+    }
+    print("BLB temp ${tempProductsData.length}");
+    setState(() {
+      _showSearchClearIcon=text.isNotEmpty;
+      displayProductsList.addAll(tempProductsData);
+    });
   }
 }

@@ -191,7 +191,7 @@ class _IndentScreenState extends State<IndentScreen>{
                                     Order order=orderList[index];
                                     var format = DateFormat('dd-MMM-yyy hh:mm a');
                                     var createdDate=format.format(order.createdDate);
-                                    var orderDate=format.format(order.date);
+                                    var orderDate=dateFormat.format(order.date);
                                     return InkWellMouseRegion(
                                       child: Container(
                                         padding: EdgeInsets.only(top: 15,bottom: 15,left: 5),

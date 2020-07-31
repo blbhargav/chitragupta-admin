@@ -722,4 +722,16 @@ class Repository {
         .document(data.id)
         .setData(data.toJson());
   }
+  cancelOrder(Order order) async {
+    return await databaseReference
+        .collection('Orders')
+        .document(order.orderId)
+        .updateData({"status":-1});
+  }
+  completeOrder(Order order) async {
+    return await databaseReference
+        .collection('Orders')
+        .document(order.orderId)
+        .updateData({"status":0});
+  }
 }
