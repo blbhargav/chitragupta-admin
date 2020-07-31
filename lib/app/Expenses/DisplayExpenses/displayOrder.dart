@@ -813,7 +813,6 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                             child: ListView.separated(
                                 controller: _scrollController,
                                 shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
                                 separatorBuilder:
                                     (BuildContext context, int index) {
                                   return Container(
