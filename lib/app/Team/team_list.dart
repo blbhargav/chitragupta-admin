@@ -566,6 +566,7 @@ class _TeamListPageState extends State<TeamListPage> {
 
     var index=cityNames.indexWhere((note) => note.startsWith(selectedCity));
     City city=cityList[index];
+
     if(title.contains("Edit")){
       _bloc.add(EditTeamMembersEvent(
           name: _nameController.text,

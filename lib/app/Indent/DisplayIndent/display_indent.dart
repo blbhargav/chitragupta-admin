@@ -59,7 +59,7 @@ class _DisplayIndentState extends State<DisplayIndent>{
 
   List<int> _selectedFile;
   Uint8List _bytesData;
-
+ScrollController _scrollController=ScrollController();
 
   @override
   void initState() {
@@ -76,6 +76,7 @@ class _DisplayIndentState extends State<DisplayIndent>{
     _productController.dispose();
     _purchaseOrderQtyController.dispose();
     _purchaseQtyController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -197,110 +198,115 @@ class _DisplayIndentState extends State<DisplayIndent>{
                         child: Container(
                           margin: EdgeInsets.only(top: 3,left: 2,right: 2),
                           padding: EdgeInsets.all(5),
-                          child: ListView.separated(
-                            shrinkWrap: true,
-                            separatorBuilder: (BuildContext context, int index) {
-                              return Padding(
-                                child: Divider(thickness: 1,),
-                                padding: EdgeInsets.only(top: 5, bottom: 5),
-                              );
-                            },
-                            itemCount: indentList.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              Product indentProduct=indentList[index];
-                              var format = DateFormat('dd-MMM-yyy hh:mm a');
+                          child: Scrollbar(
+                            isAlwaysShown: true,
+                            controller: _scrollController,
+                            child: ListView.separated(
+                              shrinkWrap: true,
+                              controller: _scrollController,
+                              separatorBuilder: (BuildContext context, int index) {
+                                return Padding(
+                                  child: Divider(thickness: 1,),
+                                  padding: EdgeInsets.only(top: 5, bottom: 5),
+                                );
+                              },
+                              itemCount: indentList.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                Product indentProduct=indentList[index];
+                                var format = DateFormat('dd-MMM-yyy hh:mm a');
 //                              var createdDate=format.format(order.createdDate);
 //                              var orderDate=format.format(order.date);
-                              return InkWellMouseRegion(
-                                child: Container(
-                                  padding: EdgeInsets.only(top: 15,bottom: 15,left: 5),
-                                  color: Colors.white,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: Text("${index+1}",textAlign:TextAlign.center ,
-                                          style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
-                                        flex: 1,
-                                      ),
-                                      Padding(padding: EdgeInsets.all(5),),
-                                      Expanded(
-                                        child: Text("${indentProduct.product}",textAlign:TextAlign.start ,
-                                          style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
-                                        flex: 4,
-                                      ),
-                                      Padding(padding: EdgeInsets.all(5),),
-                                      Expanded(
-                                        child: Text("${indentProduct.purchaseOrderQty}",textAlign:TextAlign.center ,
-                                          style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
-                                        flex: 2,
-                                      ),
-                                      Padding(padding: EdgeInsets.all(5),),
-                                      Expanded(
-                                        child: Text("${indentProduct.purchaseQty}",textAlign:TextAlign.center ,
-                                          style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
-                                        flex: 2,
-                                      ),
-                                      Padding(padding: EdgeInsets.all(5),),
-                                      Expanded(
-                                        child: (indentProduct.employee!=null)?Text("${indentProduct.employee}",
-                                          textAlign:TextAlign.start,
-                                          style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),
-                                        ):Container(
-                                          child: DropdownSearch<Member>(
-                                            items: employeeList,
-                                            itemAsString: (Member p) => p.name,
-                                            maxHeight: 300,
-                                            isFilteredOnline: false,
-                                            //onFind: (String filter) => getData(filter),
-                                            label: "Select Employee",
-                                            onChanged: (val){
-                                              indentProduct.employee=val.name;
-                                              indentProduct.employeeId=val.uid;
-                                              _indentBloc.add(UpdateIndentProductsEvent(product: indentProduct));
-                                            },
-                                            showSearchBox: true,
-                                          ),
-                                          padding: EdgeInsets.only(left: 5,right: 5),
+                                return InkWellMouseRegion(
+                                  child: Container(
+                                    padding: EdgeInsets.only(top: 15,bottom: 15,left: 5),
+                                    color: Colors.white,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: Text("${index+1}",textAlign:TextAlign.center ,
+                                            style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
+                                          flex: 1,
                                         ),
-                                        flex: 3,
-                                      ),
+                                        Padding(padding: EdgeInsets.all(5),),
+                                        Expanded(
+                                          child: Text("${indentProduct.product}",textAlign:TextAlign.start ,
+                                            style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
+                                          flex: 4,
+                                        ),
+                                        Padding(padding: EdgeInsets.all(5),),
+                                        Expanded(
+                                          child: Text("${indentProduct.purchaseOrderQty}",textAlign:TextAlign.center ,
+                                            style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
+                                          flex: 2,
+                                        ),
+                                        Padding(padding: EdgeInsets.all(5),),
+                                        Expanded(
+                                          child: Text("${indentProduct.purchaseQty}",textAlign:TextAlign.center ,
+                                            style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),),
+                                          flex: 2,
+                                        ),
+                                        Padding(padding: EdgeInsets.all(5),),
+                                        Expanded(
+                                          child: (indentProduct.employee!=null)?Text("${indentProduct.employee}",
+                                            textAlign:TextAlign.start,
+                                            style: TextStyle(color: Colors.black,fontSize:16,fontWeight: FontWeight.w400),
+                                          ):Container(
+                                            child: DropdownSearch<Member>(
+                                              items: employeeList,
+                                              itemAsString: (Member p) => p.name,
+                                              maxHeight: 300,
+                                              isFilteredOnline: false,
+                                              //onFind: (String filter) => getData(filter),
+                                              label: "Select Employee",
+                                              onChanged: (val){
+                                                indentProduct.employee=val.name;
+                                                indentProduct.employeeId=val.uid;
+                                                _indentBloc.add(UpdateIndentProductsEvent(product: indentProduct));
+                                              },
+                                              showSearchBox: true,
+                                            ),
+                                            padding: EdgeInsets.only(left: 5,right: 5),
+                                          ),
+                                          flex: 3,
+                                        ),
 //                                      Expanded(
 //                                        child: Center(
 //                                          child: Text("Action",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
 //                                        ),
 //                                        flex: 2,
 //                                      ),
-                                      Padding(padding: EdgeInsets.all(5),),
-                                      Expanded(
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            InkWellMouseRegion(
-                                              child: Icon(Icons.edit,color: Colors.black,),
-                                              onTap: (){
-                                                resetForm();
-                                                showEditIndentAlertDialog(context,indentProduct);
-                                              },
-                                            ),
-                                            InkWellMouseRegion(
-                                              child: Icon(Icons.delete,color: Colors.red,),
-                                              onTap: (){
-                                                showDeleteProductDialog(context,indentProduct);
-                                              },
-                                            )
-                                          ],
+                                        Padding(padding: EdgeInsets.all(5),),
+                                        Expanded(
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              InkWellMouseRegion(
+                                                child: Icon(Icons.edit,color: Colors.black,),
+                                                onTap: (){
+                                                  resetForm();
+                                                  showEditIndentAlertDialog(context,indentProduct);
+                                                },
+                                              ),
+                                              InkWellMouseRegion(
+                                                child: Icon(Icons.delete,color: Colors.red,),
+                                                onTap: (){
+                                                  showDeleteProductDialog(context,indentProduct);
+                                                },
+                                              )
+                                            ],
+                                          ),
+                                          flex: 2,
                                         ),
-                                        flex: 2,
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                onTap: (){
-                                },
-                              );
-                            },
+                                  onTap: (){
+                                  },
+                                );
+                              },
+                            ),
                           ),
                         ),
                       )

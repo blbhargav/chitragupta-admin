@@ -14,15 +14,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 /// id : ""
 
 class Product {
-  int ourQty;
-  int deliveredQty;
-  int purchasedQty;
-  int actualExcessQty;
-  int EODExcess;
-  int amountSpent;
-  int returnQty;
-  int invoiceAmount;
-  int paid;
+  int deliveredQty=0;
+  int purchasedQty=0;
+  int actualExcessQty=0;
+  int EODExcess=0;
+  int amountSpent=0;
+  int returnQty=0;
+  int invoiceAmount=0;
   String remarks;
 
   String id;
@@ -34,10 +32,10 @@ class Product {
   int createdDate;
   String employee;
   String employeeId;
-  int purchaseOrderQty;
-  int purchaseQty;
+  int purchaseOrderQty=0;
+  int purchaseQty=0;
 
-  Product({this.ourQty, this.deliveredQty, this.purchasedQty, this.actualExcessQty, this.EODExcess, this.amountSpent,
+  Product({this.deliveredQty, this.purchasedQty, this.actualExcessQty, this.EODExcess, this.amountSpent,
     this.returnQty, this.invoiceAmount, this.remarks, this.id,this.orderId,this.purchaseQty,this.purchaseOrderQty,this.categoryId,this.createdDate});
 
   Product.fromSnapshot({DocumentSnapshot snapshot}) {
@@ -64,7 +62,6 @@ class Product {
 
   Map<String, dynamic> toMap() {
     var map = new Map<String, dynamic>();
-    map["ourQty"] = ourQty;
     map["usedQty"] = deliveredQty;
     map["purchasedQty"] = purchasedQty;
     map["actualExcessQty"] = actualExcessQty;
@@ -82,6 +79,7 @@ class Product {
       "product":product,
       "productId":productId,
       "purchaseQty":purchaseQty,
+      "purchasedQty":purchasedQty,
       "purchaseOrderQty":purchaseOrderQty,
       "employeeId":employeeId,
       "employee":employee,
@@ -94,7 +92,9 @@ class Product {
       "invoiceAmount":invoiceAmount,
       "remarks":remarks,
       "createdDate":createdDate,
-      "id":id
+      "id":id,
+      "amountSpent":amountSpent,
+      "invoiceAmount":invoiceAmount
     };
   }
 

@@ -19,19 +19,16 @@ class dashBoardScreen extends StatefulWidget {
       : repository = repository ?? Repository();
 
   @override
-  _dashBoardScreenState createState() => _dashBoardScreenState(repository);
+  _dashBoardScreenState createState() => _dashBoardScreenState();
 }
 
 class _dashBoardScreenState extends State<dashBoardScreen>
     with TickerProviderStateMixin {
-  _dashBoardScreenState(Repository repository)
-      : repository = repository ?? Repository();
 
   String userName = "Hi Guest";
   String currency = "₹", noDataTV = "";
   StreamSubscription _subscriptionTodo;
   bool _laoding = true;
-  Repository repository;
 
   String _createOrderErrorTV = null,_createNameErrorTV = null;
 
@@ -64,7 +61,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
         .format(DateTime(now.year, now.month, now.day + 2));
     _orderNameController.text="Super Daily";
     _orderDateController.addListener(dateValidator());
-    repository.getRecentOrdersOrders().listen((event) {
+    widget.repository.getRecentOrdersOrders().listen((event) {
       List<Order> tempMonthOrdersList = new List();
       if (event.documents.length > 0) {
         event.documents.forEach((element) {
@@ -77,7 +74,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
       });
     });
 
-    repository.getTodayOrders().listen((event) {
+    widget.repository.getTodayOrders().listen((event) {
       List<Order> tempMonthOrdersList = new List();
       int spentToday=0,earnedToday=0;
       if (event.documents.length > 0) {
@@ -109,7 +106,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
       });
     });
 
-    repository.getThisMonthOrdersOrders().listen((event) {
+    widget.repository.getThisMonthOrdersOrders().listen((event) {
       List<Order> tempMonthOrdersList = new List();
       int spentMonthly=0,earnedMonthly=0;
       if (event.documents.length > 0) {
@@ -1203,7 +1200,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
   void addTransactionPage() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AddOrderScreen(repository)),
+      MaterialPageRoute(builder: (context) => AddOrderScreen(widget.repository)),
     );
   }
 
@@ -1333,7 +1330,7 @@ class _dashBoardScreenState extends State<dashBoardScreen>
       setState(() {
         _laoding = false;
       });
-      repository.createOrder(date,_orderNameController.text);
+      widget.repository.createOrder(date,_orderNameController.text);
     }
   }
 }

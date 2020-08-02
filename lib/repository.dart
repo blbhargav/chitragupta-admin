@@ -118,6 +118,8 @@ class Repository {
       "name": name,
       "amountEarned":0,
       "amountSpent":0,
+      "totalItems":0,
+      "procuredItems":0,
       "status": 1
     };
     var docId =
@@ -522,6 +524,8 @@ class Repository {
       "customerID":customer.customerID,
       "amountEarned":0,
       "amountSpent":0,
+      "totalItems":0,
+      "procuredItems":0,
       "status": 1
     };
 
@@ -684,6 +688,7 @@ class Repository {
 
   //add indent
   addIndentProduct(Product indent)async{
+    await databaseReference.collection("Orders").document(indent.orderId).updateData({"totalItems":FieldValue.increment(1)});
     return await databaseReference
         .collection('Orders')
         .document(indent.orderId)
@@ -707,15 +712,16 @@ class Repository {
     }
     return indentList;
   }
-  removeProductFromOrder(String orderId, String productId) {
-    return databaseReference
+  removeProductFromOrder(String orderId, String productId) async{
+    await databaseReference.collection("Orders").document(orderId).updateData({"totalItems":FieldValue.increment(-1)});
+    return await databaseReference
         .collection('Orders')
         .document(orderId)
         .collection("products")
         .document(productId).delete();
   }
-  updateProductInOrder(String orderId, Product data) {
-    return databaseReference
+  updateProductInOrder(String orderId, Product data) async{
+    return await databaseReference
         .collection('Orders')
         .document(orderId)
         .collection("products")

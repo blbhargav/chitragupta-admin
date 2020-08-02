@@ -58,6 +58,7 @@ class City {
     map["city"] = _city;
     map["state"] = _state;
     map["status"] = _status;
+    map["cityID"]=_cityID;
     return map;
   }
 
