@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:chitragupta/Invoice/invoice.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/models/Order.dart';
@@ -10,12 +12,18 @@ import 'package:chitragupta/repository.dart';
 import 'package:chitragupta/extension/util.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:chitragupta/models/ExtraData.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'dart:html' as html;
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 import '../../../login.dart';
 
@@ -49,15 +57,12 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   final _extraEarnedValueController = TextEditingController();
 
   final ScrollController _scrollController=ScrollController();
-  TextEditingController _spareSearchControllers = TextEditingController();
+  TextEditingController _productSearchControllers = TextEditingController();
 
-  String _extraDataKeyErrorTV = null, _extraDataValueErrorTV = null;
-  String _extraSpentKeyErrorTV = null, _extraSpentValueErrorTV = null;
-  String _extraEarnedKeyErrorTV = null, _extraEarnedValueErrorTV = null;
+  String _extraDataKeyErrorTV, _extraDataValueErrorTV;
+  String _extraSpentKeyErrorTV, _extraSpentValueErrorTV;
+  String _extraEarnedKeyErrorTV, _extraEarnedValueErrorTV;
 
-  TextEditingController _descriptionController = new TextEditingController();
-  TextEditingController _poQtyController = new TextEditingController();
-  TextEditingController _ourQtyController = new TextEditingController();
   TextEditingController _deliveredQtyController = new TextEditingController();
   TextEditingController _purchasedQtyController = new TextEditingController();
   TextEditingController _actualExcessQtyController = new TextEditingController();
@@ -67,7 +72,25 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   TextEditingController _invoiceAmountController = new TextEditingController();
   TextEditingController _remarksController = new TextEditingController();
 
-  String _descriptionErrorTv = null, _poQtyErrorTv = null;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _extraDataKeyController.dispose();
+    _extraDataValueController.dispose();
+    _extraSpentKeyController.dispose();
+    _extraSpentValueController.dispose();
+    _productSearchControllers.dispose();
+    _deliveredQtyController.dispose();
+    _purchasedQtyController.dispose();
+    _actualExcessQtyController.dispose();
+    _EODExcessController.dispose();
+    _amountSpentController.dispose();
+    _returnQtyController.dispose();
+    _invoiceAmountController.dispose();
+    _remarksController.dispose();
+    super.dispose();
+  }
 
   List<Color> saveGradient = [
     Color(0xFF0EDED2),
@@ -81,6 +104,8 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
     initScreen();
   }
 
+
+
   List<ExtraData> extraData = new List();
   List<ExtraData> extraSpent = new List();
   List<ExtraData> extraEarned = new List();
@@ -88,17 +113,6 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   final List<Product> productsList = new List();
   List<Product> displayProductsList = new List();
   List<Member> membersList = new List();
-  String member1Name="-",member2Name="-",member3Name="-",member4Name="-";
-  int member1Amount=0,member2Amount=0,member3Amount=0,member4Amount=0;
-
-  List<int> _selectedFile;
-  Uint8List _bytesData;
-  void _handleResult(Object result) {
-    setState(() {
-      _bytesData = Base64Decoder().convert(result.toString().split(",").last);
-      _selectedFile = _bytesData;
-    });
-  }
 
   void initScreen() {
     repository.getOrder(widget.order.orderId).listen((_event) {
@@ -164,11 +178,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
     });
   }
 
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -381,8 +391,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                                                     children: <Widget>[
                                                       Flexible(
                                                           child: Text(
-                                                            extraData[index]
-                                                                .name,
+                                                            extraData[index].name,
                                                             style: TextStyle(
                                                                 color: Colors
                                                                     .black54),
@@ -613,13 +622,13 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               child: ListTile(
                                 leading: Icon(Icons.search),
                                 title: TextField(
-                                  controller: _spareSearchControllers,
+                                  controller: _productSearchControllers,
                                   decoration: InputDecoration(
                                       hintText: 'Search Product', border: InputBorder.none),
                                   onChanged: onSearchTextChanged,
                                 ),
                                 trailing: _showSearchClearIcon? IconButton(icon:  Icon(Icons.cancel), onPressed: () {
-                                  _spareSearchControllers.clear();
+                                  _productSearchControllers.clear();
                                   onSearchTextChanged('');
                                 },):null,
                               ),
@@ -645,7 +654,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                             RaisedButton(
                               child: Text("Invoice"),
                               onPressed: (){
-
+                                showInvoicePreview(context);
                               },
                             ),
                           ],
@@ -1853,9 +1862,6 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
     setState(() {
       _loading = false;
     });
-    _descriptionController.text = "";
-    _poQtyController.text = "";
-    _ourQtyController.text = "";
     _deliveredQtyController.text = "";
     _purchasedQtyController.text = "";
     _actualExcessQtyController.text = "";
@@ -1994,5 +2000,80 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
       _showSearchClearIcon=text.isNotEmpty;
       displayProductsList.addAll(tempProductsData);
     });
+  }
+
+
+  void _printDocument() {
+    Printing.layoutPdf(
+      onLayout: (PdfPageFormat format){
+        return generateInvoice(format);
+      },
+    );
+  }
+
+  showInvoicePreview(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          final actions = <PdfPreviewAction>[
+            if (!kIsWeb)
+              PdfPreviewAction(
+                icon: const Icon(Icons.save),
+                onPressed: _saveAsFile,
+              )
+          ];
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            contentPadding: EdgeInsets.only(top: 10.0),
+            content: Container(
+              width: MediaQuery.of(context).size.width/0.9,
+              padding:
+              EdgeInsets.only(top: 10, right: 15, bottom: 10, left: 15),
+              child: PdfPreview(
+                maxPageWidth: MediaQuery.of(context).size.width/0.9,
+                build: generateInvoice,
+                actions: actions,
+                onPrinted: _showPrintedToast,
+                onShared: _showSharedToast,
+              ),
+            ),
+          );
+        });
+  }
+  void _showPrintedToast(BuildContext context) {
+    final ScaffoldState scaffold = Scaffold.of(context);
+
+    scaffold.showSnackBar(
+      const SnackBar(
+        content: Text('Document printed successfully'),
+      ),
+    );
+  }
+
+  void _showSharedToast(BuildContext context) {
+    final ScaffoldState scaffold = Scaffold.of(context);
+
+    scaffold.showSnackBar(
+      const SnackBar(
+        content: Text('Document shared successfully'),
+      ),
+    );
+  }
+
+
+  Future<void> _saveAsFile(
+      BuildContext context,
+      LayoutCallback build,
+      PdfPageFormat pageFormat,
+      ) async {
+    final Uint8List bytes = await build(pageFormat);
+
+    final Directory appDocDir = await getApplicationDocumentsDirectory();
+    final String appDocPath = appDocDir.path;
+    final File file = File(appDocPath + '/' + 'document.pdf');
+    print('Save as file ${file.path} ...');
+    await file.writeAsBytes(bytes);
+    OpenFile.open(file.path);
   }
 }
