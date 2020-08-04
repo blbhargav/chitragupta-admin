@@ -1,4 +1,5 @@
 import 'package:chitragupta/app/Team/team_bloc.dart';
+import 'package:chitragupta/extension/Constants.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/extension/util.dart';
@@ -42,7 +43,8 @@ class _TeamListPageState extends State<TeamListPage> {
   void initState() {
     _bloc=TeamBloc(repository: widget.repository);
     _bloc.add(FetchTeamMembersEvent());
-    _bloc.add(FetchCitiesEvent());
+    if(Repository.user.type==Constants.superAdmin)
+      _bloc.add(FetchCitiesEvent());
     super.initState();
   }
   @override
@@ -73,7 +75,6 @@ class _TeamListPageState extends State<TeamListPage> {
                 _loading=false;
               }else if(state is LoadTeamMembersState){
                 teamList=state.teamList;
-                print("BLB team ${teamList.length}");
               }else if(state is AddingSuccessState){
                 _bloc.add(FetchTeamMembersEvent());
               }else if(state is AddingFailedState){
@@ -434,7 +435,7 @@ class _TeamListPageState extends State<TeamListPage> {
                       ),
                     ),
                   ),
-                  Container(
+                  (Repository.user.type==Constants.superAdmin)?Container(
                     child: HandCursor(
                       child: DropdownButton<String>(
                         isExpanded: true,
@@ -455,7 +456,7 @@ class _TeamListPageState extends State<TeamListPage> {
                     ),
                     padding: EdgeInsets.only(left: 5,right: 5,top: 5,bottom: 0),
                     margin: EdgeInsets.only(bottom: 10,left: 5,right: 5),
-                  ),
+                  ):Container(),
                   Container(
                     margin: EdgeInsets.only(top: 10, bottom: 10),
                     padding: EdgeInsets.only(left: 10, right: 10),
@@ -552,7 +553,7 @@ class _TeamListPageState extends State<TeamListPage> {
       return;
     }
 
-    if(selectedCity=="Select City"){
+    if((Repository.user.type==Constants.superAdmin) && selectedCity=="Select City"){
       _commonError="Please select city";
       showAlertDialog(context,null);
       return;
@@ -564,32 +565,44 @@ class _TeamListPageState extends State<TeamListPage> {
       return;
     }
 
-    var index=cityNames.indexWhere((note) => note.startsWith(selectedCity));
-    City city=cityList[index];
+    if((Repository.user.type==Constants.superAdmin)){
+      if(selectedCity=="Select City"){
+        _commonError=error;
+        showAlertDialog(context,null);
+        return;
+      }
+      var index=cityNames.indexWhere((note) => note.startsWith(selectedCity));
+      City city=cityList[index];
+      sendDataToDB(city.city,city.cityID,city.state);
+    }else {
+      sendDataToDB(Repository.user.city,Repository.user.cityID,Repository.user.state);
+    }
+  }
 
+  void sendDataToDB(String cityName, String cityID,String state){
     if(title.contains("Edit")){
       _bloc.add(EditTeamMembersEvent(
-          name: _nameController.text,
-          mobile: _mobileController.text,
-          email: _emailController.text,
-          address: _addressController.text,
-          city: city.city,
-          state: city.state,
-          cityID: city.cityID,
+        name: _nameController.text,
+        mobile: _mobileController.text,
+        email: _emailController.text,
+        address: _addressController.text,
+        city: cityName,
+        state: state,
+        cityID: cityID,
         userID: editCustomerID,
 
       ));
     }else
-    _bloc.add(AddMemberEvent(
-      name: _nameController.text,
-      mobile: _mobileController.text,
-      email: _emailController.text,
-      address: _addressController.text,
-      city: city.city,
-      state: city.state,
-      cityID: city.cityID,
-        type: selectedRole
-    ));
+      _bloc.add(AddMemberEvent(
+          name: _nameController.text,
+          mobile: _mobileController.text,
+          email: _emailController.text,
+          address: _addressController.text,
+          city: cityName,
+          state: state,
+          cityID: cityID,
+          type: selectedRole
+      ));
   }
 
   void resetForm(){

@@ -1,4 +1,5 @@
 import 'package:chitragupta/app/Customers/customers_bloc.dart';
+import 'package:chitragupta/extension/Constants.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/extension/util.dart';
@@ -40,7 +41,8 @@ class _CustomersListPageState extends State<CustomersListPage> {
   void initState() {
     _bloc=CustomersBloc(repository: widget.repository);
     _bloc.add(FetchCustomersEvent());
-    _bloc.add(FetchCitiesEvent());
+    if(Repository.user.type==Constants.superAdmin)
+      _bloc.add(FetchCitiesEvent());
     super.initState();
   }
   @override
@@ -354,6 +356,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
                     child: new TextField(
                       controller: this._mobileController,
                       textCapitalization: TextCapitalization.words,
+                      maxLength: 10,
                       decoration: InputDecoration(
                         labelText: "Mobile",
                         prefixIcon: Icon(Icons.mobile_screen_share),
@@ -386,7 +389,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
                       ),
                     ),
                   ),
-                  Container(
+                  (Repository.user.type==Constants.superAdmin)?Container(
                     child: HandCursor(
                       child: DropdownButton<String>(
                         isExpanded: true,
@@ -407,7 +410,7 @@ class _CustomersListPageState extends State<CustomersListPage> {
                     ),
                     padding: EdgeInsets.only(left: 5,right: 5,top: 5,bottom: 0),
                     margin: EdgeInsets.only(bottom: 10,left: 5,right: 5),
-                  ),
+                  ):Container(),
                   Container(
                     margin: EdgeInsets.only(top: 10, bottom: 10),
                     padding: EdgeInsets.only(left: 10, right: 10),
@@ -504,34 +507,43 @@ class _CustomersListPageState extends State<CustomersListPage> {
       return;
     }
 
-    if(selectedCity=="Select City"){
-      _commonError=error;
-      showAlertDialog(context,null);
-      return;
+    if((Repository.user.type==Constants.superAdmin)){
+      if(selectedCity=="Select City"){
+        _commonError=error;
+        showAlertDialog(context,null);
+        return;
+      }
+      var index=cityNames.indexWhere((note) => note.startsWith(selectedCity));
+      City city=cityList[index];
+      sendDataToDB(city.city,city.cityID,city.state);
+    }else {
+      sendDataToDB(Repository.user.city,Repository.user.cityID,Repository.user.state);
     }
-    var index=cityNames.indexWhere((note) => note.startsWith(selectedCity));
-    City city=cityList[index];
+
+  }
+
+  void sendDataToDB(String cityName, String cityID,String state){
     if(title.contains("Edit")){
       _bloc.add(EditCustomerEvent(
           name: _nameController.text,
           mobile: _mobileController.text,
           email: _emailController.text,
           address: _addressController.text,
-          city: city.city,
-          state: city.state,
-          cityID: city.cityID,
-        customerID: editCustomerID
+          city: cityName,
+          state: state,
+          cityID: cityID,
+          customerID: editCustomerID
       ));
     }else
-    _bloc.add(AddCustomerEvent(
-      name: _nameController.text,
-      mobile: _mobileController.text,
-      email: _emailController.text,
-      address: _addressController.text,
-      city: city.city,
-      state: city.state,
-      cityID: city.cityID
-    ));
+      _bloc.add(AddCustomerEvent(
+          name: _nameController.text,
+          mobile: _mobileController.text,
+          email: _emailController.text,
+          address: _addressController.text,
+        city: cityName,
+        state: state,
+        cityID: cityID,
+      ));
   }
 
   void resetForm(){

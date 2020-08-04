@@ -50,8 +50,11 @@ class _Login extends State<Login> {
   void initState() {
     super.initState();
 
-    _userIdController.text='bhargavbl224@gmail.com';
-    _passwordController.text='Blb@9618794545';
+//    _userIdController.text='bhargavbl224@gmail.com';
+//    _passwordController.text='Blb@9618794545';
+
+    _userIdController.text='bhargav.bl@plexcel.com';
+    _passwordController.text='12345678';
   }
 
   @override

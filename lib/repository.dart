@@ -440,11 +440,11 @@ class Repository {
           .where("adminId",isEqualTo: uid)
           .where("status", isEqualTo: 1)
           .getDocuments();
-      print("BLB super member team ${snapshot.documents.length}");
       if (snapshot.documents.length > 0) {
         snapshot.documents.forEach((element) {
           Member member = Member.fromSnapshot(snapshot: element);
-          tempTeamList.add(member);
+          if(member.uid!=member.adminId)
+            tempTeamList.add(member);
         });
       }
     }else if(user.type==Constants.admin){
@@ -476,7 +476,6 @@ class Repository {
           .where("type",isEqualTo: Constants.employee)
           .where("status", isEqualTo: 1)
           .getDocuments();
-      print("BLB super member team  for city $cityId ${snapshot.documents.length}");
       if (snapshot.documents.length > 0) {
         snapshot.documents.forEach((element) {
           Member member = Member.fromSnapshot(snapshot: element);
@@ -521,6 +520,7 @@ class Repository {
       "name": customer.name,
       "cityID":customer.cityID,
       "city":customer.city,
+      "state":customer.state,
       "customerID":customer.customerID,
       "amountEarned":0,
       "amountSpent":0,
@@ -538,7 +538,7 @@ class Repository {
   Future<List<Order>> getActiveIndents() async{
     List<Order> tempOrdersList=List();
 
-   if(user.type=="SuperAdmin"){
+   if(user.type==Constants.superAdmin){
      var orderSnapshot = await databaseReference
          .collection("Orders")
          .where("status", isEqualTo: 1)
@@ -551,7 +551,7 @@ class Repository {
          tempOrdersList.add(order);
        });
      }
-   }else if(user.type=="Admin"){
+   }else if(user.type==Constants.admin){
      var orderSnapshot=await databaseReference
           .collection("Orders")
           .where("status", isEqualTo: 1)

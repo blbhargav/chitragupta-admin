@@ -2028,10 +2028,9 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
             contentPadding: EdgeInsets.only(top: 10.0),
             content: Container(
               width: MediaQuery.of(context).size.width/0.9,
-              padding:
-              EdgeInsets.only(top: 10, right: 15, bottom: 10, left: 15),
+              padding: EdgeInsets.only(top: 10, right: 15, bottom: 10, left: 15),
               child: PdfPreview(
-                maxPageWidth: MediaQuery.of(context).size.width/0.9,
+                maxPageWidth: 700,
                 build: generateInvoice,
                 actions: actions,
                 onPrinted: _showPrintedToast,
@@ -2062,11 +2061,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   }
 
 
-  Future<void> _saveAsFile(
-      BuildContext context,
-      LayoutCallback build,
-      PdfPageFormat pageFormat,
-      ) async {
+  Future<void> _saveAsFile(BuildContext context, LayoutCallback build, PdfPageFormat pageFormat) async {
     final Uint8List bytes = await build(pageFormat);
 
     final Directory appDocDir = await getApplicationDocumentsDirectory();

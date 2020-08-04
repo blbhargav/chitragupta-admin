@@ -1,4 +1,5 @@
 import 'package:chitragupta/app/category/category_bloc.dart';
+import 'package:chitragupta/extension/Constants.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/models/City.dart';
@@ -34,7 +35,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
   void initState() {
     _bloc=CategoryBloc(repository: widget.repository);
     _bloc.add(FetchCategoriesEvent());
-    _bloc.add(FetchCitiesEvent());
+    if(Repository.user.type==Constants.superAdmin)
+      _bloc.add(FetchCitiesEvent());
     super.initState();
   }
 
@@ -334,7 +336,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                     ),
                   ),
 
-                  Container(
+                  (Repository.user.type==Constants.superAdmin)?Container(
                     child: HandCursor(
                       child: DropdownButton<String>(
                         isExpanded: true,
@@ -355,7 +357,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                     ),
                     padding: EdgeInsets.only(left: 5,right: 5,top: 5,bottom: 0),
                     margin: EdgeInsets.only(bottom: 10,left: 5,right: 5),
-                  ),
+                  ):Container(),
 
                   _commonError.isNotEmpty?Container(
                     child: Center(child: Text("$_commonError",style: TextStyle(color: Colors.red),),),
@@ -399,30 +401,38 @@ class _CategoriesPageState extends State<CategoriesPage> {
       return;
     }
 
-    if(selectedCity=="Select City"){
-      _commonError=error;
-      showAlertDialog(context,null);
-      return;
+    if((Repository.user.type==Constants.superAdmin)){
+      if(selectedCity=="Select City"){
+        _commonError=error;
+        showAlertDialog(context,null);
+        return;
+      }
+      var index=cityNames.indexWhere((note) => note.startsWith(selectedCity));
+      City city=cityList[index];
+      sendDataToDatabase(city.city,city.cityID,city.state);
+    }else {
+      sendDataToDatabase(Repository.user.city,Repository.user.cityID,Repository.user.state);
     }
-    var index=cityNames.indexWhere((note) => note.startsWith(selectedCity));
-    City city=cityList[index];
+
+  }
+
+  void sendDataToDatabase(String cityName, String cityID,String state){
     if(title.contains("Edit")){
       _bloc.add(EditCategoryEvent(
           name: _nameController.text,
-          city: city.city,
-          state: city.state,
-          cityID: city.cityID,
+          city: cityName,
+          state: state,
+          cityID: cityID,
           id: editCategoryID
       ));
     }else{
       _bloc.add(AddCategoryEvent(
           name: _nameController.text,
-          city: city.city,
-          state: city.state,
-          cityID: city.cityID
+          city: cityName,
+          state: state,
+          cityID: cityID,
       ));
     }
-      
   }
 
   showDeleteCategoryDialog(BuildContext contxt, Category category) {
