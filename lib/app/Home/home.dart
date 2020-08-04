@@ -14,6 +14,7 @@ import 'package:chitragupta/app/dashboard.dart';
 import 'package:chitragupta/app/preview_invoice.dart';
 import 'package:chitragupta/app/product/product.dart';
 import 'package:chitragupta/app/settings.dart';
+import 'package:chitragupta/extension/Constants.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/models/Order.dart';
@@ -96,6 +97,8 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
               if(state is HomeInitial){
                 resetColors();
                 pageName="Dashboard";
+                if(Repository.user.type==Constants.admin)
+                  pageName="Dashboard - ${Repository.user.city}";
                 _container=dashBoardScreen(widget.repository);
                 dashboardItemColor=Colors.black;
               }else if(state is ShowIndentState){
