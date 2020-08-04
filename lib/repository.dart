@@ -651,7 +651,7 @@ class Repository {
     return databaseReference.collection("Products").document("${index.data["count"]}").setData(data);
   }
 
-  editProduct(String id,String name,String cityID,String city,String state,String categoryId,String category) async {
+  editProduct(String id,String name,String cityID,String city,String state,String categoryId,String category,int status) async {
     if (uid == null) {
       await getUserId();
     }
@@ -663,19 +663,30 @@ class Repository {
       "state":state,
       "categoryId":categoryId,
       "category":category,
-      "status": 1
+      "status": status
     };
-
-    return databaseReference.collection("Products").document(id).updateData(data);
+    print("BLB product edit ${data}");
+    return await databaseReference.collection("Products").document(id).updateData(data);
   }
 
   Future<List<ProductModel>> getProductsOnce() async{
     List<ProductModel> categoryList=List();
-    var snapshot=await databaseReference
-        .collection("Products")
-        .where("adminId",isEqualTo: user.adminId)
-        .where("status", isEqualTo: 1)
-        .getDocuments();
+    QuerySnapshot snapshot;
+    if(user.type==Constants.superAdmin)
+      snapshot=await databaseReference
+          .collection("Products")
+          .where("adminId",isEqualTo: user.adminId)
+          .where("status", isEqualTo: 1)
+          .orderBy("name",descending: false)
+          .getDocuments();
+    else
+      snapshot=await databaseReference
+          .collection("Products")
+          .where("adminId",isEqualTo: user.adminId)
+          .where("status", isEqualTo: 1)
+          .where("cityID",isEqualTo: user.cityID)
+          .orderBy("name",descending: false)
+          .getDocuments();
 
     if (snapshot.documents.length > 0) {
       snapshot.documents.forEach((element) {

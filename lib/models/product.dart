@@ -6,8 +6,9 @@ class ProductModel {
   String _adminId;
   String _cityID;
   String _city;
+  String _state;
   String _name;
-  int _categoryId;
+  String _categoryId;
   String _category;
 
   int get createdDate => _createdDate;
@@ -15,8 +16,9 @@ class ProductModel {
   String get cityID => _cityID;
   String get name => _name;
   String get city => _city;
+  String get state => _state;
   String get id =>_id;
-  int get categoryId =>_categoryId;
+  String get categoryId =>_categoryId;
   String get category =>_category;
 
   ProductModel({
@@ -43,6 +45,7 @@ class ProductModel {
     _cityID = snapshot.data["cityID"];
     _name = snapshot.data["name"];
     _city = snapshot.data["city"];
+    _state = snapshot.data["state"];
     _categoryId = snapshot.data["categoryId"];
     _category = snapshot.data["category"];
     _id=snapshot.documentID;

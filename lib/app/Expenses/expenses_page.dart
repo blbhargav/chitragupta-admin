@@ -34,7 +34,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>{
 
   List<Order> orderList=List();
 
-
+  var format = DateFormat('dd-MMM-yyy hh:mm a');
   var dateFormat = DateFormat('EEEE, dd-MMM-yyy');
   @override
   void initState() {
@@ -97,7 +97,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>{
                                 flex: 1,
                               ),
                               Expanded(
-                                child: Text("Customer",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
+                                child: Text("Customer",textAlign:TextAlign.start ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
                                 flex: 2,
                               ),
                               Expanded(
@@ -108,12 +108,12 @@ class _ExpensesScreenState extends State<ExpensesScreen>{
                                 child: Text("Created at",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
                                 flex: 1,
                               ),
-                              Expanded(
-                                child: Center(
-                                  child: Text("Action",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
-                                ),
-                                flex: 1,
-                              ),
+//                              Expanded(
+//                                child: Center(
+//                                  child: Text("Action",textAlign:TextAlign.center ,style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
+//                                ),
+//                                flex: 1,
+//                              ),
 //                              Expanded(
 //                                child: InkWell(
 //                                  child: Icon(Icons.delete,color: Colors.red,),
@@ -140,9 +140,8 @@ class _ExpensesScreenState extends State<ExpensesScreen>{
                                   itemCount: orderList.length,
                                   itemBuilder: (BuildContext context, int index) {
                                     Order order=orderList[index];
-                                    var format = DateFormat('dd-MMM-yyy hh:mm a');
                                     var createdDate=format.format(order.createdDate);
-                                    var orderDate=format.format(order.date);
+                                    var orderDate=dateFormat.format(order.date);
                                     return InkWellMouseRegion(
                                       child: Container(
                                         padding: EdgeInsets.only(top: 15,bottom: 15,left: 5),
@@ -157,7 +156,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>{
                                             ),
                                             Expanded(
                                               child: Text("${order.name}",style: TextStyle(color: Colors.black,
-                                                  fontWeight: FontWeight.w400,fontSize: 16),textAlign:TextAlign.center ,),
+                                                  fontWeight: FontWeight.w400,fontSize: 16),textAlign:TextAlign.start ,),
                                               flex: 2,
                                             ),
                                             Expanded(
@@ -170,15 +169,15 @@ class _ExpensesScreenState extends State<ExpensesScreen>{
                                                   fontWeight: FontWeight.w400,fontSize: 16),textAlign:TextAlign.center ,),
                                               flex: 1,
                                             ),
-                                            Expanded(
-                                              child: InkWellMouseRegion(
-                                                child: Icon(Icons.delete,color: Colors.red,),
-                                                onTap: (){
-
-                                                },
-                                              ),
-                                              flex: 1,
-                                            ),
+//                                            Expanded(
+//                                              child: InkWellMouseRegion(
+//                                                child: Icon(Icons.delete,color: Colors.red,),
+//                                                onTap: (){
+//
+//                                                },
+//                                              ),
+//                                              flex: 1,
+//                                            ),
                                           ],
                                         ),
                                       ),

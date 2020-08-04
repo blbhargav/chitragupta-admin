@@ -1,3 +1,4 @@
+import 'package:chitragupta/extension/Constants.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/models/City.dart';
@@ -17,7 +18,7 @@ class ProductsPage extends StatefulWidget {
   _ProductsPageState createState() => _ProductsPageState();
 }
 class _ProductsPageState extends State<ProductsPage> {
-  bool _loading = false,showCity=false;
+  bool _loading = false,showCity=false,_showSearchClearIcon=false;
   ProductBloc _bloc;
   List<City> cityList = new List();
   List<String> cityNames = new List();
@@ -27,14 +28,15 @@ class _ProductsPageState extends State<ProductsPage> {
   List<String> categoryNames = new List();
   String selectedCategory="Select Category";
 
-  List<ProductModel> productsList=List();
+  final List<ProductModel> productsList=List();
+  List<ProductModel> displayProductsList=List();
 
   TextEditingController _nameController = new TextEditingController();
 
   var title="Add Category",_commonError = "";
   var editCategoryID="";
 
-
+  TextEditingController _productSearchControllers = TextEditingController();
 
   @override
   void initState() {
@@ -42,13 +44,16 @@ class _ProductsPageState extends State<ProductsPage> {
     _bloc.add(FetchProductsEvent());
     _bloc.add(ProductInitEvent());
     _bloc.add(FetchCategoriesEvent());
-    _bloc.add(FetchCitiesEvent());
+
+    if(Repository.user.type==Constants.superAdmin)
+      _bloc.add(FetchCitiesEvent());
     super.initState();
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _productSearchControllers.dispose();
     super.dispose();
   }
 
@@ -78,7 +83,8 @@ class _ProductsPageState extends State<ProductsPage> {
                   }else if(state is HideProgressState){
                     _loading=false;
                   }else if(state is LoadProductsState){
-                    productsList=state.productList;
+                    productsList.addAll(state.productList);
+                    displayProductsList=state.productList;
                   }else if(state is AddingSuccessState){
                     _bloc.add(FetchProductsEvent());
                   }
@@ -92,23 +98,52 @@ class _ProductsPageState extends State<ProductsPage> {
 //                  Align(child: Text("Indents",style: TextStyle(color: Colors.lightBlue[900],fontSize: 25,fontWeight: FontWeight.w700),),
 //                    alignment: Alignment.center,),
 
-                            Align(
-                              child: RaisedButton(
-                                hoverColor: Colors.red,
-                                child: Text(
-                                  "+Add Product",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 400,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      width: 1, //
+                                      color: Colors.grey,
+                                    ),
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(
+                                            15.0) //         <--- border radius here
+                                    ),
+                                  ),
+                                  child: ListTile(
+                                    leading: Icon(Icons.search),
+                                    title: TextField(
+                                      controller: _productSearchControllers,
+                                      decoration: InputDecoration(
+                                          hintText: 'Search Product', border: InputBorder.none),
+                                      onChanged: onSearchTextChanged,
+                                    ),
+                                    trailing: _showSearchClearIcon? IconButton(icon:  Icon(Icons.cancel), onPressed: () {
+                                      _productSearchControllers.clear();
+                                      onSearchTextChanged('');
+                                    },):null,
+                                  ),
                                 ),
-                                onPressed: () {
-                                  title="Add Product";
-                                  resetForm();
-                                  showAlertDialog(context,null);
-                                },
-                                color: Colors.lightBlue[900],
-                              ),
-                              alignment: Alignment.topRight,
+                                Spacer(),
+                                RaisedButton(
+                                  hoverColor: Colors.red,
+                                  child: Text(
+                                    "+Add Product",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                  onPressed: () {
+                                    title="Add Product";
+                                    resetForm();
+                                    showAlertDialog(context,null);
+                                  },
+                                  color: Colors.lightBlue[900],
+                                )
+                              ],
                             ),
                             Container(
                               margin: EdgeInsets.only(top: 10),
@@ -129,12 +164,22 @@ class _ProductsPageState extends State<ProductsPage> {
                                   Padding(padding: EdgeInsets.all(5),),
                                   Expanded(
                                     child: Text(
-                                      "Category",
+                                      "Product",
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w600),
                                     ),
                                     flex: 2,
+                                  ),
+                                  Padding(padding: EdgeInsets.all(5),),
+                                  Expanded(
+                                    child: Text(
+                                      "Category",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    flex: 1,
                                   ),
                                   showCity?Expanded(
                                     child: Container(
@@ -155,7 +200,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                           color: Colors.white,
                                           fontWeight: FontWeight.w600),
                                     ),
-                                    flex: 2,
+                                    flex: 1,
                                   ),
                                   Padding(padding: EdgeInsets.all(5),),
                                   Expanded(
@@ -173,74 +218,86 @@ class _ProductsPageState extends State<ProductsPage> {
                               ),
                             ),
 
-                            (productsList.length>0)?Container(
-                              margin: EdgeInsets.only(top: 10,left: 10,right: 10),
-                              child: ListView.separated(
-                                shrinkWrap: true,
-                                separatorBuilder: (BuildContext context, int index) {
-                                  return Padding(
-                                    child: Divider(thickness: 1,),
-                                    padding: EdgeInsets.only(top: 5, bottom: 5),
-                                  );
-                                },
-                                itemCount: productsList.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  ProductModel product=productsList[index];
-                                  var date = new DateTime.fromMillisecondsSinceEpoch(product.createdDate );
-                                  var format = DateFormat('dd-MMM-yyy hh:mm a');
-                                  var createdDate=format.format(date);
-                                  return InkWellMouseRegion(
-                                    child: Container(
-                                      padding: EdgeInsets.only(top: 10,bottom: 10,left: 5,right: 5),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              "${product.id}",
-                                              style: TextStyle(
-                                                  color: Colors.black,fontSize: 16,
-                                                  fontWeight: FontWeight.w400),
-                                            ),
-                                            flex: 1,
-                                          ),
-                                          Padding(padding: EdgeInsets.all(5),),
-                                          Expanded(
-                                            child: Text(
-                                              "${product.name}",
-                                              style: TextStyle(
-                                                  color: Colors.black,fontSize: 16,
-                                                  fontWeight: FontWeight.w400),
-                                            ),
-                                            flex: 2,
-                                          ),
-                                          showCity?Expanded(
-                                            child: Container(
+                            (displayProductsList.length>0)?Expanded(
+                              child: Container(
+                                margin: EdgeInsets.only(top: 10,left: 10,right: 10),
+                                child: ListView.separated(
+                                  shrinkWrap: true,
+                                  separatorBuilder: (BuildContext context, int index) {
+                                    return Padding(
+                                      child: Divider(thickness: 1,),
+                                      padding: EdgeInsets.only(top: 5, bottom: 5),
+                                    );
+                                  },
+                                  itemCount: displayProductsList.length,
+                                  itemBuilder: (BuildContext context, int index) {
+                                    ProductModel product=displayProductsList[index];
+                                    var date = new DateTime.fromMillisecondsSinceEpoch(product.createdDate );
+                                    var format = DateFormat('dd-MMM-yyy hh:mm a');
+                                    var createdDate=format.format(date);
+                                    return InkWellMouseRegion(
+                                      child: Container(
+                                        padding: EdgeInsets.only(top: 10,bottom: 10,left: 5,right: 5),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            Expanded(
                                               child: Text(
-                                                "${product.city}",
+                                                "${product.id}",
                                                 style: TextStyle(
                                                     color: Colors.black,fontSize: 16,
                                                     fontWeight: FontWeight.w400),
                                               ),
-                                              padding: EdgeInsets.only(left: 10,right: 10),
+                                              flex: 1,
                                             ),
-                                            flex: 1,
-                                          ):Container(),
-                                          Expanded(
-                                            child: Text(
-                                              "$createdDate",
-                                              style: TextStyle(
-                                                  color: Colors.black,fontSize: 16,
-                                                  fontWeight: FontWeight.w400),
+
+                                            Padding(padding: EdgeInsets.all(5),),
+                                            Expanded(
+                                              child: Text(
+                                                "${product.name}",
+                                                style: TextStyle(
+                                                    color: Colors.black,fontSize: 16,
+                                                    fontWeight: FontWeight.w400),
+                                              ),
+                                              flex: 2,
                                             ),
-                                            flex: 2,
-                                          ),
-                                          Padding(padding: EdgeInsets.all(5),),
-                                          Expanded(
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
+                                            Padding(padding: EdgeInsets.all(5),),
+                                            Expanded(
+                                              child: Text(
+                                                "${product.category}",
+                                                style: TextStyle(
+                                                    color: Colors.black,fontSize: 16,
+                                                    fontWeight: FontWeight.w400),
+                                              ),
+                                              flex: 1,
+                                            ),
+                                            showCity?Expanded(
+                                              child: Container(
+                                                child: Text(
+                                                  "${product.city}",
+                                                  style: TextStyle(
+                                                      color: Colors.black,fontSize: 16,
+                                                      fontWeight: FontWeight.w400),
+                                                ),
+                                                padding: EdgeInsets.only(left: 10,right: 10),
+                                              ),
+                                              flex: 1,
+                                            ):Container(),
+                                            Expanded(
+                                              child: Text(
+                                                "$createdDate",
+                                                style: TextStyle(
+                                                    color: Colors.black,fontSize: 16,
+                                                    fontWeight: FontWeight.w400),
+                                              ),
+                                              flex: 1,
+                                            ),
+                                            Padding(padding: EdgeInsets.all(5),),
+                                            Expanded(
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
 //                                          InkWellMouseRegion(
 //                                            child: Icon(Icons.edit,color: Colors.black,),
 //                                            onTap: (){
@@ -249,24 +306,25 @@ class _ProductsPageState extends State<ProductsPage> {
 //                                            },
 //                                          ),
 //                                          Padding(padding: EdgeInsets.all(10),),
-                                                InkWellMouseRegion(
-                                                  child: Icon(Icons.delete,color: Colors.red,),
-                                                  onTap: (){
-                                                    showDeleteProductDialog(context,product);
-                                                  },
-                                                )
-                                              ],
+                                                  InkWellMouseRegion(
+                                                    child: Icon(Icons.delete,color: Colors.red,),
+                                                    onTap: (){
+                                                      showDeleteProductDialog(context,product);
+                                                    },
+                                                  )
+                                                ],
+                                              ),
+                                              flex: 1,
                                             ),
-                                            flex: 1,
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    onTap: (){
+                                      onTap: (){
 
-                                    },
-                                  );
-                                },
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
                             ):Expanded(
                               child: Center(child: Text("No Data Found"),),
@@ -502,7 +560,7 @@ class _ProductsPageState extends State<ProductsPage> {
                       Expanded(
                         child: Center(
                           child: Text(
-                            "Delete Category?",
+                            "Delete ${product.name}?",
                             style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w700,
@@ -526,7 +584,7 @@ class _ProductsPageState extends State<ProductsPage> {
                   Container(
                     margin: EdgeInsets.only(top: 30, bottom: 30),
                     padding: EdgeInsets.only(left: 10, right: 10,bottom: 10,top: 10),
-                    child: Text("Are you sure you want to delete ${product.name} ?"),
+                    child: Text("Are you sure you want to delete ${product.name}?"),
                   ),
                   SizedBox(
                     width: double.infinity,
@@ -544,7 +602,7 @@ class _ProductsPageState extends State<ProductsPage> {
                       padding: EdgeInsets.only(top: 15, bottom: 15),
                       onPressed: () {
                         Navigator.pop(contxt);
-
+                        _bloc.add(DeleteProductEvent(product));
                       },
                     ),
                   ),
@@ -574,6 +632,24 @@ class _ProductsPageState extends State<ProductsPage> {
     _nameController.text="";
     selectedCity="Select City";
     selectedCategory="Select Category";
+  }
+
+  void onSearchTextChanged(String text) {
+    List<ProductModel> tempProductsData=List();
+    displayProductsList.clear();
+    if (text.isEmpty) {
+      tempProductsData.addAll(productsList);
+    }else{
+      productsList.forEach((product) {
+        if (product.name.toLowerCase().contains(text.toLowerCase())){
+          tempProductsData.add(product);
+        }
+      });
+    }
+    setState(() {
+      _showSearchClearIcon=text.isNotEmpty;
+      displayProductsList.addAll(tempProductsData);
+    });
   }
 
 

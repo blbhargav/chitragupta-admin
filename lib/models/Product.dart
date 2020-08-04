@@ -27,7 +27,7 @@ class Product {
   String product;
   String productId;
   String category;
-  int categoryId;
+  String categoryId;
   String orderId;
   int createdDate;
   String employee;

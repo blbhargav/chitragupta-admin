@@ -21,3 +21,8 @@ class EditProductEvent extends ProductEvent {
 }
 
 class FetchCategoriesEvent extends ProductEvent{}
+
+class DeleteProductEvent extends ProductEvent{
+  final ProductModel product;
+  DeleteProductEvent(this.product);
+}

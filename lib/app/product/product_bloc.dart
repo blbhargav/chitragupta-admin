@@ -44,6 +44,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }else if(event is AddProductEvent){
       yield ShowProgressState();
       try{
+        print("BLB product ${event.name}, ${event.city}, ${event.cityID}, ${event.state}, ${event.categoryId}, ${event.category}");
         await repository.addProduct(event.name, event.city,event.cityID,event.state,event.categoryId,event.category);
         yield HideProgressState();
         yield AddingSuccessState();
@@ -66,13 +67,25 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }else if(event is EditProductEvent){
       yield ShowProgressState();
       try{
-        await repository.editCategory(event.id,event.name, event.cityID,event.city,event.state);
+        await repository.editProduct(event.id,event.name, event.cityID,event.city,event.state,event.categoryId,event.category,0);
         yield HideProgressState();
         yield AddingSuccessState();
       }catch(_e){
         yield HideProgressState();
         yield AddingFailedState();
       }
+    }else if(event is DeleteProductEvent){
+      yield ShowProgressState();
+      try{
+        ProductModel product=event.product;
+        await repository.editProduct(product.id,product.name, product.cityID,product.city,product.state ,product.categoryId,product.category,0);
+        yield HideProgressState();
+        yield AddingSuccessState();
+      }catch(_e){
+        yield HideProgressState();
+        yield AddingFailedState();
+      }
+
     }
   }
 }
