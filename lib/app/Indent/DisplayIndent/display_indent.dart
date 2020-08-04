@@ -24,8 +24,9 @@ import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
 class DisplayIndent extends StatefulWidget {
   final Repository repository;
   final Order order;
-  DisplayIndent(Repository repository,Order order)
-      : repository = repository ?? Repository(),order=order;
+  Function() callback;
+  DisplayIndent(Repository repository,Order order,Function function)
+      : repository = repository ?? Repository(),order=order,callback=function;
 
   @override
   _DisplayIndentState createState() => _DisplayIndentState();
@@ -125,6 +126,7 @@ ScrollController _scrollController=ScrollController();
                             hoverColor: Colors.red,
                             child: Text("Back",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w700),),
                             onPressed: () {
+                              widget.callback();
                             },
                             color: Colors.lightBlue[900],
                           ),

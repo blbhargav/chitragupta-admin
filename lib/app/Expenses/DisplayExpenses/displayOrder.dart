@@ -30,9 +30,10 @@ import '../../../login.dart';
 class DisplayOrderScreen extends StatefulWidget {
   Repository repository;
   Order order;
-  DisplayOrderScreen(Repository repository, Order order)
+  Function() callback;
+  DisplayOrderScreen(Repository repository, Order order,Function function)
       : repository = repository ?? Repository(),
-        order=order;
+        order=order,callback=function;
   @override
   _DisplayOrderScreenState createState() =>
       _DisplayOrderScreenState(repository: repository);
@@ -634,6 +635,14 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                               ),
                             ),
                             Spacer(),
+                            RaisedButton(
+                              child: Text("Back",style: TextStyle(color: Colors.white),),
+                              color: Colors.lightBlue[900],
+                              onPressed: (){
+                                widget.callback();
+                              },
+                            ),
+                            Padding(padding: EdgeInsets.all(10),),
                             RaisedButton(
                               child: Text("Cancel",style: TextStyle(color: Colors.white),),
                               color: Colors.red[500],

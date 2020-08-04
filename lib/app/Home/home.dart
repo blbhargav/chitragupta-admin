@@ -78,6 +78,12 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
   expenseCallback(Order order) {
     _homeBloc.add(DisplayExpenseClickedEvent(order));
   }
+  indentsCallBack(){
+    _homeBloc.add(IndentItemClickedEvent());
+  }
+  expensesCallBack(){
+    _homeBloc.add(ExpensesItemClickedEvent());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +106,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
               }else if(state is DisplayIndentState){
                 resetColors();
                 pageName="Indent : ${state.order.orderId}";
-                _container=DisplayIndent(widget.repository,state.order);
+                _container=DisplayIndent(widget.repository,state.order,indentsCallBack);
                 indentItemColor=Colors.black;
               }else if(state is ShowExpensesState){
                 resetColors();
@@ -110,7 +116,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
               }else if(state is DisplayExpenseState){
                 resetColors();
                 pageName="Expense : ${state.order.orderId}";
-                _container=DisplayOrderScreen(widget.repository,state.order);
+                _container=DisplayOrderScreen(widget.repository,state.order,expensesCallBack);
                 expensesItemColor=Colors.black;
               }else if(state is ShowAnalyticsState){
                 resetColors();
