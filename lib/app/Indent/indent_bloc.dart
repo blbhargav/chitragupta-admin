@@ -73,6 +73,13 @@ class IndentBloc extends Bloc<IndentEvent, IndentState> {
         yield DisplayOrdersState(ordersList: orders);
         yield ResetFormState();
       }
+    }else if(event is DeleteIndentClickedEvent){
+      yield ShowProgressState();
+      await repository.cancelOrder(event.order);
+      var orders=await repository.getActiveIndents();
+      yield HideProgressState();
+      yield DisplayOrdersState(ordersList: orders);
+      yield ResetFormState();
     }
 
   }

@@ -24,3 +24,8 @@ class CreateIndentEvent extends IndentEvent {
   CreateIndentEvent({this.customer,this.city,this.orderDate});
 }
 
+class DeleteIndentClickedEvent extends IndentEvent {
+  final Order order;
+  DeleteIndentClickedEvent(this.order);
+}
+
