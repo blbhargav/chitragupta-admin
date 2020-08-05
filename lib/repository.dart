@@ -36,7 +36,7 @@ class Repository {
         .collection("Versions")
         .document("web")
         .get();
-    return (Constants.version==snapshot.data["version"]);
+    return !(Constants.version==snapshot.data["version"]);
   }
 
   Future signInWithCredentials(String email, String password) {

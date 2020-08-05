@@ -77,7 +77,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 color:Colors.red ),
             ),
             Padding(padding: EdgeInsets.all(5),),
-            Text("Browser cache is avoiding you to use latest version of this Application. Please clear browser cache and try again."),
+            Text("Browser cache is avoiding you to use latest version of this Application. Please clear browser cache or open in 'Incognito Mode'."),
 
           ],
         ),
