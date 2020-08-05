@@ -20,7 +20,6 @@ class loginRoot extends StatefulWidget {
 class _loginRootState extends State<loginRoot> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       //resizeToAvoidBottomInset: true,
@@ -53,8 +52,8 @@ class _Login extends State<Login> {
 //    _userIdController.text='bhargavbl224@gmail.com';
 //    _passwordController.text='Blb@9618794545';
 
-    _userIdController.text='bhargav.bl@plexcel.com';
-    _passwordController.text='12345678';
+//    _userIdController.text='bhargav.bl@plexcel.com';
+//    _passwordController.text='12345678';
   }
 
   @override

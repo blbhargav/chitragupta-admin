@@ -22,9 +22,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     startTime();
   }
   Future<void> _checkUserHistory() async {
-    isAppUpToDate=await widget.repository.checkForUpdate();
+    var result=await widget.repository.checkForUpdate();
     setState(() {
-
+      isAppUpToDate=result;
     });
     if(isAppUpToDate){
       Navigator.pushAndRemoveUntil(
@@ -35,8 +35,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           ModalRoute.withName("/login")
       );
     }
-
-
   }
 
   @override
