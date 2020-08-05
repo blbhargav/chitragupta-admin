@@ -12,6 +12,7 @@ import 'package:chitragupta/models/product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:chitragupta/globals.dart' as globals;
 import 'package:http/http.dart' as http;
@@ -28,6 +29,14 @@ class Repository {
     //this.fbDBRef.setPersistenceEnabled(true);
     //databaseReference.settings(persistenceEnabled: true);
     //getUserId();
+  }
+
+  Future<bool> checkForUpdate() async {
+    var snapshot=await databaseReference
+        .collection("Versions")
+        .document("web")
+        .get();
+    return (Constants.version==snapshot.data["version"]);
   }
 
   Future signInWithCredentials(String email, String password) {
@@ -751,4 +760,6 @@ class Repository {
         .document(order.orderId)
         .updateData({"status":0});
   }
+
+
 }

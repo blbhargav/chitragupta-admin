@@ -140,7 +140,7 @@ class _settingsState extends State<Settings>{
 
     Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => SplashScreen()),
+        MaterialPageRoute(builder: (context) => SplashScreen(repository: repository,)),
         ModalRoute.withName("/Splash"));
   }
 
