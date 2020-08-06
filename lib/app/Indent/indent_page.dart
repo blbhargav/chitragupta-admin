@@ -29,8 +29,6 @@ class _IndentScreenState extends State<IndentScreen>{
   TextEditingController _cityController = new TextEditingController();
   TextEditingController _indentDateController = new TextEditingController();
   TextEditingController _indentCustomerController = new TextEditingController();
-
-  String _createOrderErrorTV = null,_createNameErrorTV = null;
   DateTime _currentDate=DateTime.now();
 
   bool _loading=false;

@@ -361,32 +361,36 @@ class Repository {
 
   Future<List<Customer>> getCustomersOnce() async {
     List<Customer> tempCustomersList = new List();
-    var customersDBRef=databaseReference
-        .collection("Customers")
-        .where("adminId",isEqualTo: uid)
-        .where("status", isEqualTo: 1)
-        .reference();
+    if(user.type==Constants.superAdmin){
+      var snapshot=await databaseReference
+          .collection("Customers")
+          .where("adminId",isEqualTo: uid)
+          .where("status", isEqualTo: 1)
+          .getDocuments();
+      if (snapshot.documents.length > 0) {
+        snapshot.documents.forEach((element) {
+          Customer customer = Customer.fromSnapshot(snapshot: element);
+          tempCustomersList.add(customer);
+        });
+      }
 
-    if(user.type=="Admin"){
-      customersDBRef= databaseReference
+    }else if(user.type==Constants.admin){
+      var snapshot=await databaseReference
           .collection("Customers")
           .where("adminId",isEqualTo: user.adminId)
           .where("cityID", isEqualTo: user.cityID)
           .where("status", isEqualTo: 1)
-          .reference();
-    }
-
-    var snapshot=await customersDBRef.getDocuments();
-    if (snapshot.documents.length > 0) {
-      snapshot.documents.forEach((element) {
-        Customer customer = Customer.fromSnapshot(snapshot: element);
-        tempCustomersList.add(customer);
-      });
+          .getDocuments();
+      if (snapshot.documents.length > 0) {
+        snapshot.documents.forEach((element) {
+          Customer customer = Customer.fromSnapshot(snapshot: element);
+          tempCustomersList.add(customer);
+        });
+      }
     }
     return tempCustomersList;
 
   }
-
 
 
   //Team management
