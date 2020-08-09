@@ -13,6 +13,7 @@ import 'package:chitragupta/app/category/category.dart';
 import 'package:chitragupta/app/dashboard.dart';
 import 'package:chitragupta/app/preview_invoice.dart';
 import 'package:chitragupta/app/product/product.dart';
+import 'package:chitragupta/app/Profile/profile.dart';
 import 'package:chitragupta/app/settings.dart';
 import 'package:chitragupta/extension/Constants.dart';
 import 'package:chitragupta/extension/hover_extensions.dart';
@@ -166,6 +167,10 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                 pageName="About";
                 _container=Container(child: Center(child: Text("About"),),);
                 aboutItemColor=Colors.black;
+              }else if(state is ShowProfileState){
+                resetColors();
+                pageName="Profile";
+                _container=Profile(widget.repository);
               }
             },
             child: BlocBuilder<HomeBloc,HomeState>(
@@ -206,7 +211,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                           ),
                           Container(
                             child: Text(
-                              "${userName}",
+                              "Chitragupta",
                               style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
@@ -233,7 +238,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                                   child: new Container(
                                     padding: EdgeInsets.all(1),
                                     decoration: new BoxDecoration(
-                                      color: Colors.transparent,
+                                      color: Colors.red,
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     constraints: BoxConstraints(
@@ -241,10 +246,10 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                                       minHeight: 12,
                                     ),
                                     child: new Text(
-                                      '',
+                                      '0',
                                       style: new TextStyle(
                                         color: Colors.white,
-                                        fontSize: 8,
+                                        fontSize: 12,fontWeight: FontWeight.w700
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
@@ -255,7 +260,44 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
                             onTap: () {},
                           ),
                           Padding(
-                            padding: EdgeInsets.all(5),
+                            padding: EdgeInsets.all(10),
+                          ),
+                          InkWellMouseRegion(
+                            child: Row(
+                              children: [
+                                Card(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(2),
+                                      child: CircleAvatar(
+                                        radius: 20.0,
+                                        backgroundImage: AssetImage(
+                                          "assets/user_avatar.png",
+                                        ),
+                                        backgroundColor: Colors.white,
+                                      ),
+                                    ),
+                                    elevation: 5,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                    )),
+                                Container(
+                                  child: Text(
+                                    "${userName}",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white),
+                                  ),
+                                  padding: EdgeInsets.only(top: 3),
+                                ),
+                              ],
+                            ),
+                            onTap: (){
+                              _homeBloc.add(ProfileClickedEvent());
+                            },
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(10),
                           ),
                         ],
                       ),
@@ -683,7 +725,7 @@ class _HomeScreenState extends State<homeScreen> with TickerProviderStateMixin {
     widget.repository.getUserId();
     widget.repository.getProfile().then((value) {
       setState(() {
-        user = new Member.fromSnapshot(snapshot: value);
+        user = value;
         userName=user.name;
       });
     });

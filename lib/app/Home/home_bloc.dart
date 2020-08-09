@@ -48,6 +48,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         yield ShowCategoryState();
       }else if(event is ProductsClickedEvent){
         yield ShowProductsState();
+      }else if(event is ProfileClickedEvent){
+        yield ShowProfileState();
       }
   }
 }

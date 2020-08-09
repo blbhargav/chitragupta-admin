@@ -3,5 +3,5 @@ class Constants{
   static const String admin="Admin";
   static const String employee="Employee";
 
-  static const String version="1.3.0";
+  static const String version="1.3.1";
 }

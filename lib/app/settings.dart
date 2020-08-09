@@ -1,6 +1,6 @@
 import 'package:chitragupta/app/about.dart';
 import 'package:chitragupta/app/changePassword.dart';
-import 'package:chitragupta/app/profile.dart';
+import 'package:chitragupta/app/Profile/profile.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';

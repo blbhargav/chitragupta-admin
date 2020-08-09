@@ -36,3 +36,4 @@ class TeamItemClickedEvent extends HomeEvent{}
 class CategoryItemClickedEvent extends HomeEvent{}
 class ProductsClickedEvent extends HomeEvent{}
 class LogoutItemClickedEvent extends HomeEvent{}
+class ProfileClickedEvent extends HomeEvent{}

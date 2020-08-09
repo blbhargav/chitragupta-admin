@@ -36,3 +36,4 @@ class DisplayExpenseState extends HomeState {
   final Order order;
   DisplayExpenseState(this.order);
 }
+class ShowProfileState extends HomeState {}

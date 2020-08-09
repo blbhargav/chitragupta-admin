@@ -22,13 +22,12 @@ class Repository {
   SharedPreferences prefs;
   final databaseReference = Firestore.instance;
   static String uid = globals.UID;
-  static Member user;
+  static Member user,adminUser;
 
   Repository({FirebaseAuth firebaseAuth, fbDBRef}) {
     _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
     //this.fbDBRef.setPersistenceEnabled(true);
     //databaseReference.settings(persistenceEnabled: true);
-    //getUserId();
   }
 
   Future<bool> checkForUpdate() async {
@@ -93,7 +92,9 @@ class Repository {
 
   Future<String> getUserId() async {
     if (prefs == null) prefs = await SharedPreferences.getInstance();
-    if (prefs != null && prefs.getString("uid") != null) {
+    if(uid!=null){
+      return uid;
+    }else if (prefs != null && prefs.getString("uid") != null) {
       uid = prefs.getString("uid");
     } else {
       FirebaseUser user = await _firebaseAuth.currentUser();
@@ -109,7 +110,28 @@ class Repository {
     if (uid == null) {
       await getUserId();
     }
-    return databaseReference.collection("Users").document(uid).get();
+    if(user==null){
+      var snapShot=await databaseReference.collection("Users").document(uid).get();
+      user =Member.fromSnapshot(snapshot: snapShot);
+    }
+    return user;
+  }
+  getAdminProfile() async {
+    if (uid == null) {
+      await getUserId();
+    }
+    if(user==null){
+      await getProfile();
+    }
+    if(adminUser==null){
+      if(user.type==Constants.superAdmin){
+        adminUser=user;
+      }else {
+        var snapShot=await databaseReference.collection("Users").document(user.adminId).get();
+        adminUser =Member.fromSnapshot(snapshot: snapShot);
+      }
+    }
+    return adminUser;
   }
 
   createOrder(String date, String name) {

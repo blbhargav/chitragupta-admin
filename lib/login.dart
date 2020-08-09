@@ -49,11 +49,11 @@ class _Login extends State<Login> {
   void initState() {
     super.initState();
 
-//    _userIdController.text='bhargavbl224@gmail.com';
-//    _passwordController.text='Blb@9618794545';
+    _userIdController.text='bhargavbl224@gmail.com';
+    _passwordController.text='Blb@9618794545';
 
-//    _userIdController.text='bhargav.bl@plexcel.com';
-//    _passwordController.text='12345678';
+    _userIdController.text='bhargav.bl@plexcel.com';
+    _passwordController.text='12345678';
 
 
 //    _userIdController.text='spattipati8@gmail.com';
@@ -66,8 +66,7 @@ class _Login extends State<Login> {
       child: ListView(
         children: <Widget>[
           Padding(
-            padding:
-                EdgeInsets.only(top: MediaQuery.of(context).size.height / 3),
+            padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 3),
           ),
           Align(
             child: Container(
@@ -174,21 +173,19 @@ class _Login extends State<Login> {
               _userIdController.text, _passwordController.text)
           .then((res) async {
         setState(() {
-          _loading = false;
+          _loading = true;
         });
         await widget.repository.updateUserSignedLocally(true, res.user.uid);
         Repository.uid=res.user.uid;
-        Member user;
-        widget.repository.getProfile().then((value) {
-          user = new Member.fromSnapshot(snapshot: value);
-        }).whenComplete(() {
-          Repository.user = user;
-          navigateToHome();
-        });
+        await widget.repository.getUserId();
+        await widget.repository.getProfile();
+        await widget.repository.getAdminProfile();
+        navigateToHome();
         setState(() {
           _loading = false;
         });
       }).catchError((e) {
+        print("BLB ${e.toString()}");
         setState(() {
           _loading = false;
         });
