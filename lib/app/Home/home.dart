@@ -11,7 +11,6 @@ import 'package:chitragupta/app/City/cities.dart';
 import 'package:chitragupta/app/Customers/customers_list.dart';
 import 'package:chitragupta/app/category/category.dart';
 import 'package:chitragupta/app/dashboard.dart';
-import 'package:chitragupta/app/preview_invoice.dart';
 import 'package:chitragupta/app/product/product.dart';
 import 'package:chitragupta/app/Profile/profile.dart';
 import 'package:chitragupta/app/settings.dart';

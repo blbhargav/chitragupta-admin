@@ -413,6 +413,17 @@ class Repository {
     return tempCustomersList;
 
   }
+  Future<Customer> getCustomerById(String customerID) async {
+    Customer customer;
+
+    var snapshot=await databaseReference
+        .collection("Customers")
+        .document(customerID)
+        .get();
+    customer = Customer.fromSnapshot(snapshot: snapshot);
+    return customer;
+
+  }
 
 
   //Team management

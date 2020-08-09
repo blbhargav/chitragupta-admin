@@ -1,4 +1,5 @@
 import 'package:chitragupta/app/Profile/profile_bloc.dart';
+import 'package:chitragupta/extension/Constants.dart';
 import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/repository.dart';
@@ -219,6 +220,102 @@ class _ProfileState extends State<Profile> {
                               ),
                             ),
                           ),
+
+                          (Repository.user.type==Constants.admin)?Container(
+                            child: Center(
+                              child: Container(
+                                margin: EdgeInsets.only(top: 20),
+                                padding: EdgeInsets.all(10),
+                                width: 500,
+                                color: Colors.white,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text("Company Deatails",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 20,
+                                          color: Colors.lightBlue[900]
+                                      ),
+                                    ),
+                                    Padding(padding: EdgeInsets.all(10),),
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: Text("Name", style: TextStyle(fontSize: 16,color: Colors.black54),),
+                                          flex: 1,
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 10,right: 20),
+                                          child: Text(":"),
+                                        ),
+                                        Expanded(
+                                          child: Text("${Repository.adminUser.name}" , style: TextStyle(fontSize: 18),),
+                                          flex: 3,
+                                        )
+                                      ],
+                                    ),
+                                    Padding(padding: EdgeInsets.all(10),),
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: Text("Mobile", style: TextStyle(fontSize: 16,color: Colors.black54),),
+                                          flex: 1,
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 10,right: 20),
+                                          child: Text(":"),
+                                        ),
+                                        Expanded(
+                                          child: Text("${Repository.adminUser.mobile}" , style: TextStyle(fontSize: 18),),
+                                          flex: 3,
+                                        )
+                                      ],
+                                    ),
+                                    Padding(padding: EdgeInsets.all(10),),
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: Text("Email", style: TextStyle(fontSize: 16,color: Colors.black54),),
+                                          flex: 1,
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 10,right: 20),
+                                          child: Text(":"),
+                                        ),
+                                        Expanded(
+                                          child: Text("${Repository.adminUser.email}" , style: TextStyle(fontSize: 18),),
+                                          flex: 3,
+                                        )
+                                      ],
+                                    ),
+                                    Padding(padding: EdgeInsets.all(10),),
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: Text("Address", style: TextStyle(fontSize: 16,color: Colors.black54),),
+                                          flex: 1,
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 10,right: 20),
+                                          child: Text(":"),
+                                        ),
+                                        Expanded(
+                                          child: Text("${Repository.adminUser.address}" , style: TextStyle(fontSize: 18),),
+                                          flex: 3,
+                                        )
+                                      ],
+                                    ),
+                                    Padding(padding: EdgeInsets.all(10),),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ):Container(),
 
 
                         ],

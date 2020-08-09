@@ -1,44 +1,38 @@
 
 import 'dart:typed_data';
 
+import 'package:chitragupta/models/Order.dart';
+import 'package:chitragupta/models/Product.dart';
+import 'package:chitragupta/models/customer.dart';
+import 'package:chitragupta/repository.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-Future<Uint8List> generateInvoice(PdfPageFormat pageFormat) async {
+Future<Uint8List> generateInvoice(Order order, Customer customer, List<Product> productsList ) async {
   final lorem = pw.LoremText();
 
-  final products = <InvoiceProduct>[
-    InvoiceProduct('19874', lorem.sentence(4), 3.99, 2),
-    InvoiceProduct('98452', lorem.sentence(6), 15, 2),
-    InvoiceProduct('28375', lorem.sentence(4), 6.95, 3),
-    InvoiceProduct('95673', lorem.sentence(3), 49.99, 4),
-    InvoiceProduct('23763', lorem.sentence(2), 560.03, 1),
-    InvoiceProduct('55209', lorem.sentence(5), 26, 1),
-    InvoiceProduct('09853', lorem.sentence(5), 26, 1),
-    InvoiceProduct('23463', lorem.sentence(5), 34, 1),
-    InvoiceProduct('56783', lorem.sentence(5), 7, 4),
-    InvoiceProduct('78256', lorem.sentence(5), 23, 1),
-    InvoiceProduct('23745', lorem.sentence(5), 94, 1),
-    InvoiceProduct('07834', lorem.sentence(5), 12, 1),
-    InvoiceProduct('23547', lorem.sentence(5), 34, 1),
-    InvoiceProduct('98387', lorem.sentence(5), 7.99, 2),
-  ];
-
+  List<InvoiceProduct> products = List();
+  var i=1;
+  productsList.forEach((product) {
+    products.add(InvoiceProduct("${i++}",product.product,product.invoiceAmount.toDouble(),product.deliveredQty));
+  });
   final invoice = Invoice(
-    invoiceNumber: '982347',
+    invoiceNumber: '${order.orderId}',
     products: products,
-    customerName: 'Abraham Swearegin',
-    customerAddress: '54 rue de Rivoli\n75001 Paris, France',
+    customerName: '${order.name}',
+    customerAddress: '${customer.address}',
     paymentInfo:
-    '4509 Wiseman Street\nKnoxville, Tennessee(TN), 37929\n865-372-0425',
-    tax: .15,
+    'Make all checks payable to Pureinfresh If you have any questions concerning this invoice, contact Nageswar at 8187828580, hello@pureinfresh.com',
+    tax: 0.01,
     baseColor: PdfColors.teal,
-    accentColor: PdfColors.blueGrey900,
+    accentColor: PdfColors.blueGrey600,
+    order: order
   );
 
-  return await invoice.buildPdf(pageFormat);
+  return await invoice.buildPdf(PdfPageFormat.a4);
 }
 
 class Invoice {
@@ -51,6 +45,7 @@ class Invoice {
     this.paymentInfo,
     this.baseColor,
     this.accentColor,
+    this.order
   });
 
   final List<InvoiceProduct> products;
@@ -61,6 +56,7 @@ class Invoice {
   final String paymentInfo;
   final PdfColor baseColor;
   final PdfColor accentColor;
+  final Order order;
 
   static const _darkColor = PdfColors.blueGrey800;
   static const _lightColor = PdfColors.white;
@@ -95,7 +91,7 @@ class Invoice {
     doc.addPage(
       pw.MultiPage(
         pageTheme: _buildTheme(
-          pageFormat,
+          PdfPageFormat.a4,
           font1 != null ? pw.Font.ttf(font1) : null,
           font2 != null ? pw.Font.ttf(font2) : null,
           font3 != null ? pw.Font.ttf(font3) : null,
@@ -104,6 +100,8 @@ class Invoice {
         footer: _buildFooter,
         build: (context) => [
           _contentHeader(context),
+          _summaryHeader(context),
+          pw.SizedBox(height: 5),
           _contentTable(context),
           pw.SizedBox(height: 20),
           _contentFooter(context),
@@ -135,7 +133,7 @@ class Invoice {
                       style: pw.TextStyle(
                         color: baseColor,
                         fontWeight: pw.FontWeight.bold,
-                        fontSize: 40,
+                        fontSize: 25,
                       ),
                     ),
                   ),
@@ -158,7 +156,7 @@ class Invoice {
                         children: [
                           pw.Text('Invoice #'),
                           pw.Text(invoiceNumber),
-                          pw.Text('Date:'),
+                          pw.Text('Invoice Date:'),
                           pw.Text(_formatDate(DateTime.now())),
                         ],
                       ),
@@ -175,7 +173,7 @@ class Invoice {
                     alignment: pw.Alignment.topRight,
                     padding: const pw.EdgeInsets.only(bottom: 8, left: 30),
                     height: 72,
-                    child: _logo != null ? pw.Image(_logo) : pw.PdfLogo(),
+                    //child: _logo != null ? pw.Image(_logo) : pw.PdfLogo(),
                   ),
                   // pw.Container(
                   //   color: baseColor,
@@ -274,67 +272,208 @@ class Invoice {
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Expanded(
-          child: pw.Container(
-            margin: const pw.EdgeInsets.symmetric(horizontal: 20),
-            height: 70,
-            child: pw.FittedBox(
-              child: pw.Text(
-                'Total: ${_formatCurrency(_grandTotal)}',
-                style: pw.TextStyle(
-                  color: baseColor,
-                  fontStyle: pw.FontStyle.italic,
-                ),
-              ),
-            ),
-          ),
-        ),
-        pw.Expanded(
-          child: pw.Row(
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            mainAxisSize: pw.MainAxisSize.min,
             children: [
               pw.Container(
-                margin: const pw.EdgeInsets.only(left: 10, right: 10),
-                height: 70,
+                margin: const pw.EdgeInsets.only(top: 10),
                 child: pw.Text(
-                  'Invoice to:',
+                  'Invoice From:',
                   style: pw.TextStyle(
-                    color: _darkColor,
-                    fontWeight: pw.FontWeight.bold,
-                    fontSize: 12,
+                    color: PdfColors.grey600,
+                    fontWeight: pw.FontWeight.bold ,
+                    fontSize: 8,
                   ),
                 ),
               ),
-              pw.Expanded(
-                child: pw.Container(
-                  height: 70,
-                  child: pw.RichText(
-                      text: pw.TextSpan(
-                          text: '$customerName\n',
-                          style: pw.TextStyle(
-                            color: _darkColor,
-                            fontWeight: pw.FontWeight.bold,
-                            fontSize: 12,
+
+              pw.Container(
+                margin: const pw.EdgeInsets.only(top: 5,bottom: 5),
+                child: pw.RichText(
+                    text: pw.TextSpan(
+                        text: '${Repository.adminUser.name}\n',
+                        style: pw.TextStyle(
+                          color: _darkColor,
+                          fontWeight: pw.FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                        children: [
+                          const pw.TextSpan(
+                            text: '\n',
+                            style: pw.TextStyle(
+                              fontSize: 5,
+                            ),
                           ),
-                          children: [
-                            const pw.TextSpan(
-                              text: '\n',
-                              style: pw.TextStyle(
-                                fontSize: 5,
-                              ),
+                          pw.TextSpan(
+                            text: '${Repository.adminUser.address}',
+                            style: pw.TextStyle(
+                              fontWeight: pw.FontWeight.normal,
+                              fontSize: 10,
                             ),
-                            pw.TextSpan(
-                              text: customerAddress,
-                              style: pw.TextStyle(
-                                fontWeight: pw.FontWeight.normal,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ])),
+                          ),
+                        ])),
+              ),
+              pw.Text("${Repository.adminUser.mobile}",
+                  style: pw.TextStyle(fontSize: 8,
+                      fontWeight: pw.FontWeight.normal)),
+              pw.Padding(padding: pw.EdgeInsets.all(1),),
+              pw.Text("${Repository.adminUser.email}",
+                  style: pw.TextStyle(fontSize: 8,
+                      fontWeight: pw.FontWeight.normal)),
+
+              pw.Padding(padding: pw.EdgeInsets.all(3),),
+            ]
+          )
+        ),
+        pw.Padding(padding: pw.EdgeInsets.all(5)),
+        pw.Expanded(
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            mainAxisSize: pw.MainAxisSize.min,
+            children: [
+              pw.Container(
+                margin: const pw.EdgeInsets.only(top: 10,),
+                child: pw.Text(
+                  'Invoice To:',
+                  style: pw.TextStyle(
+                    color: PdfColors.grey600,
+                    fontWeight: pw.FontWeight.bold,
+                    fontSize: 8,
+                  ),
                 ),
               ),
+              pw.Container(
+                margin: const pw.EdgeInsets.only(top: 5,bottom: 5),
+                child: pw.RichText(
+                    text: pw.TextSpan(
+                        text: '$customerName\n',
+                        style: pw.TextStyle(
+                          color: _darkColor,
+                          fontWeight: pw.FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                        children: [
+                          const pw.TextSpan(
+                            text: '\n',
+                            style: pw.TextStyle(
+                              fontSize: 5,
+                            ),
+                          ),
+                          pw.TextSpan(
+                            text: customerAddress,
+                            style: pw.TextStyle(
+                              fontWeight: pw.FontWeight.normal,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ])),
+              ),
+              pw.Padding(padding: pw.EdgeInsets.all(3),),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  pw.Widget _summaryHeader(pw.Context context){
+    return pw.Row(
+      mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
+      children: [
+        pw.Container(
+          child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(
+                  'Order Date',
+                  style: pw.TextStyle(
+                    fontSize: 7,
+                    color: PdfColors.grey600,
+                    fontStyle: pw.FontStyle.normal,
+                  ),
+                ),
+                pw.Padding(padding: pw.EdgeInsets.all(1)),
+                pw.Text(
+                  '${_formatDate(order.createdDate)}',
+                  style: pw.TextStyle(
+                    fontSize: 9,
+                    fontStyle: pw.FontStyle.normal,
+                  ),
+                )
+              ]
+          ),
+        ),
+        pw.Container(
+          child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(
+                  'Delivered Date',
+                  style: pw.TextStyle(
+                    fontSize: 7,
+                    color: PdfColors.grey600,
+                    fontStyle: pw.FontStyle.normal,
+                  ),
+                ),
+                pw.Padding(padding: pw.EdgeInsets.all(1)),
+                pw.Text(
+                  '${_formatDate(order.date)}',
+                  style: pw.TextStyle(
+                    fontSize: 9,
+                    fontStyle: pw.FontStyle.normal,
+                  ),
+                )
+              ]
+          ),
+        ),
+        pw.Container(
+          child: pw.Column(
+              children: [
+                pw.Text(
+                  'Total Items',
+                  style: pw.TextStyle(
+                    fontSize: 7,
+                    color: PdfColors.grey600,
+                    fontStyle: pw.FontStyle.normal,
+                  ),
+                ),
+                pw.Padding(padding: pw.EdgeInsets.all(1)),
+                pw.Text(
+                  '${products.length}',
+                  style: pw.TextStyle(
+                    color: baseColor,
+                    fontSize: 14,
+                    fontStyle: pw.FontStyle.italic,
+                  ),
+                )
+              ]
+          ),
+        ),
+        pw.Container(
+          child: pw.Column(
+              children: [
+                pw.Text(
+                  'Total Amount',
+                  style: pw.TextStyle(
+                    fontSize: 7,
+                    color: PdfColors.grey600,
+                    fontStyle: pw.FontStyle.normal,
+                  ),
+                ),
+                pw.Padding(padding: pw.EdgeInsets.all(1)),
+                pw.Text(
+                  '${_formatCurrency(_grandTotal)}',
+                  style: pw.TextStyle(
+                    color: baseColor,
+                    fontSize: 12,
+                    fontStyle: pw.FontStyle.italic,
+                  ),
+                )
+              ]
+          ),
+        ),
+      ]
     );
   }
 
@@ -347,13 +486,6 @@ class Invoice {
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text(
-                'Thank you for your business',
-                style: pw.TextStyle(
-                  color: _darkColor,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
               pw.Container(
                 margin: const pw.EdgeInsets.only(top: 20, bottom: 8),
                 child: pw.Text(
@@ -370,6 +502,14 @@ class Invoice {
                   fontSize: 8,
                   lineSpacing: 5,
                   color: _darkColor,
+                ),
+              ),
+              pw.Text(
+                'Thank you for your business',
+                style: pw.TextStyle(
+                  color: _darkColor,
+                  fontSize: 8,
+                  fontWeight: pw.FontWeight.bold,
                 ),
               ),
             ],
@@ -449,7 +589,7 @@ class Invoice {
                 ),
               ),
               pw.Text(
-                pw.LoremText().paragraph(40),
+                "This is system generated invoice, no signature needed",
                 textAlign: pw.TextAlign.justify,
                 style: const pw.TextStyle(
                   fontSize: 6,
@@ -469,10 +609,11 @@ class Invoice {
 
   pw.Widget _contentTable(pw.Context context) {
     const tableHeaders = [
-      'SKU#',
+      'SN#',
       'Item Description',
-      'Price',
       'Quantity',
+      //'Units'
+      'Unit Price',
       'Total'
     ];
 
@@ -484,13 +625,14 @@ class Invoice {
         color: baseColor,
       ),
       headerHeight: 25,
-      cellHeight: 40,
+      cellHeight: 30,
       cellAlignments: {
         0: pw.Alignment.centerLeft,
         1: pw.Alignment.centerLeft,
         2: pw.Alignment.centerRight,
         3: pw.Alignment.center,
         4: pw.Alignment.centerRight,
+        //5: pw.Alignment.centerRight,
       },
       headerStyle: pw.TextStyle(
         color: _baseTextColor,
@@ -505,7 +647,7 @@ class Invoice {
         border: pw.BoxBorder(
           bottom: true,
           color: accentColor,
-          width: .5,
+          width: 0.01,
         ),
       ),
       headers: List<String>.generate(
@@ -524,7 +666,7 @@ class Invoice {
 }
 
 String _formatCurrency(double amount) {
-  return '\$${amount.toStringAsFixed(2)}';
+  return '₹ ${amount.toStringAsFixed(2)}';
 }
 
 String _formatDate(DateTime date) {
@@ -534,13 +676,15 @@ String _formatDate(DateTime date) {
 
 class InvoiceProduct {
   const InvoiceProduct(
-      this.sku,
+      this.SN,
+      //this.units,
       this.productName,
       this.price,
       this.quantity,
       );
 
-  final String sku;
+  final String SN;
+  //final String units;
   final String productName;
   final double price;
   final int quantity;
@@ -549,13 +693,15 @@ class InvoiceProduct {
   String getIndex(int index) {
     switch (index) {
       case 0:
-        return sku;
+        return SN;
       case 1:
         return productName;
       case 2:
-        return _formatCurrency(price);
-      case 3:
         return quantity.toString();
+//      case 3:
+//        return units;
+      case 3:
+        return _formatCurrency(price);
       case 4:
         return _formatCurrency(total);
     }

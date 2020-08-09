@@ -8,6 +8,7 @@ import 'package:chitragupta/models/Member.dart';
 import 'package:chitragupta/models/Order.dart';
 import 'package:chitragupta/models/Product.dart';
 import 'package:chitragupta/extension/progress.dart';
+import 'package:chitragupta/models/customer.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:chitragupta/extension/util.dart';
 import 'package:expandable/expandable.dart';
@@ -36,17 +37,16 @@ class DisplayOrderScreen extends StatefulWidget {
         order=order,callback=function;
   @override
   _DisplayOrderScreenState createState() =>
-      _DisplayOrderScreenState(repository: repository);
+      _DisplayOrderScreenState();
 }
 
 class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
-  Repository repository;
 
-  _DisplayOrderScreenState({Repository repository})
-      : repository = repository ?? Repository();
+  _DisplayOrderScreenState();
 
   bool _loading = false,_showSearchClearIcon=false;
   Order order;
+  Customer customer;
 
   final _extraDataKeyController = TextEditingController();
   final _extraDataValueController = TextEditingController();
@@ -58,6 +58,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   final _extraEarnedValueController = TextEditingController();
 
   final ScrollController _scrollController=ScrollController();
+  final ScrollController _alertScrollController=ScrollController();
   TextEditingController _productSearchControllers = TextEditingController();
 
   String _extraDataKeyErrorTV, _extraDataValueErrorTV;
@@ -77,6 +78,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _alertScrollController.dispose();
     _extraDataKeyController.dispose();
     _extraDataValueController.dispose();
     _extraSpentKeyController.dispose();
@@ -115,8 +117,8 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   List<Product> displayProductsList = new List();
   List<Member> membersList = new List();
 
-  void initScreen() {
-    repository.getOrder(widget.order.orderId).listen((_event) {
+  void initScreen() async {
+    widget.repository.getOrder(widget.order.orderId).listen((_event) {
       setState(() {
         _loading = false;
         event=_event;
@@ -125,7 +127,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
       });
     });
 
-    repository.getOrderExtraData(widget.order.orderId).listen((event) {
+    widget.repository.getOrderExtraData(widget.order.orderId).listen((event) {
       List<ExtraData> extraList = new List();
       if (event.documents.length > 0) {
         event.documents.forEach((element) {
@@ -136,7 +138,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
         extraData = extraList;
       });
     });
-    repository.getOrderExtraSpent(widget.order.orderId).listen((event) {
+    widget.repository.getOrderExtraSpent(widget.order.orderId).listen((event) {
       List<ExtraData> extraList = new List();
       if (event.documents.length > 0) {
         event.documents.forEach((element) {
@@ -147,7 +149,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
         extraSpent = extraList;
       });
     });
-    repository.getOrderExtraEarned(widget.order.orderId).listen((event) {
+    widget.repository.getOrderExtraEarned(widget.order.orderId).listen((event) {
       List<ExtraData> extraList = new List();
       if (event.documents.length > 0) {
         event.documents.forEach((element) {
@@ -159,7 +161,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
       });
     });
 
-    repository.getOrderProducts(widget.order.orderId).listen((event) {
+    widget.repository.getOrderProducts(widget.order.orderId).listen((event) {
       List<Product> products = new List();
       if (event.documents.length > 0) {
         event.documents.forEach((element) {
@@ -172,11 +174,12 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
       });
     });
 
-    repository.getEmployeesOnceByCity(widget.order.cityID).then((value) {
+    widget.repository.getEmployeesOnceByCity(widget.order.cityID).then((value) {
       setState(() {
         membersList = value;
       });
     });
+    customer=await widget.repository.getCustomerById(widget.order.customerID);
   }
 
   
@@ -1078,7 +1081,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                           _loading = true;
                         });
 
-                        await repository.addExtraDataToOrder(
+                        await widget.repository.addExtraDataToOrder(
                             order.orderId,
                             ExtraData(
                                 name: _extraDataKeyController.text,
@@ -1206,7 +1209,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                           _loading = true;
                         });
 
-                        await repository.addExtraSpentToOrder(
+                        await widget.repository.addExtraSpentToOrder(
                             order.orderId,
                             ExtraData(
                                 name: _extraSpentKeyController.text,
@@ -1334,7 +1337,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                           _loading = true;
                         });
 
-                        await repository.addExtraEarnedToOrder(
+                        await widget.repository.addExtraEarnedToOrder(
                             order.orderId,
                             ExtraData(
                                 name: _extraEarnedKeyController.text,
@@ -1506,7 +1509,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
     setState(() {
       _loading = true;
     });
-    await repository.removeProductFromOrder(widget.order.orderId, id);
+    await widget.repository.removeProductFromOrder(widget.order.orderId, id);
     setState(() {
       _loading = false;
     });
@@ -1552,10 +1555,10 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
                   context: contxt,
                   child: Scrollbar(
                     isAlwaysShown: true,
-                    controller: _scrollController,
+                    controller: _alertScrollController,
                     child: ListView(
                       reverse: false,
-                      controller: _scrollController,
+                      controller: _alertScrollController,
                       shrinkWrap: true,
                       padding: EdgeInsets.only(left: 5, right: 5),
                       children: <Widget>[
@@ -1867,7 +1870,7 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
     if (_remarksController.text.trim().length > 0) {
       product.remarks = _remarksController.text;
     }
-    await repository.updateProductInOrder(widget.order.orderId, product);
+    await widget.repository.updateProductInOrder(widget.order.orderId, product);
     setState(() {
       _loading = false;
     });
@@ -2012,72 +2015,86 @@ class _DisplayOrderScreenState extends State<DisplayOrderScreen> {
   }
 
 
-  void _printDocument() {
-    Printing.layoutPdf(
-      onLayout: (PdfPageFormat format){
-        return generateInvoice(format);
-      },
-    );
-  }
-
   showInvoicePreview(BuildContext context) {
     return showDialog(
         context: context,
         builder: (BuildContext context) {
-          final actions = <PdfPreviewAction>[
-            if (!kIsWeb)
-              PdfPreviewAction(
-                icon: const Icon(Icons.save),
-                onPressed: _saveAsFile,
-              )
-          ];
           return AlertDialog(
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(15.0))),
             contentPadding: EdgeInsets.only(top: 10.0),
             content: Container(
-              width: MediaQuery.of(context).size.width/0.9,
+              width: 800,
               padding: EdgeInsets.only(top: 10, right: 15, bottom: 10, left: 15),
-              child: PdfPreview(
-                maxPageWidth: 700,
-                build: generateInvoice,
-                actions: actions,
-                onPrinted: _showPrintedToast,
-                onShared: _showSharedToast,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            "Invoice",
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.lightBlue[900]),
+                          ),
+                        ),
+                      ),
+                      InkWellMouseRegion(
+                        child: Icon(
+                          Icons.cancel,
+                          color: Colors.red,
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                      )
+                    ],
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  ),
+                  Expanded(
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: [
+
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      RaisedButton(
+                        child: Text("Print"),
+                        onPressed: () async {
+                          await Printing.layoutPdf(
+                              onLayout: (PdfPageFormat format) async => generateInvoice(order,customer,productsList));
+                        },
+                        hoverColor: Colors.orange,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(5),
+                      ),
+                      RaisedButton(
+                        child: Text("Save"),
+                        hoverColor: Colors.green,
+                        onPressed: () async {
+                          await Printing.sharePdf(bytes: await generateInvoice(order,customer,productsList), filename: 'Invoice-${order.orderId}.pdf');
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           );
         });
-  }
-  void _showPrintedToast(BuildContext context) {
-    final ScaffoldState scaffold = Scaffold.of(context);
-
-    scaffold.showSnackBar(
-      const SnackBar(
-        content: Text('Document printed successfully'),
-      ),
-    );
-  }
-
-  void _showSharedToast(BuildContext context) {
-    final ScaffoldState scaffold = Scaffold.of(context);
-
-    scaffold.showSnackBar(
-      const SnackBar(
-        content: Text('Document shared successfully'),
-      ),
-    );
-  }
-
-
-  Future<void> _saveAsFile(BuildContext context, LayoutCallback build, PdfPageFormat pageFormat) async {
-    final Uint8List bytes = await build(pageFormat);
-
-    final Directory appDocDir = await getApplicationDocumentsDirectory();
-    final String appDocPath = appDocDir.path;
-    final File file = File(appDocPath + '/' + 'document.pdf');
-    print('Save as file ${file.path} ...');
-    await file.writeAsBytes(bytes);
-    OpenFile.open(file.path);
   }
 }
