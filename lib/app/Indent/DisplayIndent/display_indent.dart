@@ -10,7 +10,7 @@ import 'package:chitragupta/models/Order.dart';
 import 'package:chitragupta/models/Product.dart';
 import 'package:chitragupta/models/category.dart';
 import 'package:chitragupta/models/indent.dart';
-import 'package:chitragupta/models/product.dart';
+import 'package:chitragupta/models/product_model.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';

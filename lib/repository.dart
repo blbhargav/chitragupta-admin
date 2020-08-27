@@ -8,7 +8,7 @@ import 'package:chitragupta/models/Product.dart';
 import 'package:chitragupta/models/category.dart';
 import 'package:chitragupta/models/customer.dart';
 import 'package:chitragupta/models/indent.dart';
-import 'package:chitragupta/models/product.dart';
+import 'package:chitragupta/models/product_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';

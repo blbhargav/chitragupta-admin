@@ -3,7 +3,7 @@ import 'package:chitragupta/extension/hover_extensions.dart';
 import 'package:chitragupta/extension/progress.dart';
 import 'package:chitragupta/models/City.dart';
 import 'package:chitragupta/models/category.dart';
-import 'package:chitragupta/models/product.dart';
+import 'package:chitragupta/models/product_model.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

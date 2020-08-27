@@ -4,7 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:chitragupta/extension/Constants.dart';
 import 'package:chitragupta/models/City.dart';
 import 'package:chitragupta/models/category.dart';
-import 'package:chitragupta/models/product.dart';
+import 'package:chitragupta/models/product_model.dart';
 import 'package:chitragupta/repository.dart';
 import 'package:equatable/equatable.dart';
 
