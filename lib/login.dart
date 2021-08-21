@@ -21,8 +21,6 @@ class _loginRootState extends State<loginRoot> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
-      //resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       body: Stack(
         children: <Widget>[Background(), Login(repository: widget.repository,)],

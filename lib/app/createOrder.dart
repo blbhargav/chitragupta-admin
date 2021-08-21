@@ -30,7 +30,6 @@ class _AddOrderScreenState extends State<AddOrderScreen> {
   Widget build(BuildContext context) {
     return ProgressHUD(
         child: Scaffold(
-          resizeToAvoidBottomPadding: true,
           key: globalKey,
           appBar: AppBar(
             title: Text("Add Order"),
